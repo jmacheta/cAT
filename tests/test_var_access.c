@@ -29,7 +29,7 @@ SOFTWARE.
 
 #include <assert.h>
 
-#include "../src/cat.h"
+#include <cat/cat.h>
 
 static char ack_results[256];
 
@@ -113,241 +113,58 @@ static int print_cmd_list(const struct cat_command *cmd)
 }
 
 static struct cat_variable vars_ro[] = {
-        {
-                .type = CAT_VAR_INT_DEC,
-                .data = &var2,
-                .data_size = sizeof(var2),
-                .write = var2_write,
-                .read = var2_read,
-                .access = CAT_VAR_ACCESS_READ_ONLY
-        }
+        { .type = CAT_VAR_INT_DEC, .data = &var2, .data_size = sizeof(var2), .write = var2_write, .read = var2_read, .access = CAT_VAR_ACCESS_READ_ONLY }
 };
 
 static struct cat_variable vars_wo[] = {
-        {
-                .type = CAT_VAR_INT_DEC,
-                .data = &var3,
-                .data_size = sizeof(var3),
-                .write = var3_write,
-                .read = var3_read,
-                .access = CAT_VAR_ACCESS_WRITE_ONLY
-        }
+        { .type = CAT_VAR_INT_DEC, .data = &var3, .data_size = sizeof(var3), .write = var3_write, .read = var3_read, .access = CAT_VAR_ACCESS_WRITE_ONLY }
 };
 
 static struct cat_variable vars[] = {
-        {
-                .type = CAT_VAR_INT_DEC,
-                .data = &var1,
-                .data_size = sizeof(var1),
-                .write = var1_write,
-                .read = var1_read,
-                .access = CAT_VAR_ACCESS_READ_WRITE
-        },
-        {
-                .type = CAT_VAR_INT_DEC,
-                .data = &var2,
-                .data_size = sizeof(var2),
-                .write = var2_write,
-                .read = var2_read,
-                .access = CAT_VAR_ACCESS_READ_ONLY
-        },
-        {
-                .type = CAT_VAR_INT_DEC,
-                .data = &var3,
-                .data_size = sizeof(var3),
-                .write = var3_write,
-                .read = var3_read,
-                .access = CAT_VAR_ACCESS_WRITE_ONLY
-        }
+        { .type = CAT_VAR_INT_DEC, .data = &var1, .data_size = sizeof(var1), .write = var1_write, .read = var1_read, .access = CAT_VAR_ACCESS_READ_WRITE },
+        { .type = CAT_VAR_INT_DEC, .data = &var2, .data_size = sizeof(var2), .write = var2_write, .read = var2_read, .access = CAT_VAR_ACCESS_READ_ONLY },
+        { .type = CAT_VAR_INT_DEC, .data = &var3, .data_size = sizeof(var3), .write = var3_write, .read = var3_read, .access = CAT_VAR_ACCESS_WRITE_ONLY }
 };
 
 static struct cat_variable vars_misc_ro[] = {
-        {
-                .type = CAT_VAR_INT_DEC,
-                .data = &var1,
-                .data_size = sizeof(var1),
-                .access = CAT_VAR_ACCESS_READ_WRITE
-        },
-        {
-                .type = CAT_VAR_INT_DEC,
-                .data = &var_int8,
-                .data_size = sizeof(var_int8),
-                .name = "x",
-                .access = CAT_VAR_ACCESS_READ_ONLY
-        },
-        {
-                .type = CAT_VAR_INT_DEC,
-                .data = &var_int16,
-                .data_size = sizeof(var_int16),
-                .name = "y",
-                .access = CAT_VAR_ACCESS_READ_ONLY
-        },
-        {
-                .type = CAT_VAR_INT_DEC,
-                .data = &var_int32,
-                .data_size = sizeof(var_int32),
-                .access = CAT_VAR_ACCESS_READ_ONLY
-        },
-        {
-                .type = CAT_VAR_UINT_DEC,
-                .data = &var_uint8,
-                .data_size = sizeof(var_uint8),
-                .access = CAT_VAR_ACCESS_READ_ONLY
-        },
-        {
-                .type = CAT_VAR_UINT_DEC,
-                .data = &var_uint16,
-                .data_size = sizeof(var_uint16),
-                .access = CAT_VAR_ACCESS_READ_ONLY
-        },
-        {
-                .type = CAT_VAR_UINT_DEC,
-                .data = &var_uint32,
-                .data_size = sizeof(var_uint32),
-                .access = CAT_VAR_ACCESS_READ_ONLY
-        },
-        {
-                .type = CAT_VAR_NUM_HEX,
-                .data = &var_hex8,
-                .data_size = sizeof(var_hex8),
-                .access = CAT_VAR_ACCESS_READ_ONLY
-        },
-        {
-                .type = CAT_VAR_NUM_HEX,
-                .data = &var_hex16,
-                .data_size = sizeof(var_hex16),
-                .access = CAT_VAR_ACCESS_READ_ONLY
-        },
-        {
-                .type = CAT_VAR_NUM_HEX,
-                .data = &var_hex32,
-                .data_size = sizeof(var_hex32),
-                .access = CAT_VAR_ACCESS_READ_ONLY
-        },
-        {
-                .type = CAT_VAR_BUF_HEX,
-                .data = &var_buf,
-                .data_size = sizeof(var_buf),
-                .access = CAT_VAR_ACCESS_READ_ONLY
-        },
-        {
-                .type = CAT_VAR_BUF_STRING,
-                .data = &var_string,
-                .data_size = sizeof(var_string),
-                .name = "msg",
-                .access = CAT_VAR_ACCESS_READ_ONLY
-        }
+        { .type = CAT_VAR_INT_DEC, .data = &var1, .data_size = sizeof(var1), .access = CAT_VAR_ACCESS_READ_WRITE },
+        { .type = CAT_VAR_INT_DEC, .data = &var_int8, .data_size = sizeof(var_int8), .name = "x", .access = CAT_VAR_ACCESS_READ_ONLY },
+        { .type = CAT_VAR_INT_DEC, .data = &var_int16, .data_size = sizeof(var_int16), .name = "y", .access = CAT_VAR_ACCESS_READ_ONLY },
+        { .type = CAT_VAR_INT_DEC, .data = &var_int32, .data_size = sizeof(var_int32), .access = CAT_VAR_ACCESS_READ_ONLY },
+        { .type = CAT_VAR_UINT_DEC, .data = &var_uint8, .data_size = sizeof(var_uint8), .access = CAT_VAR_ACCESS_READ_ONLY },
+        { .type = CAT_VAR_UINT_DEC, .data = &var_uint16, .data_size = sizeof(var_uint16), .access = CAT_VAR_ACCESS_READ_ONLY },
+        { .type = CAT_VAR_UINT_DEC, .data = &var_uint32, .data_size = sizeof(var_uint32), .access = CAT_VAR_ACCESS_READ_ONLY },
+        { .type = CAT_VAR_NUM_HEX, .data = &var_hex8, .data_size = sizeof(var_hex8), .access = CAT_VAR_ACCESS_READ_ONLY },
+        { .type = CAT_VAR_NUM_HEX, .data = &var_hex16, .data_size = sizeof(var_hex16), .access = CAT_VAR_ACCESS_READ_ONLY },
+        { .type = CAT_VAR_NUM_HEX, .data = &var_hex32, .data_size = sizeof(var_hex32), .access = CAT_VAR_ACCESS_READ_ONLY },
+        { .type = CAT_VAR_BUF_HEX, .data = &var_buf, .data_size = sizeof(var_buf), .access = CAT_VAR_ACCESS_READ_ONLY },
+        { .type = CAT_VAR_BUF_STRING, .data = &var_string, .data_size = sizeof(var_string), .name = "msg", .access = CAT_VAR_ACCESS_READ_ONLY }
 };
 
 static struct cat_variable vars_misc_wo[] = {
-        {
-                .type = CAT_VAR_INT_DEC,
-                .data = &var1,
-                .data_size = sizeof(var1),
-                .access = CAT_VAR_ACCESS_READ_WRITE
-        },
-        {
-                .type = CAT_VAR_INT_DEC,
-                .data = &var_int8,
-                .data_size = sizeof(var_int8),
-                .name = "x",
-                .access = CAT_VAR_ACCESS_WRITE_ONLY
-        },
-        {
-                .type = CAT_VAR_INT_DEC,
-                .data = &var_int16,
-                .data_size = sizeof(var_int16),
-                .name = "y",
-                .access = CAT_VAR_ACCESS_WRITE_ONLY
-        },
-        {
-                .type = CAT_VAR_INT_DEC,
-                .data = &var_int32,
-                .data_size = sizeof(var_int32),
-                .access = CAT_VAR_ACCESS_WRITE_ONLY
-        },
-        {
-                .type = CAT_VAR_UINT_DEC,
-                .data = &var_uint8,
-                .data_size = sizeof(var_uint8),
-                .access = CAT_VAR_ACCESS_WRITE_ONLY
-        },
-        {
-                .type = CAT_VAR_UINT_DEC,
-                .data = &var_uint16,
-                .data_size = sizeof(var_uint16),
-                .access = CAT_VAR_ACCESS_WRITE_ONLY
-        },
-        {
-                .type = CAT_VAR_UINT_DEC,
-                .data = &var_uint32,
-                .data_size = sizeof(var_uint32),
-                .access = CAT_VAR_ACCESS_WRITE_ONLY
-        },
-        {
-                .type = CAT_VAR_NUM_HEX,
-                .data = &var_hex8,
-                .data_size = sizeof(var_hex8),
-                .access = CAT_VAR_ACCESS_WRITE_ONLY
-        },
-        {
-                .type = CAT_VAR_NUM_HEX,
-                .data = &var_hex16,
-                .data_size = sizeof(var_hex16),
-                .access = CAT_VAR_ACCESS_WRITE_ONLY
-        },
-        {
-                .type = CAT_VAR_NUM_HEX,
-                .data = &var_hex32,
-                .data_size = sizeof(var_hex32),
-                .access = CAT_VAR_ACCESS_WRITE_ONLY
-        },
-        {
-                .type = CAT_VAR_BUF_HEX,
-                .data = &var_buf,
-                .data_size = sizeof(var_buf),
-                .access = CAT_VAR_ACCESS_WRITE_ONLY
-        },
-        {
-                .type = CAT_VAR_BUF_STRING,
-                .data = &var_string,
-                .data_size = sizeof(var_string),
-                .name = "msg",
-                .access = CAT_VAR_ACCESS_WRITE_ONLY
-        }
+        { .type = CAT_VAR_INT_DEC, .data = &var1, .data_size = sizeof(var1), .access = CAT_VAR_ACCESS_READ_WRITE },
+        { .type = CAT_VAR_INT_DEC, .data = &var_int8, .data_size = sizeof(var_int8), .name = "x", .access = CAT_VAR_ACCESS_WRITE_ONLY },
+        { .type = CAT_VAR_INT_DEC, .data = &var_int16, .data_size = sizeof(var_int16), .name = "y", .access = CAT_VAR_ACCESS_WRITE_ONLY },
+        { .type = CAT_VAR_INT_DEC, .data = &var_int32, .data_size = sizeof(var_int32), .access = CAT_VAR_ACCESS_WRITE_ONLY },
+        { .type = CAT_VAR_UINT_DEC, .data = &var_uint8, .data_size = sizeof(var_uint8), .access = CAT_VAR_ACCESS_WRITE_ONLY },
+        { .type = CAT_VAR_UINT_DEC, .data = &var_uint16, .data_size = sizeof(var_uint16), .access = CAT_VAR_ACCESS_WRITE_ONLY },
+        { .type = CAT_VAR_UINT_DEC, .data = &var_uint32, .data_size = sizeof(var_uint32), .access = CAT_VAR_ACCESS_WRITE_ONLY },
+        { .type = CAT_VAR_NUM_HEX, .data = &var_hex8, .data_size = sizeof(var_hex8), .access = CAT_VAR_ACCESS_WRITE_ONLY },
+        { .type = CAT_VAR_NUM_HEX, .data = &var_hex16, .data_size = sizeof(var_hex16), .access = CAT_VAR_ACCESS_WRITE_ONLY },
+        { .type = CAT_VAR_NUM_HEX, .data = &var_hex32, .data_size = sizeof(var_hex32), .access = CAT_VAR_ACCESS_WRITE_ONLY },
+        { .type = CAT_VAR_BUF_HEX, .data = &var_buf, .data_size = sizeof(var_buf), .access = CAT_VAR_ACCESS_WRITE_ONLY },
+        { .type = CAT_VAR_BUF_STRING, .data = &var_string, .data_size = sizeof(var_string), .name = "msg", .access = CAT_VAR_ACCESS_WRITE_ONLY }
 };
 
-static struct cat_command cmds[] = {
-        {
-                .name = "+VRW",
-                .var = vars,
-                .var_num = sizeof(vars) / sizeof(vars[0])
-        },
-        {
-                .name = "+VRO",
-                .var = vars_ro,
-                .var_num = sizeof(vars_ro) / sizeof(vars_ro[0])
-        },
-        {
-                .name = "+VWO",
-                .var = vars_wo,
-                .var_num = sizeof(vars_wo) / sizeof(vars_wo[0])
-        },
-        {
-                .name = "+MRO",
-                .var = vars_misc_ro,
-                .var_num = sizeof(vars_misc_ro) / sizeof(vars_misc_ro[0])
-        },
-        {
-                .name = "+MWO",
-                .var = vars_misc_wo,
-                .var_num = sizeof(vars_misc_wo) / sizeof(vars_misc_wo[0])
-        },
-        {
-                .name = "#HELP",
-                .run = print_cmd_list,
-        }
-};
+static struct cat_command cmds[] = { { .name = "+VRW", .var = vars, .var_num = sizeof(vars) / sizeof(vars[0]) },
+                                     { .name = "+VRO", .var = vars_ro, .var_num = sizeof(vars_ro) / sizeof(vars_ro[0]) },
+                                     { .name = "+VWO", .var = vars_wo, .var_num = sizeof(vars_wo) / sizeof(vars_wo[0]) },
+                                     { .name = "+MRO", .var = vars_misc_ro, .var_num = sizeof(vars_misc_ro) / sizeof(vars_misc_ro[0]) },
+                                     { .name = "+MWO", .var = vars_misc_wo, .var_num = sizeof(vars_misc_wo) / sizeof(vars_misc_wo[0]) },
+                                     {
+                                             .name = "#HELP",
+                                             .run = print_cmd_list,
+                                     } };
 
 static char buf[256];
 
@@ -356,9 +173,7 @@ static struct cat_command_group cmd_group = {
         .cmd_num = sizeof(cmds) / sizeof(cmds[0]),
 };
 
-static struct cat_command_group *cmd_desc[] = {
-        &cmd_group
-};
+static struct cat_command_group *cmd_desc[] = { &cmd_group };
 
 static struct cat_descriptor desc = {
         .cmd_group = cmd_desc,
@@ -387,10 +202,7 @@ static int read_char(char *ch)
         return 1;
 }
 
-static struct cat_io_interface iface = {
-        .read = read_char,
-        .write = write_char
-};
+static struct cat_io_interface iface = { .read = read_char, .write = write_char };
 
 static void prepare_input(const char *text)
 {
@@ -419,35 +231,43 @@ int main(int argc, char **argv)
         cat_init(&at, &desc, &iface, NULL);
 
         prepare_input("\nAT#HELP\n");
-        while (cat_service(&at) != 0) {};
+        while (cat_service(&at) != 0) {
+        };
 
-        assert(strcmp(ack_results, "\nAT+VRW?\nAT+VRW=\nAT+VRW=?\n\nAT+VRO?\nAT+VRO=?\n\nAT+VWO=\nAT+VWO=?\n\nAT+MRO?\nAT+MRO=\nAT+MRO=?\n\nAT+MWO?\nAT+MWO=\nAT+MWO=?\n\nAT#HELP\n\nOK\n") == 0);
+        assert(strcmp(ack_results,
+                      "\nAT+VRW?\nAT+VRW=\nAT+VRW=?\n\nAT+VRO?\nAT+VRO=?\n\nAT+VWO=\nAT+VWO=?\n\nAT+MRO?\nAT+MRO=\nAT+MRO=?\n\nAT+MWO?\nAT+MWO=\nAT+MWO=?\n\nAT#HELP\n\nOK\n") ==
+               0);
 
         prepare_input("\nAT+VRW=?\n");
-        while (cat_service(&at) != 0) {};
+        while (cat_service(&at) != 0) {
+        };
 
         assert(strcmp(ack_results, "\n+VRW=<INT8[RW]>,<INT8[RO]>,<INT8[WO]>\n\nOK\n") == 0);
 
         prepare_input("\nAT+VRO=?\n");
-        while (cat_service(&at) != 0) {};
+        while (cat_service(&at) != 0) {
+        };
 
         assert(strcmp(ack_results, "\n+VRO=<INT8[RO]>\n\nOK\n") == 0);
 
         prepare_input("\nAT+VWO=?\n");
-        while (cat_service(&at) != 0) {};
+        while (cat_service(&at) != 0) {
+        };
 
         assert(strcmp(ack_results, "\n+VWO=<INT8[WO]>\n\nOK\n") == 0);
 
         var2 = 1;
         prepare_input("\nAT+VRO=1\n");
-        while (cat_service(&at) != 0) {};
+        while (cat_service(&at) != 0) {
+        };
 
         assert(strcmp(ack_results, "\nERROR\n") == 0);
         assert(var2 == 1);
 
         var3 = 3;
         prepare_input("\nAT+VWO?\n");
-        while (cat_service(&at) != 0) {};
+        while (cat_service(&at) != 0) {
+        };
 
         assert(strcmp(ack_results, "\nERROR\n") == 0);
         assert(var3 == 3);
@@ -459,14 +279,16 @@ int main(int argc, char **argv)
         var3_read_cntr = 0;
 
         prepare_input("\nAT+VRW?\n");
-        while (cat_service(&at) != 0) {};
+        while (cat_service(&at) != 0) {
+        };
 
         assert(strcmp(ack_results, "\n+VRW=-1,-2,0\n\nOK\n") == 0);
         assert(var2_write_cntr == 0);
         assert(var3_read_cntr == 1);
 
         prepare_input("\nAT+VRW=1,2,3\n");
-        while (cat_service(&at) != 0) {};
+        while (cat_service(&at) != 0) {
+        };
 
         assert(strcmp(ack_results, "\nOK\n") == 0);
         assert(var2_write_cntr == 1);
@@ -492,12 +314,14 @@ int main(int argc, char **argv)
         strcpy(var_string, "test_string");
 
         prepare_input("\nAT+MWO?\n");
-        while (cat_service(&at) != 0) {};
+        while (cat_service(&at) != 0) {
+        };
 
         assert(strcmp(ack_results, "\n+MWO=100,0,0,0,0,0,0,0x00,0x0000,0x00000000,00000000,\"\"\n\nOK\n") == 0);
 
         prepare_input("\nAT+MWO=1,2,3,4,5,6,7,0x08,0x0009,0x0000000A,01020304,\"abc\"\n");
-        while (cat_service(&at) != 0) {};
+        while (cat_service(&at) != 0) {
+        };
 
         assert(strcmp(ack_results, "\nOK\n") == 0);
         assert(var1 == 1);
@@ -517,12 +341,14 @@ int main(int argc, char **argv)
         assert(strcmp(var_string, "abc") == 0);
 
         prepare_input("\nAT+MRO?\n");
-        while (cat_service(&at) != 0) {};
+        while (cat_service(&at) != 0) {
+        };
 
         assert(strcmp(ack_results, "\n+MRO=1,2,3,4,5,6,7,0x08,0x0009,0x0000000A,01020304,\"abc\"\n\nOK\n") == 0);
 
         prepare_input("\nAT+MRO=2,0,0,0,0,0,0,0x00,0x0000,0x00000000,00000000,\"cba\"\n");
-        while (cat_service(&at) != 0) {};
+        while (cat_service(&at) != 0) {
+        };
 
         assert(strcmp(ack_results, "\nOK\n") == 0);
         assert(var1 == 2);

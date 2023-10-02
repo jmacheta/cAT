@@ -29,7 +29,7 @@ SOFTWARE.
 
 #include <assert.h>
 
-#include "../src/cat.h"
+#include <cat/cat.h>
 
 static int ap_read(const struct cat_command *cmd, uint8_t *data, size_t *data_size, const size_t max_data_size)
 {
@@ -41,58 +41,18 @@ static int ap_write(const struct cat_command *cmd, const uint8_t *data, const si
         return 0;
 }
 
-static struct cat_variable vars_ap1[] = {
-        {
-                .name = "var_ap1_1"
-        },
-        {
-                .name = "var_ap1_2"
-        },
-        {
-                .name = "var_ap1_3"
-        }
-};
+static struct cat_variable vars_ap1[] = { { .name = "var_ap1_1" }, { .name = "var_ap1_2" }, { .name = "var_ap1_3" } };
 
-static struct cat_variable vars_apx2[] = {
-        {
-                .name = "var_apx2_1"
-        },
-        {
-                .name = "var_apx2_2"
-        },
-        {
-                .name = "var_apx2_3"
-        }
-};
+static struct cat_variable vars_apx2[] = { { .name = "var_apx2_1" }, { .name = "var_apx2_2" }, { .name = "var_apx2_3" } };
 
 static struct cat_command cmds[] = {
-        {
-                .name = "AP1",
-                .write = ap_write,
-                .only_test = true,
-                .var = vars_ap1,
-                .var_num = sizeof(vars_ap1) / sizeof(vars_ap1[0])
-        },
-        {
-                .name = "AP2",
-                .read = ap_read,
-                .only_test = false
-        },
+        { .name = "AP1", .write = ap_write, .only_test = true, .var = vars_ap1, .var_num = sizeof(vars_ap1) / sizeof(vars_ap1[0]) },
+        { .name = "AP2", .read = ap_read, .only_test = false },
 };
 
 static struct cat_command cmds2[] = {
-        {
-                .name = "APX1",
-                .write = ap_write,
-                .only_test = true
-        },
-        {
-                .name = "APX2",
-                .read = ap_read,
-                .only_test = false,
-                .var = vars_apx2,
-                .var_num = sizeof(vars_apx2) / sizeof(vars_apx2[0])
-        },
+        { .name = "APX1", .write = ap_write, .only_test = true },
+        { .name = "APX2", .read = ap_read, .only_test = false, .var = vars_apx2, .var_num = sizeof(vars_apx2) / sizeof(vars_apx2[0]) },
 };
 
 static char buf[128];
@@ -111,18 +71,13 @@ static struct cat_command_group cmd_group2 = {
         .cmd_num = sizeof(cmds2) / sizeof(cmds2[0]),
 };
 
-static struct cat_command_group *cmd_desc[] = {
-        &cmd_group1,
-        &cmd_group2
-};
+static struct cat_command_group *cmd_desc[] = { &cmd_group1, &cmd_group2 };
 
-static struct cat_descriptor desc = {
-        .cmd_group = cmd_desc,
-        .cmd_group_num = sizeof(cmd_desc) / sizeof(cmd_desc[0]),
+static struct cat_descriptor desc = { .cmd_group = cmd_desc,
+                                      .cmd_group_num = sizeof(cmd_desc) / sizeof(cmd_desc[0]),
 
-        .buf = buf,
-        .buf_size = sizeof(buf)
-};
+                                      .buf = buf,
+                                      .buf_size = sizeof(buf) };
 
 static int write_char(char ch)
 {
@@ -134,10 +89,7 @@ static int read_char(char *ch)
         return 1;
 }
 
-static struct cat_io_interface iface = {
-        .read = read_char,
-        .write = write_char
-};
+static struct cat_io_interface iface = { .read = read_char, .write = write_char };
 
 int main(int argc, char **argv)
 {

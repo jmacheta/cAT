@@ -29,8 +29,7 @@ SOFTWARE.
 
 #include <assert.h>
 
-#include "../src/cat.h"
-
+#include <cat/cat.h>
 static char run_results[256];
 static char ack_results[256];
 
@@ -58,50 +57,44 @@ static int e1_run(const struct cat_command *cmd)
         return 0;
 }
 
-static struct cat_command cmds1[] = {
-        {
-                .name = "E",
-                .run = e_run,
-        },
-        {
-                .name = "E0",
-                .run = e0_run,
-        },
-        {
-                .name = "E1",
-                .run = e1_run,
-        }
-};
+static struct cat_command cmds1[] = { {
+                                              .name = "E",
+                                              .run = e_run,
+                                      },
+                                      {
+                                              .name = "E0",
+                                              .run = e0_run,
+                                      },
+                                      {
+                                              .name = "E1",
+                                              .run = e1_run,
+                                      } };
 
-static struct cat_command cmds2[] = {
-        {
-                .name = "E0",
-                .run = e0_run,
-        },
-        {
-                .name = "E1",
-                .run = e1_run,
-        },
-        {
-                .name = "E",
-                .run = e_run,
-        }
-};
+static struct cat_command cmds2[] = { {
+                                              .name = "E0",
+                                              .run = e0_run,
+                                      },
+                                      {
+                                              .name = "E1",
+                                              .run = e1_run,
+                                      },
+                                      {
+                                              .name = "E",
+                                              .run = e_run,
+                                      } };
 
-static struct cat_command cmds3[] = {
-        {
-                .name = "E0",
-                .run = e0_run,
-        },
-        {
-                .name = "E",
-                .run = e_run,
-        },
-        {
-                .name = "E1",
-                .run = e1_run,
-        }
-};
+static struct cat_command cmds3[] = { {
+                                              .name = "E0",
+                                              .run = e0_run,
+                                      },
+                                      {
+                                              .name = "E",
+                                              .run = e_run,
+                                      },
+                                      {
+                                              .name = "E1",
+                                              .run = e1_run,
+                                      } };
 
 static char buf[128];
 
@@ -110,9 +103,7 @@ static struct cat_command_group cmd_1_group = {
         .cmd_num = sizeof(cmds1) / sizeof(cmds1[0]),
 };
 
-static struct cat_command_group *cmd_1_desc[] = {
-        &cmd_1_group
-};
+static struct cat_command_group *cmd_1_desc[] = { &cmd_1_group };
 
 static struct cat_descriptor desc_1 = {
         .cmd_group = cmd_1_desc,
@@ -127,9 +118,7 @@ static struct cat_command_group cmd_2_group = {
         .cmd_num = sizeof(cmds2) / sizeof(cmds2[0]),
 };
 
-static struct cat_command_group *cmd_2_desc[] = {
-        &cmd_2_group
-};
+static struct cat_command_group *cmd_2_desc[] = { &cmd_2_group };
 
 static struct cat_descriptor desc_2 = {
         .cmd_group = cmd_2_desc,
@@ -144,9 +133,7 @@ static struct cat_command_group cmd_3_group = {
         .cmd_num = sizeof(cmds3) / sizeof(cmds3[0]),
 };
 
-static struct cat_command_group *cmd_3_desc[] = {
-        &cmd_3_group
-};
+static struct cat_command_group *cmd_3_desc[] = { &cmd_3_group };
 
 static struct cat_descriptor desc_3 = {
         .cmd_group = cmd_3_desc,
@@ -175,10 +162,7 @@ static int read_char(char *ch)
         return 1;
 }
 
-static struct cat_io_interface iface = {
-        .read = read_char,
-        .write = write_char
-};
+static struct cat_io_interface iface = { .read = read_char, .write = write_char };
 
 static void prepare_input(const char *text)
 {
@@ -198,7 +182,8 @@ int main(int argc, char **argv)
         cat_init(&at, &desc_1, &iface, NULL);
 
         prepare_input(test_case_1);
-        while (cat_service(&at) != 0) {};
+        while (cat_service(&at) != 0) {
+        };
 
         assert(strcmp(ack_results, "\nOK\n\nOK\n\nOK\n") == 0);
         assert(strcmp(run_results, " E:E E0:E0 E1:E1") == 0);
@@ -206,7 +191,8 @@ int main(int argc, char **argv)
         cat_init(&at, &desc_2, &iface, NULL);
 
         prepare_input(test_case_1);
-        while (cat_service(&at) != 0) {};
+        while (cat_service(&at) != 0) {
+        };
 
         assert(strcmp(ack_results, "\nOK\n\nOK\n\nOK\n") == 0);
         assert(strcmp(run_results, " E:E E0:E0 E1:E1") == 0);
@@ -214,7 +200,8 @@ int main(int argc, char **argv)
         cat_init(&at, &desc_3, &iface, NULL);
 
         prepare_input(test_case_1);
-        while (cat_service(&at) != 0) {};
+        while (cat_service(&at) != 0) {
+        };
 
         assert(strcmp(ack_results, "\nOK\n\nOK\n\nOK\n") == 0);
         assert(strcmp(run_results, " E:E E0:E0 E1:E1") == 0);

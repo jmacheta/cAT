@@ -29,7 +29,7 @@ SOFTWARE.
 
 #include <assert.h>
 
-#include "../src/cat.h"
+#include <cat/cat.h>
 
 static char cmd_results[256];
 static char ack_results[256];
@@ -78,22 +78,8 @@ static int ap_write(const struct cat_command *cmd, const uint8_t *data, const si
 }
 
 static struct cat_command cmds[] = {
-        {
-                .name = "AP1",
-                .test = ap_test,
-                .write = ap_write,
-                .read = ap_read,
-                .run = ap_run,
-                .only_test = true
-        },
-        {
-                .name = "AP2",
-                .test = ap_test,
-                .write = ap_write,
-                .read = ap_read,
-                .run = ap_run,
-                .only_test = false
-        },
+        { .name = "AP1", .test = ap_test, .write = ap_write, .read = ap_read, .run = ap_run, .only_test = true },
+        { .name = "AP2", .test = ap_test, .write = ap_write, .read = ap_read, .run = ap_run, .only_test = false },
 };
 
 static char buf[128];
@@ -103,17 +89,13 @@ static struct cat_command_group cmd_group = {
         .cmd_num = sizeof(cmds) / sizeof(cmds[0]),
 };
 
-static struct cat_command_group *cmd_desc[] = {
-        &cmd_group
-};
+static struct cat_command_group *cmd_desc[] = { &cmd_group };
 
-static struct cat_descriptor desc = {
-        .cmd_group = cmd_desc,
-        .cmd_group_num = sizeof(cmd_desc) / sizeof(cmd_desc[0]),
+static struct cat_descriptor desc = { .cmd_group = cmd_desc,
+                                      .cmd_group_num = sizeof(cmd_desc) / sizeof(cmd_desc[0]),
 
-        .buf = buf,
-        .buf_size = sizeof(buf)
-};
+                                      .buf = buf,
+                                      .buf_size = sizeof(buf) };
 
 static int write_char(char ch)
 {
@@ -134,10 +116,7 @@ static int read_char(char *ch)
         return 1;
 }
 
-static struct cat_io_interface iface = {
-        .read = read_char,
-        .write = write_char
-};
+static struct cat_io_interface iface = { .read = read_char, .write = write_char };
 
 static void prepare_input(const char *text)
 {
@@ -158,13 +137,15 @@ int main(int argc, char **argv)
         cat_init(&at, &desc, &iface, NULL);
 
         prepare_input(test_case_1);
-        while (cat_service(&at) != 0) {};
+        while (cat_service(&at) != 0) {
+        };
 
         assert(strcmp(ack_results, "\nap_test\n\nOK\n\nERROR\n\nERROR\n\nERROR\n") == 0);
         assert(strcmp(cmd_results, " test:AP1") == 0);
 
         prepare_input(test_case_2);
-        while (cat_service(&at) != 0) {};
+        while (cat_service(&at) != 0) {
+        };
 
         assert(strcmp(ack_results, "\nap_test\n\nOK\n\nap_read\n\nOK\n\nOK\n\nOK\n") == 0);
         assert(strcmp(cmd_results, " test:AP2 read:AP2 write:AP2 run:AP2") == 0);

@@ -29,7 +29,7 @@ SOFTWARE.
 
 #include <assert.h>
 
-#include "../src/cat.h"
+#include <cat/cat.h>
 
 static char write_results[256];
 static char ack_results[256];
@@ -51,54 +51,33 @@ static int cmd_write(const struct cat_command *cmd, const uint8_t *data, const s
 static int var1_write(const struct cat_variable *var, size_t write_size)
 {
         assert(write_size == 1);
-        var1b = *(int8_t*)(var->data);
+        var1b = *(int8_t *)(var->data);
         return 0;
 }
 
 static int var2_write(const struct cat_variable *var, size_t write_size)
 {
         assert(write_size == 2);
-        var2b = *(int16_t*)(var->data);
+        var2b = *(int16_t *)(var->data);
         return 0;
 }
 
 static int var3_write(const struct cat_variable *var, size_t write_size)
 {
         assert(write_size == 4);
-        var3b = *(int32_t*)(var->data);
+        var3b = *(int32_t *)(var->data);
         return 0;
 }
 
-static struct cat_variable vars[] = {
-        {
-                .type = CAT_VAR_INT_DEC,
-                .data = &var1,
-                .data_size = sizeof(var1),
-                .write = var1_write
-        },
-        {
-                .type = CAT_VAR_INT_DEC,
-                .data = &var2,
-                .data_size = sizeof(var2),
-                .write = var2_write
-        },
-        {
-                .type = CAT_VAR_INT_DEC,
-                .data = &var3,
-                .data_size = sizeof(var3),
-                .write = var3_write
-        }
-};
+static struct cat_variable vars[] = { { .type = CAT_VAR_INT_DEC, .data = &var1, .data_size = sizeof(var1), .write = var1_write },
+                                      { .type = CAT_VAR_INT_DEC, .data = &var2, .data_size = sizeof(var2), .write = var2_write },
+                                      { .type = CAT_VAR_INT_DEC, .data = &var3, .data_size = sizeof(var3), .write = var3_write } };
 
-static struct cat_command cmds[] = {
-        {
-                .name = "+SET",
-                .write = cmd_write,
+static struct cat_command cmds[] = { { .name = "+SET",
+                                       .write = cmd_write,
 
-                .var = vars,
-                .var_num = sizeof(vars) / sizeof(vars[0])
-        }
-};
+                                       .var = vars,
+                                       .var_num = sizeof(vars) / sizeof(vars[0]) } };
 
 static char buf[128];
 
@@ -107,9 +86,7 @@ static struct cat_command_group cmd_group = {
         .cmd_num = sizeof(cmds) / sizeof(cmds[0]),
 };
 
-static struct cat_command_group *cmd_desc[] = {
-        &cmd_group
-};
+static struct cat_command_group *cmd_desc[] = { &cmd_group };
 
 static struct cat_descriptor desc = {
         .cmd_group = cmd_desc,
@@ -138,10 +115,7 @@ static int read_char(char *ch)
         return 1;
 }
 
-static struct cat_io_interface iface = {
-        .read = read_char,
-        .write = write_char
-};
+static struct cat_io_interface iface = { .read = read_char, .write = write_char };
 
 static void prepare_input(const char *text)
 {
@@ -170,7 +144,8 @@ int main(int argc, char **argv)
         cat_init(&at, &desc, &iface, NULL);
 
         prepare_input(test_case_1);
-        while (cat_service(&at) != 0) {};
+        while (cat_service(&at) != 0) {
+        };
 
         assert(strcmp(ack_results, "\nOK\n\nERROR\n\nOK\n\nERROR\n") == 0);
         assert(strcmp(write_results, " CMD:-128 CMD:127") == 0);
@@ -183,7 +158,8 @@ int main(int argc, char **argv)
         assert(var3b == -3);
 
         prepare_input(test_case_2);
-        while (cat_service(&at) != 0) {};
+        while (cat_service(&at) != 0) {
+        };
 
         assert(strcmp(ack_results, "\nOK\n\nERROR\n\nOK\n\nERROR\n") == 0);
         assert(strcmp(write_results, " CMD:-128,-32768 CMD:-128,32767") == 0);
@@ -196,7 +172,8 @@ int main(int argc, char **argv)
         assert(var3b == -3);
 
         prepare_input(test_case_3);
-        while (cat_service(&at) != 0) {};
+        while (cat_service(&at) != 0) {
+        };
 
         assert(strcmp(ack_results, "\nOK\n\nERROR\n\nOK\n\nERROR\n") == 0);
         assert(strcmp(write_results, " CMD:0,0,-2147483648 CMD:1,1,2147483647") == 0);

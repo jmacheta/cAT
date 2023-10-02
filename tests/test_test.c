@@ -29,7 +29,7 @@ SOFTWARE.
 
 #include <assert.h>
 
-#include "../src/cat.h"
+#include <cat/cat.h>
 
 static char test_results[256];
 static char ack_results[256];
@@ -90,28 +90,11 @@ static int test_test(const struct cat_command *cmd, uint8_t *data, size_t *data_
         return -1;
 }
 
-static struct cat_command cmds[] = {
-        {
-                .name = "A",
-                .test = a_test
-        },
-        {
-                .name = "AP",
-                .test = ap_test,
-                .write = ap_write
-        },
-        {
-                .name = "APW",
-                .write = apw_write
-        },
-        {
-                .name = "+TEST",
-                .test = test_test
-        },
-        {
-                .name = "+EMPTY"
-        }
-};
+static struct cat_command cmds[] = { { .name = "A", .test = a_test },
+                                     { .name = "AP", .test = ap_test, .write = ap_write },
+                                     { .name = "APW", .write = apw_write },
+                                     { .name = "+TEST", .test = test_test },
+                                     { .name = "+EMPTY" } };
 
 static char buf[128];
 
@@ -120,17 +103,13 @@ static struct cat_command_group cmd_group = {
         .cmd_num = sizeof(cmds) / sizeof(cmds[0]),
 };
 
-static struct cat_command_group *cmd_desc[] = {
-        &cmd_group
-};
+static struct cat_command_group *cmd_desc[] = { &cmd_group };
 
-static struct cat_descriptor desc = {
-        .cmd_group = cmd_desc,
-        .cmd_group_num = sizeof(cmd_desc) / sizeof(cmd_desc[0]),
+static struct cat_descriptor desc = { .cmd_group = cmd_desc,
+                                      .cmd_group_num = sizeof(cmd_desc) / sizeof(cmd_desc[0]),
 
-        .buf = buf,
-        .buf_size = sizeof(buf)
-};
+                                      .buf = buf,
+                                      .buf_size = sizeof(buf) };
 
 static int write_char(char ch)
 {
@@ -151,10 +130,7 @@ static int read_char(char *ch)
         return 1;
 }
 
-static struct cat_io_interface iface = {
-        .read = read_char,
-        .write = write_char
-};
+static struct cat_io_interface iface = { .read = read_char, .write = write_char };
 
 static void prepare_input(const char *text)
 {
@@ -174,7 +150,8 @@ int main(int argc, char **argv)
         cat_init(&at, &desc, &iface, NULL);
 
         prepare_input(test_case_1);
-        while (cat_service(&at) != 0) {};
+        while (cat_service(&at) != 0) {
+        };
 
         assert(strcmp(ack_results, "\r\nOK\r\n\nOK\n\nAP=\n\nOK\n\nERROR\n\nOK\n\nOK\n\nERROR\n\nA=A-val\n\nOK\n\nERROR\n") == 0);
         assert(strcmp(test_results, " AP:AP AP_W:AP APW:APW +TEST:+TEST A:A") == 0);

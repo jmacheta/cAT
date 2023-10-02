@@ -29,8 +29,7 @@ SOFTWARE.
 
 #include <assert.h>
 
-#include "../src/cat.h"
-
+#include <cat/cat.h>
 static char cmd_results[256];
 static char ack_results[256];
 
@@ -78,24 +77,15 @@ static cat_return_state cmd_write(const struct cat_command *cmd, const uint8_t *
         return ret;
 }
 
-static struct cat_variable vars[] = {
-        {
-                .name = "X",
-                .type = CAT_VAR_INT_DEC,
-                .data = &var_x,
-                .data_size = sizeof(var_x)
-        }
-};
+static struct cat_variable vars[] = { { .name = "X", .type = CAT_VAR_INT_DEC, .data = &var_x, .data_size = sizeof(var_x) } };
 
-static struct cat_command cmds[] = {
-        {
-                .name = "+CMD",
-                .write = cmd_write,
-                .read = cmd_read,
-                .var = vars,
-                .var_num = sizeof(vars) / sizeof(vars[0]),
-        }
-};
+static struct cat_command cmds[] = { {
+        .name = "+CMD",
+        .write = cmd_write,
+        .read = cmd_read,
+        .var = vars,
+        .var_num = sizeof(vars) / sizeof(vars[0]),
+} };
 
 static char buf[128];
 
@@ -104,9 +94,7 @@ static struct cat_command_group cmd_group = {
         .cmd_num = sizeof(cmds) / sizeof(cmds[0]),
 };
 
-static struct cat_command_group *cmd_desc[] = {
-        &cmd_group
-};
+static struct cat_command_group *cmd_desc[] = { &cmd_group };
 
 static struct cat_descriptor desc = {
         .cmd_group = cmd_desc,
@@ -135,10 +123,7 @@ static int read_char(char *ch)
         return 1;
 }
 
-static struct cat_io_interface iface = {
-        .read = read_char,
-        .write = write_char
-};
+static struct cat_io_interface iface = { .read = read_char, .write = write_char };
 
 static void prepare_input(const char *text)
 {
@@ -160,7 +145,8 @@ int main(int argc, char **argv)
 
         ret = CAT_RETURN_STATE_ERROR;
         prepare_input(test_case_1);
-        while (cat_service(&at) != 0) {};
+        while (cat_service(&at) != 0) {
+        };
 
         assert(strcmp(ack_results, "\nERROR\n") == 0);
         assert(strcmp(cmd_results, " write:+CMD") == 0);
@@ -168,7 +154,8 @@ int main(int argc, char **argv)
 
         ret = CAT_RETURN_STATE_DATA_OK;
         prepare_input(test_case_1);
-        while (cat_service(&at) != 0) {};
+        while (cat_service(&at) != 0) {
+        };
 
         assert(strcmp(ack_results, "\nOK\n") == 0);
         assert(strcmp(cmd_results, " write:+CMD") == 0);
@@ -176,7 +163,8 @@ int main(int argc, char **argv)
 
         ret = CAT_RETURN_STATE_DATA_NEXT;
         prepare_input(test_case_1);
-        while (cat_service(&at) != 0) {};
+        while (cat_service(&at) != 0) {
+        };
 
         assert(strcmp(ack_results, "\nOK\n") == 0);
         assert(strcmp(cmd_results, " write:+CMD write:+CMD") == 0);
@@ -184,7 +172,8 @@ int main(int argc, char **argv)
 
         ret = CAT_RETURN_STATE_NEXT;
         prepare_input(test_case_1);
-        while (cat_service(&at) != 0) {};
+        while (cat_service(&at) != 0) {
+        };
 
         assert(strcmp(ack_results, "\nOK\n") == 0);
         assert(strcmp(cmd_results, " write:+CMD write:+CMD") == 0);
@@ -192,7 +181,8 @@ int main(int argc, char **argv)
 
         ret = CAT_RETURN_STATE_OK;
         prepare_input(test_case_1);
-        while (cat_service(&at) != 0) {};
+        while (cat_service(&at) != 0) {
+        };
 
         assert(strcmp(ack_results, "\nOK\n") == 0);
         assert(strcmp(cmd_results, " write:+CMD") == 0);
@@ -201,7 +191,8 @@ int main(int argc, char **argv)
         ret_error = false;
         ret = CAT_RETURN_STATE_HOLD;
         prepare_input(test_case_1);
-        while (cat_service(&at) != 0) {};
+        while (cat_service(&at) != 0) {
+        };
 
         assert(strcmp(ack_results, "\n+CMD=2\n\n+CMD=3\n\ntest\n\nOK\n") == 0);
         assert(strcmp(cmd_results, " write:+CMD read:+CMD read:+CMD read:+CMD read:+CMD") == 0);
@@ -210,7 +201,8 @@ int main(int argc, char **argv)
         ret_error = true;
         ret = CAT_RETURN_STATE_HOLD;
         prepare_input(test_case_1);
-        while (cat_service(&at) != 0) {};
+        while (cat_service(&at) != 0) {
+        };
 
         assert(strcmp(ack_results, "\n+CMD=2\n\n+CMD=3\n\ntest\n\nERROR\n") == 0);
         assert(strcmp(cmd_results, " write:+CMD read:+CMD read:+CMD read:+CMD read:+CMD") == 0);
@@ -218,7 +210,8 @@ int main(int argc, char **argv)
 
         ret = CAT_RETURN_STATE_HOLD_EXIT_ERROR;
         prepare_input(test_case_1);
-        while (cat_service(&at) != 0) {};
+        while (cat_service(&at) != 0) {
+        };
 
         assert(strcmp(ack_results, "\nERROR\n") == 0);
         assert(strcmp(cmd_results, " write:+CMD") == 0);
@@ -226,7 +219,8 @@ int main(int argc, char **argv)
 
         ret = CAT_RETURN_STATE_HOLD_EXIT_OK;
         prepare_input(test_case_1);
-        while (cat_service(&at) != 0) {};
+        while (cat_service(&at) != 0) {
+        };
 
         assert(strcmp(ack_results, "\nERROR\n") == 0);
         assert(strcmp(cmd_results, " write:+CMD") == 0);

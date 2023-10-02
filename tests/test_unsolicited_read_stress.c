@@ -29,7 +29,7 @@ SOFTWARE.
 
 #include <assert.h>
 
-#include "../src/cat.h"
+#include <cat/cat.h>
 
 static char read_results[256];
 static char var_read_results[256];
@@ -61,43 +61,23 @@ static int var_read(const struct cat_variable *var)
         return 0;
 }
 
-static struct cat_variable u_vars[] = {
-        {
-                .name = "U1",
-                .type = CAT_VAR_INT_DEC,
-                .data = &var_u1,
-                .data_size = sizeof(var_u1),
-                .read = var_read
-        }
-};
+static struct cat_variable u_vars[] = { { .name = "U1", .type = CAT_VAR_INT_DEC, .data = &var_u1, .data_size = sizeof(var_u1), .read = var_read } };
 
-static struct cat_variable vars[] = {
-        {
-                .name = "X",
-                .type = CAT_VAR_INT_DEC,
-                .data = &var_x,
-                .data_size = sizeof(var_x),
-                .read = var_read
-        }
-};
+static struct cat_variable vars[] = { { .name = "X", .type = CAT_VAR_INT_DEC, .data = &var_x, .data_size = sizeof(var_x), .read = var_read } };
 
-static struct cat_command cmds[] = {
-        {
-                .name = "+CMD",
-                .read = cmd_read,
-                .var = vars,
-                .var_num = sizeof(vars) / sizeof(vars[0]),
-        }
-};
+static struct cat_command cmds[] = { {
+        .name = "+CMD",
+        .read = cmd_read,
+        .var = vars,
+        .var_num = sizeof(vars) / sizeof(vars[0]),
+} };
 
-static struct cat_command u_cmds[] = {
-        {
-                .name = "+UCMD",
-                .read = cmd_read,
-                .var = u_vars,
-                .var_num = sizeof(u_vars) / sizeof(u_vars[0]),
-        }
-};
+static struct cat_command u_cmds[] = { {
+        .name = "+UCMD",
+        .read = cmd_read,
+        .var = u_vars,
+        .var_num = sizeof(u_vars) / sizeof(u_vars[0]),
+} };
 
 static char buf[128];
 
@@ -106,9 +86,7 @@ static struct cat_command_group cmd_group = {
         .cmd_num = sizeof(cmds) / sizeof(cmds[0]),
 };
 
-static struct cat_command_group *cmd_desc[] = {
-        &cmd_group
-};
+static struct cat_command_group *cmd_desc[] = { &cmd_group };
 
 static struct cat_descriptor desc = {
         .cmd_group = cmd_desc,
@@ -137,10 +115,7 @@ static int read_char(char *ch)
         return 1;
 }
 
-static struct cat_io_interface iface = {
-        .read = read_char,
-        .write = write_char
-};
+static struct cat_io_interface iface = { .read = read_char, .write = write_char };
 
 static void prepare_input(const char *text)
 {
@@ -197,7 +172,8 @@ int main(int argc, char **argv)
                 assert(s == CAT_STATUS_BUSY);
         }
 
-        while (cat_service(&at) != 0) {};
+        while (cat_service(&at) != 0) {
+        };
         cmd = cat_get_processed_command(&at, CAT_FSM_TYPE_ATCMD);
         assert(cmd == NULL);
         cmd = cat_get_processed_command(&at, CAT_FSM_TYPE_UNSOLICITED);

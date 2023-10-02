@@ -29,7 +29,7 @@ SOFTWARE.
 
 #include <assert.h>
 
-#include "../src/cat.h"
+#include <cat/cat.h>
 
 static char run_results[256];
 static char ack_results[256];
@@ -45,26 +45,8 @@ static int print_name(const struct cat_command *cmd)
 }
 
 static struct cat_command cmds[] = {
-        {
-                .name = "+TEST",
-                .run = print_name
-        },
-        {
-                .name = "+TEST_A",
-                .run = print_name
-        },
-        {
-                .name = "+TEST_B",
-                .run = print_name
-        },
-        {
-                .name = "+ONE",
-                .run = print_name
-        },
-        {
-                .name = "+TWO",
-                .run = print_name
-        },
+        { .name = "+TEST", .run = print_name }, { .name = "+TEST_A", .run = print_name }, { .name = "+TEST_B", .run = print_name },
+        { .name = "+ONE", .run = print_name },  { .name = "+TWO", .run = print_name },
 };
 
 static char buf[256];
@@ -74,17 +56,13 @@ static struct cat_command_group cmd_group = {
         .cmd_num = sizeof(cmds) / sizeof(cmds[0]),
 };
 
-static struct cat_command_group *cmd_desc[] = {
-        &cmd_group
-};
+static struct cat_command_group *cmd_desc[] = { &cmd_group };
 
-static struct cat_descriptor desc = {
-        .cmd_group = cmd_desc,
-        .cmd_group_num = sizeof(cmd_desc) / sizeof(cmd_desc[0]),
+static struct cat_descriptor desc = { .cmd_group = cmd_desc,
+                                      .cmd_group_num = sizeof(cmd_desc) / sizeof(cmd_desc[0]),
 
-        .buf = buf,
-        .buf_size = sizeof(buf)
-};
+                                      .buf = buf,
+                                      .buf_size = sizeof(buf) };
 
 static int write_char(char ch)
 {
@@ -105,10 +83,7 @@ static int read_char(char *ch)
         return 1;
 }
 
-static struct cat_io_interface iface = {
-        .read = read_char,
-        .write = write_char
-};
+static struct cat_io_interface iface = { .read = read_char, .write = write_char };
 
 static void prepare_input(const char *text)
 {
@@ -140,7 +115,8 @@ int main(int argc, char **argv)
         cat_init(&at, &desc, &iface, NULL);
 
         prepare_input(test_case_1);
-        while (cat_service(&at) != 0) {};
+        while (cat_service(&at) != 0) {
+        };
 
         assert(strcmp(ack_results, "\nOK\n\nERROR\n\nERROR\n\nERROR\n\nERROR\n\nOK\n\nERROR\n\nOK\n\nOK\n\nOK\n\nOK\n\nOK\n\nOK\n\nOK\n") == 0);
         assert(strcmp(run_results, "+TEST +TEST_A +TEST_B +ONE +ONE +ONE +TWO +TWO ") == 0);

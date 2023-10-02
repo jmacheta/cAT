@@ -29,8 +29,7 @@ SOFTWARE.
 
 #include <assert.h>
 
-#include "../src/cat.h"
-
+#include <cat/cat.h>
 static char ack_results[256];
 
 static int8_t var_int;
@@ -63,66 +62,25 @@ static int common_var_read_handler(const struct cat_variable *var)
         return 0;
 }
 
-static struct cat_variable vars[] = {
-        {
-                .type = CAT_VAR_INT_DEC,
-                .data = &var_int,
-                .data_size = sizeof(var_int),
-                .read = common_var_read_handler
-        },
-        {
-                .type = CAT_VAR_UINT_DEC,
-                .data = &var_uint,
-                .data_size = sizeof(var_uint),
-                .read = common_var_read_handler
-        },
-        {
-                .type = CAT_VAR_NUM_HEX,
-                .data = &var_hex8,
-                .data_size = sizeof(var_hex8),
-                .read = common_var_read_handler
-        },
-        {
-                .type = CAT_VAR_NUM_HEX,
-                .data = &var_hex16,
-                .data_size = sizeof(var_hex16),
-                .read = common_var_read_handler
-        },
-        {
-                .type = CAT_VAR_NUM_HEX,
-                .data = &var_hex32,
-                .data_size = sizeof(var_hex32),
-                .read = common_var_read_handler
-        },
-        {
-                .type = CAT_VAR_BUF_HEX,
-                .data = &var_buf,
-                .data_size = sizeof(var_buf),
-                .read = common_var_read_handler
-        },
-        {
-                .type = CAT_VAR_BUF_STRING,
-                .data = &var_string,
-                .data_size = sizeof(var_string),
-                .read = common_var_read_handler
-        }
-};
+static struct cat_variable vars[] = { { .type = CAT_VAR_INT_DEC, .data = &var_int, .data_size = sizeof(var_int), .read = common_var_read_handler },
+                                      { .type = CAT_VAR_UINT_DEC, .data = &var_uint, .data_size = sizeof(var_uint), .read = common_var_read_handler },
+                                      { .type = CAT_VAR_NUM_HEX, .data = &var_hex8, .data_size = sizeof(var_hex8), .read = common_var_read_handler },
+                                      { .type = CAT_VAR_NUM_HEX, .data = &var_hex16, .data_size = sizeof(var_hex16), .read = common_var_read_handler },
+                                      { .type = CAT_VAR_NUM_HEX, .data = &var_hex32, .data_size = sizeof(var_hex32), .read = common_var_read_handler },
+                                      { .type = CAT_VAR_BUF_HEX, .data = &var_buf, .data_size = sizeof(var_buf), .read = common_var_read_handler },
+                                      { .type = CAT_VAR_BUF_STRING, .data = &var_string, .data_size = sizeof(var_string), .read = common_var_read_handler } };
 
 static struct cat_command cmds[] = {
-        {
-                .name = "+SET",
-                .read = cmd_read,
+        { .name = "+SET",
+          .read = cmd_read,
 
-                .var = vars,
-                .var_num = sizeof(vars) / sizeof(vars[0])
-        },
-        {
-                .name = "+TEST",
-                .read = cmd2_read,
+          .var = vars,
+          .var_num = sizeof(vars) / sizeof(vars[0]) },
+        { .name = "+TEST",
+          .read = cmd2_read,
 
-                .var = vars,
-                .var_num = sizeof(vars) / sizeof(vars[0])
-        },
+          .var = vars,
+          .var_num = sizeof(vars) / sizeof(vars[0]) },
 };
 
 static char buf[128];
@@ -132,17 +90,13 @@ static struct cat_command_group cmd_group = {
         .cmd_num = sizeof(cmds) / sizeof(cmds[0]),
 };
 
-static struct cat_command_group *cmd_desc[] = {
-        &cmd_group
-};
+static struct cat_command_group *cmd_desc[] = { &cmd_group };
 
-static struct cat_descriptor desc = {
-        .cmd_group = cmd_desc,
-        .cmd_group_num = sizeof(cmd_desc) / sizeof(cmd_desc[0]),
+static struct cat_descriptor desc = { .cmd_group = cmd_desc,
+                                      .cmd_group_num = sizeof(cmd_desc) / sizeof(cmd_desc[0]),
 
-        .buf = buf,
-        .buf_size = sizeof(buf)
-};
+                                      .buf = buf,
+                                      .buf_size = sizeof(buf) };
 
 static int write_char(char ch)
 {
@@ -163,10 +117,7 @@ static int read_char(char *ch)
         return 1;
 }
 
-static struct cat_io_interface iface = {
-        .read = read_char,
-        .write = write_char
-};
+static struct cat_io_interface iface = { .read = read_char, .write = write_char };
 
 static void prepare_input(const char *text)
 {
@@ -201,13 +152,15 @@ int main(int argc, char **argv)
         cat_init(&at, &desc, &iface, NULL);
 
         prepare_input(test_case_1);
-        while (cat_service(&at) != 0) {};
+        while (cat_service(&at) != 0) {
+        };
 
         assert(strcmp(ack_results, "\r\n+SET=-1,255,0xAA,0x0123,0xFF001234,12345678,\"\\\\\\\"test\\n\"\r\n\r\nOK\r\n") == 0);
         assert(common_cntr == 7);
 
         prepare_input(test_case_2);
-        while (cat_service(&at) != 0) {};
+        while (cat_service(&at) != 0) {
+        };
 
         assert(strcmp(ack_results, "\n+TEST=test\n\nOK\n") == 0);
         assert(common_cntr == 7);

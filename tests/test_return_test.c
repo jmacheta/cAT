@@ -29,8 +29,7 @@ SOFTWARE.
 
 #include <assert.h>
 
-#include "../src/cat.h"
-
+#include <cat/cat.h>
 static char cmd_results[256];
 static char ack_results[256];
 
@@ -72,23 +71,14 @@ static cat_return_state cmd_test(const struct cat_command *cmd, uint8_t *data, s
         return ret;
 }
 
-static struct cat_variable vars[] = {
-        {
-                .name = "X",
-                .type = CAT_VAR_INT_DEC,
-                .data = &var_x,
-                .data_size = sizeof(var_x)
-        }
-};
+static struct cat_variable vars[] = { { .name = "X", .type = CAT_VAR_INT_DEC, .data = &var_x, .data_size = sizeof(var_x) } };
 
-static struct cat_command cmds[] = {
-        {
-                .name = "+CMD",
-                .test = cmd_test,
-                .var = vars,
-                .var_num = sizeof(vars) / sizeof(vars[0]),
-        }
-};
+static struct cat_command cmds[] = { {
+        .name = "+CMD",
+        .test = cmd_test,
+        .var = vars,
+        .var_num = sizeof(vars) / sizeof(vars[0]),
+} };
 
 static char buf[128];
 
@@ -97,9 +87,7 @@ static struct cat_command_group cmd_group = {
         .cmd_num = sizeof(cmds) / sizeof(cmds[0]),
 };
 
-static struct cat_command_group *cmd_desc[] = {
-        &cmd_group
-};
+static struct cat_command_group *cmd_desc[] = { &cmd_group };
 
 static struct cat_descriptor desc = {
         .cmd_group = cmd_desc,
@@ -128,10 +116,7 @@ static int read_char(char *ch)
         return 1;
 }
 
-static struct cat_io_interface iface = {
-        .read = read_char,
-        .write = write_char
-};
+static struct cat_io_interface iface = { .read = read_char, .write = write_char };
 
 static void prepare_input(const char *text)
 {
@@ -153,35 +138,40 @@ int main(int argc, char **argv)
 
         ret = CAT_RETURN_STATE_ERROR;
         prepare_input(test_case_1);
-        while (cat_service(&at) != 0) {};
+        while (cat_service(&at) != 0) {
+        };
 
         assert(strcmp(ack_results, "\nERROR\n") == 0);
         assert(strcmp(cmd_results, " test:+CMD") == 0);
 
         ret = CAT_RETURN_STATE_DATA_OK;
         prepare_input(test_case_1);
-        while (cat_service(&at) != 0) {};
+        while (cat_service(&at) != 0) {
+        };
 
         assert(strcmp(ack_results, "\n+CMD=<X:INT32[RW]>\n\nOK\n") == 0);
         assert(strcmp(cmd_results, " test:+CMD") == 0);
 
         ret = CAT_RETURN_STATE_DATA_NEXT;
         prepare_input(test_case_1);
-        while (cat_service(&at) != 0) {};
+        while (cat_service(&at) != 0) {
+        };
 
         assert(strcmp(ack_results, "\n+CMD=<X:INT32[RW]>\n\n+CMD=<X:INT32[RW]>\n\nOK\n") == 0);
         assert(strcmp(cmd_results, " test:+CMD test:+CMD") == 0);
 
         ret = CAT_RETURN_STATE_NEXT;
         prepare_input(test_case_1);
-        while (cat_service(&at) != 0) {};
+        while (cat_service(&at) != 0) {
+        };
 
         assert(strcmp(ack_results, "\n+CMD=<X:INT32[RW]>\n\nOK\n") == 0);
         assert(strcmp(cmd_results, " test:+CMD test:+CMD") == 0);
 
         ret = CAT_RETURN_STATE_OK;
         prepare_input(test_case_1);
-        while (cat_service(&at) != 0) {};
+        while (cat_service(&at) != 0) {
+        };
 
         assert(strcmp(ack_results, "\nOK\n") == 0);
         assert(strcmp(cmd_results, " test:+CMD") == 0);
@@ -189,7 +179,8 @@ int main(int argc, char **argv)
         ret_error = false;
         ret = CAT_RETURN_STATE_HOLD;
         prepare_input(test_case_1);
-        while (cat_service(&at) != 0) {};
+        while (cat_service(&at) != 0) {
+        };
 
         assert(strcmp(ack_results, "\n+CMD=<X:INT32[RW]>\n\n+CMD=<X:INT32[RW]>\n\ntest\n\nOK\n") == 0);
         assert(strcmp(cmd_results, " test:+CMD test:+CMD test:+CMD test:+CMD test:+CMD") == 0);
@@ -197,7 +188,8 @@ int main(int argc, char **argv)
         ret_error = true;
         ret = CAT_RETURN_STATE_HOLD;
         prepare_input(test_case_1);
-        while (cat_service(&at) != 0) {};
+        while (cat_service(&at) != 0) {
+        };
 
         assert(strcmp(ack_results, "\n+CMD=<X:INT32[RW]>\n\n+CMD=<X:INT32[RW]>\n\ntest\n\nERROR\n") == 0);
         assert(strcmp(cmd_results, " test:+CMD test:+CMD test:+CMD test:+CMD test:+CMD") == 0);
