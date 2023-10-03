@@ -42,8 +42,11 @@ static struct cat_object at;
 
 static struct cat_command u_cmds[];
 
-static cat_return_state cmd_write(const struct cat_command *cmd, const uint8_t *data, const size_t data_size, const size_t args_num)
+static cat_return_state cmd_write(const struct cat_command *cmd, const uint8_t *data, size_t data_size, size_t args_num)
 {
+        (void)data; // Unused
+        (void)data_size; // Unused
+        (void)args_num; // Unused
         cat_status s;
 
         strcat(cmd_results, " write:");
@@ -59,8 +62,11 @@ static cat_return_state cmd_write(const struct cat_command *cmd, const uint8_t *
         return CAT_RETURN_STATE_ERROR;
 }
 
-static cat_return_state cmd1_read(const struct cat_command *cmd, uint8_t *data, size_t *data_size, const size_t max_data_size)
+static cat_return_state cmd1_read(const struct cat_command *cmd, uint8_t *data, size_t *data_size, size_t max_data_size)
 {
+        (void)data; // Unused
+        (void)data_size; // Unused
+        (void)max_data_size; // Unused
         cat_status s;
 
         strcat(cmd_results, " read1:");
@@ -76,8 +82,11 @@ static cat_return_state cmd1_read(const struct cat_command *cmd, uint8_t *data, 
         return CAT_RETURN_STATE_HOLD_EXIT_OK;
 }
 
-static cat_return_state cmd2_read(const struct cat_command *cmd, uint8_t *data, size_t *data_size, const size_t max_data_size)
+static cat_return_state cmd2_read(const struct cat_command *cmd, uint8_t *data, size_t *data_size, size_t max_data_size)
 {
+        (void)data; // Unused
+        (void)data_size; // Unused
+        (void)max_data_size; // Unused
         cat_status s;
 
         strcat(cmd_results, " read2:");
@@ -127,7 +136,7 @@ static struct cat_command u_cmds[] = { {
                                                .var_num = 1,
                                        } };
 
-static char buf[128];
+static uint8_t buf[128];
 
 static struct cat_command_group cmd_group = {
         .cmd = cmds,
@@ -180,10 +189,8 @@ static void prepare_input(const char *text)
 
 static const char test_case_1[] = "\nAT+CMD=0\n\nAT+CMD=1\n";
 
-int main(int argc, char **argv)
+int main(void)
 {
-        cat_status s;
-
         cat_init(&at, &desc, &iface, NULL);
 
         prepare_input(test_case_1);

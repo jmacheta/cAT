@@ -59,7 +59,7 @@ static int test_run(const struct cat_command *cmd)
 
 static struct cat_command cmds[] = { { .name = "A", .run = a_run }, { .name = "AP", .run = ap_run }, { .name = "+TEST", .run = test_run } };
 
-static char buf[128];
+static uint8_t buf[128];
 
 static struct cat_command_group cmd_group = {
         .cmd = cmds,
@@ -126,7 +126,7 @@ static void prepare_input(const char *text)
 
 static const char test_case_1[] = "\nAT\nAT+test\n";
 
-int main(int argc, char **argv)
+int main(void)
 {
         struct cat_object at;
 

@@ -55,17 +55,17 @@ static uint32_t var_hex32;
 static uint8_t var_buf[4];
 static char var_string[16];
 
-static int cmd_write(const struct cat_command *cmd, const uint8_t *data, const size_t data_size, const size_t args_num)
+static int cmd_write(const struct cat_command *cmd, const uint8_t *data, size_t data_size, size_t args_num)
 {
         return 0;
 }
 
-static int cmd_read(const struct cat_command *cmd, uint8_t *data, size_t *data_size, const size_t max_data_size)
+static int cmd_read(const struct cat_command *cmd, uint8_t *data, size_t *data_size, size_t max_data_size)
 {
         return 0;
 }
 
-static int cmd_test(const struct cat_command *cmd, uint8_t *data, size_t *data_size, const size_t max_data_size)
+static int cmd_test(const struct cat_command *cmd, uint8_t *data, size_t *data_size, size_t max_data_size)
 {
         return 0;
 }
@@ -166,7 +166,7 @@ static struct cat_command cmds[] = { { .name = "+VRW", .var = vars, .var_num = s
                                              .run = print_cmd_list,
                                      } };
 
-static char buf[256];
+static uint8_t buf[256];
 
 static struct cat_command_group cmd_group = {
         .cmd = cmds,
@@ -224,7 +224,7 @@ static void print_raw_text(char *p)
         }
 }
 
-int main(int argc, char **argv)
+int main(void)
 {
         struct cat_object at;
 

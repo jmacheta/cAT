@@ -44,13 +44,20 @@ static char const *input_text;
 static size_t input_index;
 static int common_cntr;
 
-static int cmd_read(const struct cat_command *cmd, uint8_t *data, size_t *data_size, const size_t max_data_size)
+static int cmd_read(const struct cat_command *cmd, char *data, size_t *data_size, size_t max_data_size)
 {
+        (void)cmd; // Unused
+        (void)data; // Unused
+        (void)data_size; // Unused
+        (void)max_data_size; // Unused
         return 0;
 }
 
-static int cmd2_read(const struct cat_command *cmd, uint8_t *data, size_t *data_size, const size_t max_data_size)
+static int cmd2_read(const struct cat_command *cmd, char *data, size_t *data_size, size_t max_data_size)
 {
+        (void)data_size; // Unused
+        (void)max_data_size; // Unused
+
         sprintf(data, "%s=test", cmd->name);
         *data_size = strlen(data);
         return 0;
@@ -58,6 +65,7 @@ static int cmd2_read(const struct cat_command *cmd, uint8_t *data, size_t *data_
 
 static int common_var_read_handler(const struct cat_variable *var)
 {
+        (void)var; // Unused
         common_cntr++;
         return 0;
 }
@@ -83,7 +91,7 @@ static struct cat_command cmds[] = {
           .var_num = sizeof(vars) / sizeof(vars[0]) },
 };
 
-static char buf[128];
+static uint8_t buf[128];
 
 static struct cat_command_group cmd_group = {
         .cmd = cmds,
@@ -145,7 +153,7 @@ static void prepare_input(const char *text)
 static const char test_case_1[] = "\nAT+SET?\r\n";
 static const char test_case_2[] = "\nAT+TEST?\n";
 
-int main(int argc, char **argv)
+int main(void)
 {
         struct cat_object at;
 

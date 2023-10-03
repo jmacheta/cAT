@@ -49,7 +49,7 @@ static struct cat_command cmds[] = {
         { .name = "+ONE", .run = print_name },  { .name = "+TWO", .run = print_name },
 };
 
-static char buf[256];
+static uint8_t buf[256];
 
 static struct cat_command_group cmd_group = {
         .cmd = cmds,
@@ -96,19 +96,8 @@ static void prepare_input(const char *text)
 
 static const char test_case_1[] = "\nAT\nAT+\nAT+T\nAT+TE\nAT+TES\nAT+TEST\nAT+TEST_\nAT+TEST_A\nAT+TEST_B\nAT+O\nAT+ON\nAT+ONE\nAT+TW\nAT+TWO\n";
 
-static void print_raw_text(char *p)
-{
-        while (*p != '\0') {
-                if (*p == '\n') {
-                        printf("\\n");
-                } else {
-                        putchar(*p);
-                }
-                p++;
-        }
-}
 
-int main(int argc, char **argv)
+int main(void)
 {
         struct cat_object at;
 

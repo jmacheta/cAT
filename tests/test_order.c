@@ -96,7 +96,7 @@ static struct cat_command cmds3[] = { {
                                               .run = e1_run,
                                       } };
 
-static char buf[128];
+static uint8_t buf[128];
 
 static struct cat_command_group cmd_1_group = {
         .cmd = cmds1,
@@ -175,7 +175,7 @@ static void prepare_input(const char *text)
 
 static const char test_case_1[] = "\nATE\n\nATE0\n\nATE1\n";
 
-int main(int argc, char **argv)
+int main(void)
 {
         struct cat_object at;
 

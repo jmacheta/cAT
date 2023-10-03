@@ -42,7 +42,7 @@ static struct cat_object at;
 
 static struct cat_command u_cmds[];
 
-static cat_return_state cmd_test(const struct cat_command *cmd, uint8_t *data, size_t *data_size, const size_t max_data_size)
+static cat_return_state cmd_test(const struct cat_command *cmd, uint8_t *data, size_t *data_size, size_t max_data_size)
 {
         cat_status s;
 
@@ -82,7 +82,7 @@ static struct cat_command u_cmds[] = { {
                                                .var_num = 1,
                                        } };
 
-static char buf[128];
+static uint8_t buf[128];
 
 static struct cat_command_group cmd_group = {
         .cmd = cmds,
@@ -135,7 +135,7 @@ static void prepare_input(const char *text)
 
 static const char test_case_1[] = "\nAT+CMD=?\n";
 
-int main(int argc, char **argv)
+int main(void)
 {
         cat_status s;
 

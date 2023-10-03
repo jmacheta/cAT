@@ -45,8 +45,10 @@ static int a_run(const struct cat_command *cmd)
         return 0;
 }
 
-static int a_write(const struct cat_command *cmd, const uint8_t *data, const size_t data_size, const size_t args_num)
+static int a_write(const struct cat_command *cmd, const char *data, size_t data_size, size_t args_num)
 {
+        (void)args_num; // Mark as unused
+        (void)cmd; // Mark as unused
         strcat(write_results, " A:");
         strncat(write_results, data, data_size);
 
@@ -55,8 +57,10 @@ static int a_write(const struct cat_command *cmd, const uint8_t *data, const siz
         return 0;
 }
 
-static int ap_write(const struct cat_command *cmd, const uint8_t *data, const size_t data_size, const size_t args_num)
+static int ap_write(const struct cat_command *cmd, const char *data, size_t data_size, size_t args_num)
 {
+        (void)args_num; // Mark as unused
+        (void)cmd; // Mark as unused
         strcat(write_results, " AP:");
         strncat(write_results, data, data_size);
 
@@ -65,8 +69,10 @@ static int ap_write(const struct cat_command *cmd, const uint8_t *data, const si
         return 0;
 }
 
-static int test_write(const struct cat_command *cmd, const uint8_t *data, const size_t data_size, const size_t args_num)
+static int test_write(const struct cat_command *cmd, const char *data, size_t data_size, size_t args_num)
 {
+        (void)args_num; // Mark as unused
+        (void)cmd; // Mark as unused
         strcat(write_results, " +TEST:");
         strncat(write_results, data, data_size);
 
@@ -80,7 +86,7 @@ static struct cat_command cmds[] = { { .name = "A", .write = a_write, .run = a_r
                                      { .name = "+TEST", .write = test_write },
                                      { .name = "+EMPTY" } };
 
-static char buf[128];
+static uint8_t buf[128];
 
 static struct cat_command_group cmd_group = {
         .cmd = cmds,
@@ -128,7 +134,7 @@ static void prepare_input(const char *text)
 
 static const char test_case_1[] = "\nAT\nAT+\nAT+?\nATA=123\r\nATA=\nATAP?\nATAP=11\r22\r\nAT+TEST=456\nAT+te=789\nAT+e=1\nAT+empTY=2\r\nATA\n";
 
-int main(int argc, char **argv)
+int main(void)
 {
         struct cat_object at;
 

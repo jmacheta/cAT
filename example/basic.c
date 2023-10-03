@@ -29,7 +29,7 @@ SOFTWARE.
 
 #include <assert.h>
 
-#include "../src/cat.h"
+#include <cat/cat.h>
 
 /* variables assigned to print command */
 static uint8_t x;
@@ -60,48 +60,41 @@ static int quit_run(const struct cat_command *cmd)
 }
 
 /* declaring print variables array */
-static struct cat_variable print_vars[] = {
-        {
-                .type = CAT_VAR_UINT_DEC,
-                .data = &x,
-                .data_size = sizeof(x),
-                .name = "X",
-                .access = CAT_VAR_ACCESS_READ_WRITE,
-        },
-        {
-                .type = CAT_VAR_UINT_DEC,
-                .data = &y,
-                .data_size = sizeof(y),
-                .name = "Y",
-                .access = CAT_VAR_ACCESS_READ_WRITE,
-        },
-        {
-                .type = CAT_VAR_BUF_STRING,
-                .data = message,
-                .data_size = sizeof(message),
-                .name = "MESSAGE",
-                .access = CAT_VAR_ACCESS_READ_WRITE,
-        }
-};
+static struct cat_variable print_vars[] = { {
+                                                    .type = CAT_VAR_UINT_DEC,
+                                                    .data = &x,
+                                                    .data_size = sizeof(x),
+                                                    .name = "X",
+                                                    .access = CAT_VAR_ACCESS_READ_WRITE,
+                                            },
+                                            {
+                                                    .type = CAT_VAR_UINT_DEC,
+                                                    .data = &y,
+                                                    .data_size = sizeof(y),
+                                                    .name = "Y",
+                                                    .access = CAT_VAR_ACCESS_READ_WRITE,
+                                            },
+                                            {
+                                                    .type = CAT_VAR_BUF_STRING,
+                                                    .data = message,
+                                                    .data_size = sizeof(message),
+                                                    .name = "MESSAGE",
+                                                    .access = CAT_VAR_ACCESS_READ_WRITE,
+                                            } };
 
 /* declaring commands array */
 static struct cat_command cmds[] = {
-        {
-                .name = "+PRINT",
-                .description = "Printing something special at (X,Y).",
-                .run = print_run,
-                .var = print_vars,
-                .var_num = sizeof(print_vars) / sizeof(print_vars[0]),
-                .need_all_vars = true
-        },
+        { .name = "+PRINT",
+          .description = "Printing something special at (X,Y).",
+          .run = print_run,
+          .var = print_vars,
+          .var_num = sizeof(print_vars) / sizeof(print_vars[0]),
+          .need_all_vars = true },
         {
                 .name = "#HELP",
                 .run = print_cmd_list,
         },
-        {
-                .name = "#QUIT",
-                .run = quit_run
-        },
+        { .name = "#QUIT", .run = quit_run },
 };
 
 /* working buffer */
@@ -113,17 +106,13 @@ static struct cat_command_group cmd_group = {
         .cmd_num = sizeof(cmds) / sizeof(cmds[0]),
 };
 
-static struct cat_command_group *cmd_desc[] = {
-        &cmd_group
-};
+static struct cat_command_group *cmd_desc[] = { &cmd_group };
 
-static struct cat_descriptor desc = {
-        .cmd_group = cmd_desc,
-        .cmd_group_num = sizeof(cmd_desc) / sizeof(cmd_desc[0]),
+static struct cat_descriptor desc = { .cmd_group = cmd_desc,
+                                      .cmd_group_num = sizeof(cmd_desc) / sizeof(cmd_desc[0]),
 
-        .buf = buf,
-        .buf_size = sizeof(buf)
-};
+                                      .buf = buf,
+                                      .buf_size = sizeof(buf) };
 
 /* custom target dependent input output handlers */
 static int write_char(char ch)
@@ -139,12 +128,9 @@ static int read_char(char *ch)
 }
 
 /* declaring input output interface descriptor for parser */
-static struct cat_io_interface iface = {
-        .read = read_char,
-        .write = write_char
-};
+static struct cat_io_interface iface = { .read = read_char, .write = write_char };
 
-int main(int argc, char **argv)
+int main(void)
 {
         struct cat_object at;
 
@@ -152,7 +138,8 @@ int main(int argc, char **argv)
         cat_init(&at, &desc, &iface, NULL);
 
         /* main loop with exit code conditions */
-        while ((cat_service(&at) != 0) && (quit_flag == 0)) {};
+        while ((cat_service(&at) != 0) && (quit_flag == 0)) {
+        };
 
         /* goodbye message */
         printf("Bye!\n");

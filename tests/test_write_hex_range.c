@@ -41,7 +41,7 @@ static uint32_t var3, var3b;
 static char const *input_text;
 static size_t input_index;
 
-static int cmd_write(const struct cat_command *cmd, const uint8_t *data, const size_t data_size, const size_t args_num)
+static int cmd_write(const struct cat_command *cmd, const uint8_t *data, size_t data_size, size_t args_num)
 {
         strcat(write_results, " CMD:");
         strncat(write_results, data, data_size);
@@ -79,7 +79,7 @@ static struct cat_command cmds[] = { { .name = "+SET",
                                        .var = vars,
                                        .var_num = sizeof(vars) / sizeof(vars[0]) } };
 
-static char buf[128];
+static uint8_t buf[128];
 
 static struct cat_command_group cmd_group = {
         .cmd = cmds,
@@ -136,7 +136,7 @@ static const char test_case_2[] = "\nAT+SET=0x,0x00\nAT+SET=0x1,0x00\nAT+SET=0x2
 static const char test_case_3[] =
         "\nAT+SET=0x0,0x0,0\nAT+SET=0x0,0x0,0x0000000000000\nAT+SET=0x0,0x0,0x1\nAT+SET=0x0,0x0,0xffffFFFF\nAT+SET=0x10,0x20,0x100000000\n";
 
-int main(int argc, char **argv)
+int main(void)
 {
         struct cat_object at;
 

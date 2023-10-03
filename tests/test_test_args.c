@@ -48,27 +48,43 @@ static char var_string[16];
 static char const *input_text;
 static size_t input_index;
 
-static int cmd_override_test(const struct cat_command *cmd, uint8_t *data, size_t *data_size, const size_t max_data_size)
+static int cmd_override_test(const struct cat_command *cmd, char *data, size_t *data_size, size_t max_data_size)
 {
+        (void)cmd;
+        (void)data_size;
+        (void)max_data_size;
+
         strcat(data, "\ntest");
         *data_size = strlen(data);
         return 0;
 }
 
-static int cmd_error_test(const struct cat_command *cmd, uint8_t *data, size_t *data_size, const size_t max_data_size)
+static int cmd_error_test(const struct cat_command *cmd, char *data, size_t *data_size, size_t max_data_size)
 {
+        (void)cmd;
+        (void)data;
+        (void)data_size;
+        (void)max_data_size;
         return -1;
 }
 
-static int cmd_ok_test(const struct cat_command *cmd, uint8_t *data, size_t *data_size, const size_t max_data_size)
+static int cmd_ok_test(const struct cat_command *cmd, char *data, size_t *data_size, size_t max_data_size)
 {
+        (void)cmd;
+        (void)data_size;
+        (void)max_data_size;
+
         strcpy(data, "test1");
         *data_size = strlen(data);
         return 0;
 }
 
-static int cmd_ok2_test(const struct cat_command *cmd, uint8_t *data, size_t *data_size, const size_t max_data_size)
+static int cmd_ok2_test(const struct cat_command *cmd, char *data, size_t *data_size, size_t max_data_size)
 {
+        (void)cmd;
+        (void)data_size;
+        (void)max_data_size;
+
         strcat(data, "test2");
         *data_size = strlen(data);
         return 0;
@@ -159,8 +175,8 @@ static struct cat_command cmds[] = { { .name = "+SET",
                                              .test = cmd_ok2_test,
                                      } };
 
-static char buf[256];
-static char unsolicited_buf[256];
+static uint8_t buf[256];
+static uint8_t unsolicited_buf[256];
 
 static struct cat_command_group cmd_group = {
         .cmd = cmds,
@@ -233,7 +249,7 @@ static const char test_case_1_wo[] = "\nAT+SETWO=?\n";
 static const char test_case_2[] = "\nAT+TEST=?\nAT+TEST2=?\r\nAT+AP=?\n";
 static const char test_case_3[] = "\nAT+ZZ=?\nAT+ZZ2=?\nAT+ZZ3=?\r\n";
 
-int main(int argc, char **argv)
+int main(void)
 {
         struct cat_object at;
 

@@ -29,7 +29,7 @@ SOFTWARE.
 
 #include <assert.h>
 
-#include "../src/cat.h"
+#include <cat/cat.h>
 
 /* variables assigned to scan command */
 static int rssi;
@@ -50,28 +50,22 @@ struct scan_results {
 };
 
 /* static const scan results */
-static const struct scan_results results[2][3] = {
-        {
-                {
-                        .rssi = -10,
-                        .ssid = "wifi1",
-                },
-                {
-                        .rssi = -50,
-                        .ssid = "wifi2",
-                },
-                {
-                        .rssi = -20,
-                        .ssid = "wifi3",
-                }
-        },
-        {
-                {
-                        .rssi = -20,
-                        .ssid = "bluetooth1",
-                }
-        }
-};
+static const struct scan_results results[2][3] = { { {
+                                                             .rssi = -10,
+                                                             .ssid = "wifi1",
+                                                     },
+                                                     {
+                                                             .rssi = -50,
+                                                             .ssid = "wifi2",
+                                                     },
+                                                     {
+                                                             .rssi = -20,
+                                                             .ssid = "wifi3",
+                                                     } },
+                                                   { {
+                                                           .rssi = -20,
+                                                           .ssid = "bluetooth1",
+                                                   } } };
 
 /* helper variable */
 static int scan_index;
@@ -91,31 +85,14 @@ static void load_scan_results(int index)
 }
 
 /* declaring scan variables array */
-static struct cat_variable scan_vars[] = {
-        {
-                .type = CAT_VAR_INT_DEC,
-                .data = &rssi,
-                .data_size = sizeof(rssi),
-                .name = "RSSI"
-        },
-        {
-                .type = CAT_VAR_BUF_STRING,
-                .data = ssid,
-                .data_size = sizeof(ssid),
-                .name = "SSID"
-        }
-};
+static struct cat_variable scan_vars[] = { { .type = CAT_VAR_INT_DEC, .data = &rssi, .data_size = sizeof(rssi), .name = "RSSI" },
+                                           { .type = CAT_VAR_BUF_STRING, .data = ssid, .data_size = sizeof(ssid), .name = "SSID" } };
 
 /* forward declaration */
 static cat_return_state scan_read(const struct cat_command *cmd, uint8_t *data, size_t *data_size, const size_t max_data_size);
 
 /* unsolicited command */
-static struct cat_command scan_cmd = {
-        .name = "+SCAN",
-        .read = scan_read,
-        .var = scan_vars,
-        .var_num = sizeof(scan_vars) / sizeof(scan_vars[0])
-};
+static struct cat_command scan_cmd = { .name = "+SCAN", .read = scan_read, .var = scan_vars, .var_num = sizeof(scan_vars) / sizeof(scan_vars[0]) };
 
 /* unsolicited read callback handler */
 static cat_return_state scan_read(const struct cat_command *cmd, uint8_t *data, size_t *data_size, const size_t max_data_size)
@@ -135,7 +112,7 @@ static cat_return_state scan_read(const struct cat_command *cmd, uint8_t *data, 
 /* mode variable validator */
 static int mode_write(const struct cat_variable *var, const size_t write_size)
 {
-        if (*(int*)var->data >= 2)
+        if (*(int *)var->data >= 2)
                 return -1;
         return 0;
 }
@@ -158,42 +135,29 @@ static int print_cmd_list(const struct cat_command *cmd)
 }
 
 /* declaring start command variables array */
-static struct cat_variable start_vars[] = {
-        {
-                .type = CAT_VAR_UINT_DEC,
-                .data = &mode,
-                .data_size = sizeof(mode),
-                .name = "MODE",
-                .write = mode_write,
-                .access = CAT_VAR_ACCESS_WRITE_ONLY,
-        }
-};
+static struct cat_variable start_vars[] = { {
+        .type = CAT_VAR_UINT_DEC,
+        .data = &mode,
+        .data_size = sizeof(mode),
+        .name = "MODE",
+        .write = mode_write,
+        .access = CAT_VAR_ACCESS_WRITE_ONLY,
+} };
 
 /* declaring commands array */
 static struct cat_command cmds[] = {
-        {
-                .name = "+START",
-                .description = "Start scanning after write (0 - wifi, 1 - bluetooth).",
-                .write = start_write,
-                .var = start_vars,
-                .var_num = sizeof(start_vars) / sizeof(start_vars[0]),
-                .need_all_vars = true
-        },
-        {
-                .name = "+SCAN",
-                .description = "Scan result record.",
-                .only_test = true,
-                .var = scan_vars,
-                .var_num = sizeof(scan_vars) / sizeof(scan_vars[0])
-        },
+        { .name = "+START",
+          .description = "Start scanning after write (0 - wifi, 1 - bluetooth).",
+          .write = start_write,
+          .var = start_vars,
+          .var_num = sizeof(start_vars) / sizeof(start_vars[0]),
+          .need_all_vars = true },
+        { .name = "+SCAN", .description = "Scan result record.", .only_test = true, .var = scan_vars, .var_num = sizeof(scan_vars) / sizeof(scan_vars[0]) },
         {
                 .name = "#HELP",
                 .run = print_cmd_list,
         },
-        {
-                .name = "#QUIT",
-                .run = quit_run
-        },
+        { .name = "#QUIT", .run = quit_run },
 };
 
 /* working buffer */
@@ -205,9 +169,7 @@ static struct cat_command_group cmd_group = {
         .cmd_num = sizeof(cmds) / sizeof(cmds[0]),
 };
 
-static struct cat_command_group *cmd_desc[] = {
-        &cmd_group
-};
+static struct cat_command_group *cmd_desc[] = { &cmd_group };
 
 static struct cat_descriptor desc = {
         .cmd_group = cmd_desc,
@@ -231,18 +193,16 @@ static int read_char(char *ch)
 }
 
 /* declaring input output interface descriptor for parser */
-static struct cat_io_interface iface = {
-        .read = read_char,
-        .write = write_char
-};
+static struct cat_io_interface iface = { .read = read_char, .write = write_char };
 
-int main(int argc, char **argv)
+int main(void)
 {
         /* initializing */
         cat_init(&at, &desc, &iface, NULL);
 
         /* main loop with exit code conditions */
-        while ((cat_service(&at) != 0) && (quit_flag == 0)) {};
+        while ((cat_service(&at) != 0) && (quit_flag == 0)) {
+        };
 
         /* goodbye message */
         printf("Bye!\n");

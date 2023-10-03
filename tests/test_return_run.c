@@ -42,8 +42,9 @@ static struct cat_object at;
 static cat_return_state ret;
 static bool ret_error;
 
-static cat_return_state cmd_read(const struct cat_command *cmd, uint8_t *data, size_t *data_size, const size_t max_data_size)
+static cat_return_state cmd_read(const struct cat_command *cmd, char *data, size_t *data_size, size_t max_data_size)
 {
+        (void)max_data_size; // Unused
         strcat(cmd_results, " read:");
         strcat(cmd_results, cmd->name);
 
@@ -87,7 +88,7 @@ static struct cat_command cmds[] = { {
         .var_num = sizeof(vars) / sizeof(vars[0]),
 } };
 
-static char buf[128];
+static uint8_t buf[128];
 
 static struct cat_command_group cmd_group = {
         .cmd = cmds,
@@ -137,10 +138,8 @@ static void prepare_input(const char *text)
 
 static const char test_case_1[] = "\nAT+CMD\n";
 
-int main(int argc, char **argv)
+int main(void)
 {
-        cat_status s;
-
         cat_init(&at, &desc, &iface, NULL);
 
         ret = CAT_RETURN_STATE_ERROR;

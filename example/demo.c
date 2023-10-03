@@ -29,8 +29,7 @@ SOFTWARE.
 
 #include <assert.h>
 
-#include "../src/cat.h"
-
+#include <cat/cat.h>
 static int32_t speed;
 static uint16_t adr;
 static uint8_t x;
@@ -85,13 +84,7 @@ static int go_write(const struct cat_command *cmd, const uint8_t *data, const si
 {
         int i = 0;
 
-        printf("<%s>: x=%d y=%d msg=%s @ speed=%d\n",
-                cmd->name,
-                *(uint8_t*)(cmd->var[0].data),
-                *(uint8_t*)(cmd->var[1].data),
-                msg,
-                speed
-        );
+        printf("<%s>: x=%d y=%d msg=%s @ speed=%d\n", cmd->name, *(uint8_t *)(cmd->var[0].data), *(uint8_t *)(cmd->var[1].data), msg, speed);
 
         printf("<bytes>: ");
         for (i = 0; i < sizeof(bytes_buf); i++)
@@ -102,10 +95,7 @@ static int go_write(const struct cat_command *cmd, const uint8_t *data, const si
 
 static int set_write(const struct cat_command *cmd, const uint8_t *data, const size_t data_size, const size_t args_num)
 {
-        printf("<%s>: SET SPEED TO = %d\n",
-                cmd->name,
-                speed
-        );
+        printf("<%s>: SET SPEED TO = %d\n", cmd->name, speed);
         return 0;
 }
 
@@ -132,62 +122,18 @@ static int print_cmd_list(const struct cat_command *cmd)
         return CAT_RETURN_STATE_PRINT_CMD_LIST_OK;
 }
 
-static struct cat_variable go_vars[] = {
-        {
-                .type = CAT_VAR_UINT_DEC,
-                .data = &x,
-                .data_size = sizeof(x),
-                .write = x_write,
-                .name = "x"
-        },
-        {
-                .type = CAT_VAR_UINT_DEC,
-                .data = &y,
-                .data_size = sizeof(y),
-                .write = y_write,
-                .name = "y"
-        },
-        {
-                .type = CAT_VAR_BUF_STRING,
-                .data = msg,
-                .data_size = sizeof(msg),
-                .write = msg_write,
-                .name = "msg"
-        }
-};
+static struct cat_variable go_vars[] = { { .type = CAT_VAR_UINT_DEC, .data = &x, .data_size = sizeof(x), .write = x_write, .name = "x" },
+                                         { .type = CAT_VAR_UINT_DEC, .data = &y, .data_size = sizeof(y), .write = y_write, .name = "y" },
+                                         { .type = CAT_VAR_BUF_STRING, .data = msg, .data_size = sizeof(msg), .write = msg_write, .name = "msg" } };
 
 static struct cat_variable set_vars[] = {
-        {
-                .type = CAT_VAR_INT_DEC,
-                .data = &speed,
-                .data_size = sizeof(speed),
-                .write = speed_write,
-                .name = "speed"
-        },
-        {
-                .type = CAT_VAR_NUM_HEX,
-                .data = &adr,
-                .data_size = sizeof(adr),
-                .write = adr_write,
-                .name = "address"
-        },
-        {
-                .type = CAT_VAR_BUF_HEX,
-                .data = &bytes_buf,
-                .data_size = sizeof(bytes_buf),
-                .write = bytesbuf_write,
-                .name = "buffer"
-        }
+        { .type = CAT_VAR_INT_DEC, .data = &speed, .data_size = sizeof(speed), .write = speed_write, .name = "speed" },
+        { .type = CAT_VAR_NUM_HEX, .data = &adr, .data_size = sizeof(adr), .write = adr_write, .name = "address" },
+        { .type = CAT_VAR_BUF_HEX, .data = &bytes_buf, .data_size = sizeof(bytes_buf), .write = bytesbuf_write, .name = "buffer" }
 };
 
 static struct cat_command cmds[] = {
-        {
-                .name = "+GO",
-                .write = go_write,
-                .var = go_vars,
-                .var_num = sizeof(go_vars) / sizeof(go_vars[0]),
-                .need_all_vars = true
-        },
+        { .name = "+GO", .write = go_write, .var = go_vars, .var_num = sizeof(go_vars) / sizeof(go_vars[0]), .need_all_vars = true },
         {
                 .name = "+SET",
                 .write = set_write,
@@ -195,18 +141,12 @@ static struct cat_command cmds[] = {
                 .var = set_vars,
                 .var_num = sizeof(set_vars) / sizeof(set_vars[0]),
         },
-        {
-                .name = "#TEST",
-                .run = test_run
-        },
+        { .name = "#TEST", .run = test_run },
         {
                 .name = "#HELP",
                 .run = print_cmd_list,
         },
-        {
-                .name = "#QUIT",
-                .run = quit_run
-        },
+        { .name = "#QUIT", .run = quit_run },
 
 };
 
@@ -217,17 +157,13 @@ static struct cat_command_group cmd_group = {
         .cmd_num = sizeof(cmds) / sizeof(cmds[0]),
 };
 
-static struct cat_command_group *cmd_desc[] = {
-        &cmd_group
-};
+static struct cat_command_group *cmd_desc[] = { &cmd_group };
 
-static struct cat_descriptor desc = {
-        .cmd_group = cmd_desc,
-        .cmd_group_num = sizeof(cmd_desc) / sizeof(cmd_desc[0]),
+static struct cat_descriptor desc = { .cmd_group = cmd_desc,
+                                      .cmd_group_num = sizeof(cmd_desc) / sizeof(cmd_desc[0]),
 
-        .buf = buf,
-        .buf_size = sizeof(buf)
-};
+                                      .buf = buf,
+                                      .buf_size = sizeof(buf) };
 
 static int write_char(char ch)
 {
@@ -241,18 +177,16 @@ static int read_char(char *ch)
         return 1;
 }
 
-static struct cat_io_interface iface = {
-        .read = read_char,
-        .write = write_char
-};
+static struct cat_io_interface iface = { .read = read_char, .write = write_char };
 
-int main(int argc, char **argv)
+int main(void)
 {
         struct cat_object at;
 
         cat_init(&at, &desc, &iface, NULL);
 
-        while ((cat_service(&at) != 0) && (quit_flag == 0)) {};
+        while ((cat_service(&at) != 0) && (quit_flag == 0)) {
+        };
 
         printf("Bye!\n");
 

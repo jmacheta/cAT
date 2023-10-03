@@ -73,7 +73,7 @@ static struct cat_command cmds[] = { {
                                              .disable = false,
                                      } };
 
-static char buf[128];
+static uint8_t buf[128];
 
 static struct cat_command_group cmd_group = {
         .cmd = cmds,
@@ -122,7 +122,7 @@ static void prepare_input(const char *text)
 
 static const char test_case_1[] = "\nsa\rAT\n\r\nAT\nAT+\n\nATA\r\natap\naaaattttap\na\n\r+test\r\n+testATA\nATAPATAP\n\rAT\rATA\nAT+test\r\n";
 
-int main(int argc, char **argv)
+int main(void)
 {
         struct cat_object at;
 

@@ -31,13 +31,21 @@ SOFTWARE.
 
 #include <cat/cat.h>
 
-static int ap_read(const struct cat_command *cmd, uint8_t *data, size_t *data_size, const size_t max_data_size)
+static int ap_read(const struct cat_command *cmd, uint8_t *data, size_t *data_size, size_t max_data_size)
 {
+        (void)cmd; // Unused
+        (void)data; // Unused
+        (void)data_size; // Unused
+        (void)max_data_size; // Unused
         return 0;
 }
 
-static int ap_write(const struct cat_command *cmd, const uint8_t *data, const size_t data_size, const size_t args_num)
+static int ap_write(const struct cat_command *cmd, const uint8_t *data, size_t data_size, size_t args_num)
 {
+        (void)cmd; // Unused
+        (void)data; // Unused
+        (void)data_size; // Unused
+        (void)args_num; // Unused
         return 0;
 }
 
@@ -55,7 +63,7 @@ static struct cat_command cmds2[] = {
         { .name = "APX2", .read = ap_read, .only_test = false, .var = vars_apx2, .var_num = sizeof(vars_apx2) / sizeof(vars_apx2[0]) },
 };
 
-static char buf[128];
+static uint8_t buf[128];
 
 static struct cat_command_group cmd_group1 = {
         .name = "std",
@@ -81,17 +89,19 @@ static struct cat_descriptor desc = { .cmd_group = cmd_desc,
 
 static int write_char(char ch)
 {
+        (void)ch; // Unused
         return 1;
 }
 
 static int read_char(char *ch)
 {
+        (void)ch; // Unused
         return 1;
 }
 
 static struct cat_io_interface iface = { .read = read_char, .write = write_char };
 
-int main(int argc, char **argv)
+int main(void)
 {
         struct cat_object at;
         struct cat_command const *cmd;

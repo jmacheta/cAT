@@ -40,7 +40,7 @@ static int8_t var1b, var2b, var3b;
 static char const *input_text;
 static size_t input_index;
 
-static int cmd_write1(const struct cat_command *cmd, const uint8_t *data, const size_t data_size, const size_t args_num)
+static int cmd_write1(const struct cat_command *cmd, const uint8_t *data, size_t data_size, size_t args_num)
 {
         char tmp[32];
         sprintf(tmp, " CMD1_%ld:", args_num);
@@ -49,7 +49,7 @@ static int cmd_write1(const struct cat_command *cmd, const uint8_t *data, const 
         return 0;
 }
 
-static int cmd_write3(const struct cat_command *cmd, const uint8_t *data, const size_t data_size, const size_t args_num)
+static int cmd_write3(const struct cat_command *cmd, const uint8_t *data, size_t data_size, size_t args_num)
 {
         char tmp[32];
         sprintf(tmp, " CMD3_%ld:", args_num);
@@ -100,7 +100,7 @@ static struct cat_command cmds[] = { { .name = "+SET1",
                                        .var_num = sizeof(vars) / sizeof(vars[0]),
                                        .need_all_vars = true } };
 
-static char buf[128];
+static uint8_t buf[128];
 
 static struct cat_command_group cmd_group = {
         .cmd = cmds,
@@ -153,7 +153,7 @@ static const char test_case_1[] = "\nAT+SET=-10,-20,-30\r\nAT+SET1=-10,-20,-30\r
 static const char test_case_2[] = "\nAT+SET3=-1,-2,-3,0\nAT+SET3=-1,-2,-3\nAT+SET3=-100\n";
 static const char test_case_3[] = "\nAT+SETALL=-11,-22,-33\nAT+SETALL=-1,-2,-3\nAT+SETALL=100\n";
 
-int main(int argc, char **argv)
+int main(void)
 {
         struct cat_object at;
 

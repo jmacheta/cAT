@@ -44,7 +44,7 @@ static int a_run(const struct cat_command *cmd)
         return 0;
 }
 
-static int a_read(const struct cat_command *cmd, uint8_t *data, size_t *data_size, const size_t max_data_size)
+static int a_read(const struct cat_command *cmd, char *data, size_t *data_size, size_t max_data_size)
 {
         strcat(read_results, " A:");
         strcat(read_results, cmd->name);
@@ -55,8 +55,11 @@ static int a_read(const struct cat_command *cmd, uint8_t *data, size_t *data_siz
         return 0;
 }
 
-static int ap_read(const struct cat_command *cmd, uint8_t *data, size_t *data_size, const size_t max_data_size)
+static int ap_read(const struct cat_command *cmd, char *data, size_t *data_size, size_t max_data_size)
 {
+        (void)data; // Unused
+        (void)data_size; // Unused
+        (void)max_data_size; // Unused
         strcat(read_results, " AP:");
         strcat(read_results, cmd->name);
 
@@ -65,8 +68,11 @@ static int ap_read(const struct cat_command *cmd, uint8_t *data, size_t *data_si
         return 0;
 }
 
-static int test_read(const struct cat_command *cmd, uint8_t *data, size_t *data_size, const size_t max_data_size)
+static int test_read(const struct cat_command *cmd, char *data, size_t *data_size, size_t max_data_size)
 {
+        (void)data; // Mask as unused
+        (void)data_size; // Mask as unused
+        (void)max_data_size; // Mask as unused
         strcat(read_results, " +TEST:");
         strcat(read_results, cmd->name);
 
@@ -78,7 +84,7 @@ static struct cat_command cmds[] = { { .name = "A", .read = a_read, .run = a_run
                                      { .name = "+TEST", .read = test_read },
                                      { .name = "+EMPTY" } };
 
-static char buf[128];
+static uint8_t buf[128];
 
 static struct cat_command_group cmd_group = {
         .cmd = cmds,
@@ -126,7 +132,7 @@ static void prepare_input(const char *text)
 
 static const char test_case_1[] = "\nAT\r\nAT+\nAT+?\nATA?\r\nATAP\nATAP?\nATAPA?\nAT+TEST?\nAT+te?\nAT+e?\nAT+empTY?\r\nATA\r\n";
 
-int main(int argc, char **argv)
+int main(void)
 {
         struct cat_object at;
 

@@ -36,8 +36,9 @@ static char ack_results[256];
 static char const *input_text;
 static size_t input_index;
 
-static cat_return_state cmd_write(const struct cat_command *cmd, const uint8_t *data, const size_t data_size, const size_t args_num)
+static cat_return_state cmd_write(const struct cat_command *cmd, const char *data, size_t data_size, size_t args_num)
 {
+        (void)args_num; // Unused
         strcat(run_results, " W_");
         strcat(run_results, cmd->name);
         strcat(run_results, ":");
@@ -46,8 +47,12 @@ static cat_return_state cmd_write(const struct cat_command *cmd, const uint8_t *
         return CAT_RETURN_STATE_OK;
 }
 
-static cat_return_state cmd_read(const struct cat_command *cmd, uint8_t *data, size_t *data_size, const size_t max_data_size)
+static cat_return_state cmd_read(const struct cat_command *cmd, uint8_t *data, size_t *data_size, size_t max_data_size)
 {
+        (void)data; // Unused
+        (void)data_size; // Unused
+        (void)max_data_size; // Unused
+
         strcat(run_results, " D_");
         strcat(run_results, cmd->name);
         return CAT_RETURN_STATE_OK;
@@ -60,8 +65,12 @@ static cat_return_state cmd_run(const struct cat_command *cmd)
         return CAT_RETURN_STATE_OK;
 }
 
-static cat_return_state cmd_test(const struct cat_command *cmd, uint8_t *data, size_t *data_size, const size_t max_data_size)
+static cat_return_state cmd_test(const struct cat_command *cmd, uint8_t *data, size_t *data_size, size_t max_data_size)
 {
+        (void)data; // Unused
+        (void)data_size; // Unused
+        (void)max_data_size; // Unused
+
         strcat(run_results, " T_");
         strcat(run_results, cmd->name);
         return CAT_RETURN_STATE_OK;
@@ -91,7 +100,7 @@ static struct cat_command cmds[] = {
           .implicit_write = true },
 };
 
-static char buf[128];
+static uint8_t buf[128];
 
 static struct cat_command_group cmd_group = {
         .cmd = cmds,
@@ -138,7 +147,7 @@ static void prepare_input(const char *text)
 
 static const char test_case_1[] = "\nATDTEST\nATD\nATD0\nATD1\nATD?\nATD=1\nATD=?\nAT+D\nAT+D?\nAT+D=0\nAT+D=?\nATV-1,42\n";
 
-int main(int argc, char **argv)
+int main(void)
 {
         struct cat_object at;
 
