@@ -219,7 +219,7 @@ cat_status cat_is_unsolicited_buffer_full(cat_object *self)
 static cat_command const *get_command_by_fsm(cat_object *self, cat_fsm_type fsm)
 {
         assert(self != NULL);
-        assert(fsm < CAT_FSM_TYPE_TOTAL_NUM);
+        assert(fsm < (int)(int)CAT_FSM_TYPE_TOTAL_NUM);
 
         switch (fsm) {
         case CAT_FSM_TYPE_ATCMD:
@@ -236,7 +236,7 @@ static cat_command const *get_command_by_fsm(cat_object *self, cat_fsm_type fsm)
 cat_command const *cat_get_processed_command(cat_object *self, cat_fsm_type fsm)
 {
         assert(self != NULL);
-        assert(fsm < CAT_FSM_TYPE_TOTAL_NUM);
+        assert(fsm < (int)CAT_FSM_TYPE_TOTAL_NUM);
 
         return get_command_by_fsm(self, fsm);
 }
@@ -326,15 +326,13 @@ static void ack_ok(cat_object *self)
 static size_t get_left_buffer_space_by_fsm(cat_object *self, cat_fsm_type fsm)
 {
         assert(self != NULL);
-        assert(fsm < CAT_FSM_TYPE_TOTAL_NUM);
+        assert(fsm < (int)CAT_FSM_TYPE_TOTAL_NUM);
 
         switch (fsm) {
         case CAT_FSM_TYPE_ATCMD:
                 return get_atcmd_buf_size(self) - self->position;
         case CAT_FSM_TYPE_UNSOLICITED:
                 return get_unsolicited_buf_size(self) - self->unsolicited_fsm.position;
-        default:
-                assert(false);
         }
 
         return 0;
@@ -343,15 +341,13 @@ static size_t get_left_buffer_space_by_fsm(cat_object *self, cat_fsm_type fsm)
 static char *get_current_buffer_by_fsm(cat_object *self, cat_fsm_type fsm)
 {
         assert(self != NULL);
-        assert(fsm < CAT_FSM_TYPE_TOTAL_NUM);
+        assert(fsm < (int)CAT_FSM_TYPE_TOTAL_NUM);
 
         switch (fsm) {
         case CAT_FSM_TYPE_ATCMD:
                 return &(get_atcmd_buf(self)[self->position]);
         case CAT_FSM_TYPE_UNSOLICITED:
                 return &(get_unsolicited_buf(self)[self->unsolicited_fsm.position]);
-        default:
-                assert(false);
         }
 
         return NULL;
@@ -360,7 +356,7 @@ static char *get_current_buffer_by_fsm(cat_object *self, cat_fsm_type fsm)
 static void move_position_by_fsm(cat_object *self, size_t offset, cat_fsm_type fsm)
 {
         assert(self != NULL);
-        assert(fsm < CAT_FSM_TYPE_TOTAL_NUM);
+        assert(fsm < (int)CAT_FSM_TYPE_TOTAL_NUM);
 
         switch (fsm) {
         case CAT_FSM_TYPE_ATCMD:
@@ -369,15 +365,13 @@ static void move_position_by_fsm(cat_object *self, size_t offset, cat_fsm_type f
         case CAT_FSM_TYPE_UNSOLICITED:
                 self->unsolicited_fsm.position += offset;
                 break;
-        default:
-                assert(false);
         }
 }
 
 static int print_nstring_to_buf(cat_object *self, const char *str, size_t len, cat_fsm_type fsm)
 {
         assert(self != NULL);
-        assert(fsm < CAT_FSM_TYPE_TOTAL_NUM);
+        assert(fsm < (int)CAT_FSM_TYPE_TOTAL_NUM);
 
         if (len >= get_left_buffer_space_by_fsm(self, fsm))
                 return -1;
@@ -574,7 +568,7 @@ static uint8_t convert_hex_char_to_value(const char ch)
 static void end_processing_with_error(cat_object *self, cat_fsm_type fsm)
 {
         assert(self != NULL);
-        assert(fsm < CAT_FSM_TYPE_TOTAL_NUM);
+        assert(fsm < (int)CAT_FSM_TYPE_TOTAL_NUM);
 
         switch (fsm) {
         case CAT_FSM_TYPE_ATCMD:
@@ -583,15 +577,13 @@ static void end_processing_with_error(cat_object *self, cat_fsm_type fsm)
         case CAT_FSM_TYPE_UNSOLICITED:
                 unsolicited_reset_state(self);
                 break;
-        default:
-                assert(false);
         }
 }
 
 static void end_processing_with_ok(cat_object *self, cat_fsm_type fsm)
 {
         assert(self != NULL);
-        assert(fsm < CAT_FSM_TYPE_TOTAL_NUM);
+        assert(fsm < (int)CAT_FSM_TYPE_TOTAL_NUM);
 
         switch (fsm) {
         case CAT_FSM_TYPE_ATCMD:
@@ -600,15 +592,13 @@ static void end_processing_with_ok(cat_object *self, cat_fsm_type fsm)
         case CAT_FSM_TYPE_UNSOLICITED:
                 unsolicited_reset_state(self);
                 break;
-        default:
-                assert(false);
         }
 }
 
 static void reset_position(cat_object *self, cat_fsm_type fsm)
 {
         assert(self != NULL);
-        assert(fsm < CAT_FSM_TYPE_TOTAL_NUM);
+        assert(fsm < (int)CAT_FSM_TYPE_TOTAL_NUM);
 
         switch (fsm) {
         case CAT_FSM_TYPE_ATCMD:
@@ -617,30 +607,27 @@ static void reset_position(cat_object *self, cat_fsm_type fsm)
         case CAT_FSM_TYPE_UNSOLICITED:
                 self->unsolicited_fsm.position = 0;
                 break;
-        default:
-                assert(false);
         }
 }
 
 static cat_variable const *get_var_by_fsm(cat_object *self, cat_fsm_type fsm)
 {
         assert(self != NULL);
-        assert(fsm < CAT_FSM_TYPE_TOTAL_NUM);
+        assert(fsm < (int)CAT_FSM_TYPE_TOTAL_NUM);
 
         switch (fsm) {
         case CAT_FSM_TYPE_ATCMD:
                 return self->var;
         case CAT_FSM_TYPE_UNSOLICITED:
                 return self->unsolicited_fsm.var;
-        default:
-                assert(false);
         }
+        return NULL;
 }
 
 static int print_response_test(cat_object *self, cat_fsm_type fsm)
 {
         assert(self != NULL);
-        assert(fsm < CAT_FSM_TYPE_TOTAL_NUM);
+        assert(fsm < (int)CAT_FSM_TYPE_TOTAL_NUM);
 
         cat_command const *cmd = get_command_by_fsm(self, fsm);
 
@@ -843,7 +830,7 @@ static cat_status wait_read_acknowledge(cat_object *self)
 static void start_processing_format_test_args(cat_object *self, cat_fsm_type fsm)
 {
         assert(self != NULL);
-        assert(fsm < CAT_FSM_TYPE_TOTAL_NUM);
+        assert(fsm < (int)CAT_FSM_TYPE_TOTAL_NUM);
 
         reset_position(self, fsm);
 
@@ -939,7 +926,7 @@ static cat_status search_command(cat_object *self)
 static void start_processing_format_read_args(cat_object *self, cat_fsm_type fsm)
 {
         assert(self != NULL);
-        assert(fsm < CAT_FSM_TYPE_TOTAL_NUM);
+        assert(fsm < (int)CAT_FSM_TYPE_TOTAL_NUM);
 
         reset_position(self, fsm);
 
@@ -1098,7 +1085,7 @@ static int parse_uint_decimal(cat_object *self, uint64_t *ret)
                 if (is_valid_dec_char(ch) != 0) {
                         ok = 1;
                         val *= 10;
-                        val += ch - '0';
+                        val += (unsigned)(ch - '0');
                 } else {
                         return -1;
                 }
@@ -1220,7 +1207,7 @@ static int parse_buffer_string(cat_object *self)
                         if (self->var->access == CAT_VAR_ACCESS_READ_ONLY) {
                                 size++;
                         } else {
-                                ((uint8_t *)(self->var->data))[size++] = ch;
+                                ((char *)(self->var->data))[size++] = ch;
                         }
                         break;
                 case 2:
@@ -1242,7 +1229,7 @@ static int parse_buffer_string(cat_object *self)
                         if (self->var->access == CAT_VAR_ACCESS_READ_ONLY) {
                                 size++;
                         } else {
-                                ((uint8_t *)(self->var->data))[size++] = ch;
+                                ((char *)(self->var->data))[size++] = ch;
                         }
                         state = 1;
                         break;
@@ -1268,6 +1255,11 @@ static int parse_buffer_string(cat_object *self)
         return -1;
 }
 
+static inline bool in_range(int64_t value, int64_t min, int64_t max)
+{
+        return value >= min && value <= max;
+}
+
 static int validate_int_range(cat_object *self, int64_t val)
 {
         if (self->var->access == CAT_VAR_ACCESS_READ_ONLY) {
@@ -1277,19 +1269,23 @@ static int validate_int_range(cat_object *self, int64_t val)
 
         switch (self->var->data_size) {
         case 1:
-                if ((val < INT8_MIN) || (val > INT8_MAX))
+                if (!in_range(val, INT8_MIN, INT8_MAX)) {
                         return -1;
-                *(int8_t *)(self->var->data) = val;
+                }
+                *(int8_t *)(self->var->data) = (int8_t)val;
                 break;
         case 2:
-                if ((val < INT16_MIN) || (val > INT16_MAX))
+                if (!in_range(val, INT16_MIN, INT16_MAX)) {
                         return -1;
-                *(int16_t *)(self->var->data) = val;
+                }
+
+                *(int16_t *)(self->var->data) = (int16_t)val;
                 break;
         case 4:
-                if ((val < INT32_MIN) || (val > INT32_MAX))
+                if (!in_range(val, INT32_MIN, INT32_MAX)) {
                         return -1;
-                *(int32_t *)(self->var->data) = val;
+                }
+                *(int32_t *)(self->var->data) = (int32_t)val;
                 break;
         default:
                 return -1;
@@ -1309,17 +1305,17 @@ static int validate_uint_range(cat_object *self, uint64_t val)
         case 1:
                 if (val > UINT8_MAX)
                         return -1;
-                *(uint8_t *)(self->var->data) = val;
+                *(uint8_t *)(self->var->data) = (uint8_t)val;
                 break;
         case 2:
                 if (val > UINT16_MAX)
                         return -1;
-                *(uint16_t *)(self->var->data) = val;
+                *(uint16_t *)(self->var->data) = (uint16_t)val;
                 break;
         case 4:
                 if (val > UINT32_MAX)
                         return -1;
-                *(uint32_t *)(self->var->data) = val;
+                *(uint32_t *)(self->var->data) = (uint32_t)val;
                 break;
         default:
                 return -1;
@@ -1353,7 +1349,7 @@ static cat_status parse_write_args(cat_object *self)
                         ack_error(self);
                         return CAT_STATUS_BUSY;
                 }
-                if (validate_uint_range(self, val) != 0) {
+                if (validate_uint_range(self, (uint64_t)val) != 0) {
                         ack_error(self);
                         return CAT_STATUS_BUSY;
                 }
@@ -1364,7 +1360,7 @@ static cat_status parse_write_args(cat_object *self)
                         ack_error(self);
                         return CAT_STATUS_BUSY;
                 }
-                if (validate_uint_range(self, val) != 0) {
+                if (validate_uint_range(self, (uint64_t)val) != 0) {
                         ack_error(self);
                         return CAT_STATUS_BUSY;
                 }
@@ -1419,7 +1415,7 @@ static cat_status parse_write_args(cat_object *self)
 static int print_format_num(cat_object *self, char const *fmt, uint32_t val, cat_fsm_type fsm)
 {
         assert(self != NULL);
-        assert(fsm < CAT_FSM_TYPE_TOTAL_NUM);
+        assert(fsm < (int)CAT_FSM_TYPE_TOTAL_NUM);
 
         size_t len = get_left_buffer_space_by_fsm(self, fsm);
         int written = snprintf(get_current_buffer_by_fsm(self, fsm), len, fmt, val);
@@ -1427,7 +1423,7 @@ static int print_format_num(cat_object *self, char const *fmt, uint32_t val, cat
         if ((written < 0) || ((size_t)written >= len))
                 return -1;
 
-        move_position_by_fsm(self, written, fsm);
+        move_position_by_fsm(self, (size_t)written, fsm);
         return 0;
 }
 
@@ -1436,7 +1432,7 @@ static int format_int_decimal(cat_object *self, cat_fsm_type fsm)
         int32_t val;
 
         assert(self != NULL);
-        assert(fsm < CAT_FSM_TYPE_TOTAL_NUM);
+        assert(fsm < (int)CAT_FSM_TYPE_TOTAL_NUM);
 
         cat_variable const *var = get_var_by_fsm(self, fsm);
 
@@ -1468,7 +1464,7 @@ static int format_uint_decimal(cat_object *self, cat_fsm_type fsm)
         uint32_t val;
 
         assert(self != NULL);
-        assert(fsm < CAT_FSM_TYPE_TOTAL_NUM);
+        assert(fsm < (int)CAT_FSM_TYPE_TOTAL_NUM);
 
         cat_variable const *var = get_var_by_fsm(self, fsm);
 
@@ -1501,7 +1497,7 @@ static int format_num_hexadecimal(cat_object *self, cat_fsm_type fsm)
         char fstr[8];
 
         assert(self != NULL);
-        assert(fsm < CAT_FSM_TYPE_TOTAL_NUM);
+        assert(fsm < (int)CAT_FSM_TYPE_TOTAL_NUM);
 
         cat_variable const *var = get_var_by_fsm(self, fsm);
 
@@ -1534,7 +1530,7 @@ static int format_num_hexadecimal(cat_object *self, cat_fsm_type fsm)
 static int format_buffer_hexadecimal(cat_object *self, cat_fsm_type fsm)
 {
         assert(self != NULL);
-        assert(fsm < CAT_FSM_TYPE_TOTAL_NUM);
+        assert(fsm < (int)CAT_FSM_TYPE_TOTAL_NUM);
 
         cat_variable const *var = get_var_by_fsm(self, fsm);
         uint8_t val;
@@ -1557,7 +1553,7 @@ static int format_buffer_string(cat_object *self, cat_fsm_type fsm)
         size_t i = 0;
 
         assert(self != NULL);
-        assert(fsm < CAT_FSM_TYPE_TOTAL_NUM);
+        assert(fsm < (int)CAT_FSM_TYPE_TOTAL_NUM);
 
         cat_variable const *var = get_var_by_fsm(self, fsm);
 
@@ -1597,7 +1593,7 @@ static int format_info_type(cat_object *self, cat_fsm_type fsm)
         char accessor[8];
 
         assert(self != NULL);
-        assert(fsm < CAT_FSM_TYPE_TOTAL_NUM);
+        assert(fsm < (int)CAT_FSM_TYPE_TOTAL_NUM);
 
         cat_variable const *var = get_var_by_fsm(self, fsm);
 
@@ -1697,7 +1693,7 @@ static int format_info_type(cat_object *self, cat_fsm_type fsm)
 static cat_status next_format_var_by_fsm(cat_object *self, cat_fsm_type fsm)
 {
         assert(self != NULL);
-        assert(fsm < CAT_FSM_TYPE_TOTAL_NUM);
+        assert(fsm < (int)CAT_FSM_TYPE_TOTAL_NUM);
 
         cat_command const *cmd = get_command_by_fsm(self, fsm);
 
@@ -1736,7 +1732,7 @@ static cat_status format_read_args(cat_object *self, cat_fsm_type fsm)
         cat_status stat;
 
         assert(self != NULL);
-        assert(fsm < CAT_FSM_TYPE_TOTAL_NUM);
+        assert(fsm < (int)CAT_FSM_TYPE_TOTAL_NUM);
 
         cat_variable const *var = get_var_by_fsm(self, fsm);
 
@@ -1808,7 +1804,7 @@ static cat_status format_read_args(cat_object *self, cat_fsm_type fsm)
 static cat_status format_test_args(cat_object *self, cat_fsm_type fsm)
 {
         assert(self != NULL);
-        assert(fsm < CAT_FSM_TYPE_TOTAL_NUM);
+        assert(fsm < (int)CAT_FSM_TYPE_TOTAL_NUM);
 
         if (format_info_type(self, fsm) < 0) {
                 end_processing_with_error(self, fsm);
@@ -2096,7 +2092,7 @@ static cat_status process_write_loop(cat_object *self)
 {
         assert(self != NULL);
 
-        switch (self->cmd->write(self->cmd, (uint8_t *)get_atcmd_buf(self), self->length, self->index)) {
+        switch (self->cmd->write(self->cmd, get_atcmd_buf(self), self->length, self->index)) {
         case CAT_RETURN_STATE_OK:
         case CAT_RETURN_STATE_DATA_OK:
                 ack_ok(self);
@@ -2151,15 +2147,15 @@ static cat_status process_run_loop(cat_object *self)
 static cat_return_state call_cmd_read_by_fsm(cat_object *self, cat_fsm_type fsm)
 {
         assert(self != NULL);
-        assert(fsm < CAT_FSM_TYPE_TOTAL_NUM);
+        assert(fsm < (int)CAT_FSM_TYPE_TOTAL_NUM);
 
         cat_command const *cmd = get_command_by_fsm(self, fsm);
 
         switch (fsm) {
         case CAT_FSM_TYPE_ATCMD:
-                return cmd->read(cmd, (uint8_t *)get_atcmd_buf(self), &self->position, get_atcmd_buf_size(self));
+                return cmd->read(cmd, get_atcmd_buf(self), &self->position, get_atcmd_buf_size(self));
         case CAT_FSM_TYPE_UNSOLICITED:
-                return cmd->read(cmd, (uint8_t *)get_unsolicited_buf(self), &self->unsolicited_fsm.position, get_unsolicited_buf_size(self));
+                return cmd->read(cmd, get_unsolicited_buf(self), &self->unsolicited_fsm.position, get_unsolicited_buf_size(self));
         }
         return CAT_RETURN_STATE_ERROR;
 }
@@ -2167,7 +2163,7 @@ static cat_return_state call_cmd_read_by_fsm(cat_object *self, cat_fsm_type fsm)
 static cat_status process_read_loop(cat_object *self, cat_fsm_type fsm)
 {
         assert(self != NULL);
-        assert(fsm < CAT_FSM_TYPE_TOTAL_NUM);
+        assert(fsm < (int)CAT_FSM_TYPE_TOTAL_NUM);
 
         switch (call_cmd_read_by_fsm(self, fsm)) {
         case CAT_RETURN_STATE_OK:
@@ -2224,15 +2220,15 @@ static cat_status process_read_loop(cat_object *self, cat_fsm_type fsm)
 static cat_return_state call_cmd_test_by_fsm(cat_object *self, cat_fsm_type fsm)
 {
         assert(self != NULL);
-        assert(fsm < CAT_FSM_TYPE_TOTAL_NUM);
+        assert(fsm < (int)CAT_FSM_TYPE_TOTAL_NUM);
 
         cat_command const *cmd = get_command_by_fsm(self, fsm);
 
         switch (fsm) {
         case CAT_FSM_TYPE_ATCMD:
-                return cmd->test(cmd, (uint8_t *)get_atcmd_buf(self), &self->position, get_atcmd_buf_size(self));
+                return cmd->test(cmd, get_atcmd_buf(self), &self->position, get_atcmd_buf_size(self));
         case CAT_FSM_TYPE_UNSOLICITED:
-                return cmd->test(cmd, (uint8_t *)get_unsolicited_buf(self), &self->unsolicited_fsm.position, get_unsolicited_buf_size(self));
+                return cmd->test(cmd, get_unsolicited_buf(self), &self->unsolicited_fsm.position, get_unsolicited_buf_size(self));
         }
         return CAT_RETURN_STATE_ERROR;
 }
@@ -2240,7 +2236,7 @@ static cat_return_state call_cmd_test_by_fsm(cat_object *self, cat_fsm_type fsm)
 static cat_status process_test_loop(cat_object *self, cat_fsm_type fsm)
 {
         assert(self != NULL);
-        assert(fsm < CAT_FSM_TYPE_TOTAL_NUM);
+        assert(fsm < (int)CAT_FSM_TYPE_TOTAL_NUM);
 
         switch (call_cmd_test_by_fsm(self, fsm)) {
         case CAT_RETURN_STATE_OK:
