@@ -37,14 +37,14 @@ static char ack_results[256];
 static char const *input_text;
 static size_t input_index;
 
-static int a_run(const struct cat_command *cmd)
+static int a_run(const cat_command *cmd)
 {
         strcat(run_results, " A_");
         strcat(run_results, cmd->name);
         return 0;
 }
 
-static int a_read(const struct cat_command *cmd, char *data, size_t *data_size, size_t max_data_size)
+static int a_read(const cat_command *cmd, char *data, size_t *data_size, size_t max_data_size)
 {
         strcat(read_results, " A:");
         strcat(read_results, cmd->name);
@@ -55,7 +55,7 @@ static int a_read(const struct cat_command *cmd, char *data, size_t *data_size, 
         return 0;
 }
 
-static int ap_read(const struct cat_command *cmd, char *data, size_t *data_size, size_t max_data_size)
+static int ap_read(const cat_command *cmd, char *data, size_t *data_size, size_t max_data_size)
 {
         (void)data; // Unused
         (void)data_size; // Unused
@@ -68,7 +68,7 @@ static int ap_read(const struct cat_command *cmd, char *data, size_t *data_size,
         return 0;
 }
 
-static int test_read(const struct cat_command *cmd, char *data, size_t *data_size, size_t max_data_size)
+static int test_read(const cat_command *cmd, char *data, size_t *data_size, size_t max_data_size)
 {
         (void)data; // Mask as unused
         (void)data_size; // Mask as unused
@@ -79,25 +79,25 @@ static int test_read(const struct cat_command *cmd, char *data, size_t *data_siz
         return -1;
 }
 
-static struct cat_command cmds[] = { { .name = "A", .read = a_read, .run = a_run },
-                                     { .name = "AP", .read = ap_read },
-                                     { .name = "+TEST", .read = test_read },
-                                     { .name = "+EMPTY" } };
+static cat_command cmds[] = { { .name = "A", .read = a_read, .run = a_run },
+                              { .name = "AP", .read = ap_read },
+                              { .name = "+TEST", .read = test_read },
+                              { .name = "+EMPTY" } };
 
 static uint8_t buf[128];
 
-static struct cat_command_group cmd_group = {
+static cat_command_group cmd_group = {
         .cmd = cmds,
         .cmd_num = sizeof(cmds) / sizeof(cmds[0]),
 };
 
-static struct cat_command_group *cmd_desc[] = { &cmd_group };
+static cat_command_group *cmd_desc[] = { &cmd_group };
 
-static struct cat_descriptor desc = { .cmd_group = cmd_desc,
-                                      .cmd_group_num = sizeof(cmd_desc) / sizeof(cmd_desc[0]),
+static cat_descriptor desc = { .cmd_group = cmd_desc,
+                               .cmd_group_num = sizeof(cmd_desc) / sizeof(cmd_desc[0]),
 
-                                      .buf = buf,
-                                      .buf_size = sizeof(buf) };
+                               .buf = buf,
+                               .buf_size = sizeof(buf) };
 
 static int write_char(char ch)
 {
@@ -134,7 +134,7 @@ static const char test_case_1[] = "\nAT\r\nAT+\nAT+?\nATA?\r\nATAP\nATAP?\nATAPA
 
 int main(void)
 {
-        struct cat_object at;
+        cat_object at;
 
         cat_init(&at, &desc, &iface, NULL);
 

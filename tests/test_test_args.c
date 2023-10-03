@@ -48,7 +48,7 @@ static char var_string[16];
 static char const *input_text;
 static size_t input_index;
 
-static int cmd_override_test(const struct cat_command *cmd, char *data, size_t *data_size, size_t max_data_size)
+static int cmd_override_test(const cat_command *cmd, char *data, size_t *data_size, size_t max_data_size)
 {
         (void)cmd;
         (void)data_size;
@@ -59,7 +59,7 @@ static int cmd_override_test(const struct cat_command *cmd, char *data, size_t *
         return 0;
 }
 
-static int cmd_error_test(const struct cat_command *cmd, char *data, size_t *data_size, size_t max_data_size)
+static int cmd_error_test(const cat_command *cmd, char *data, size_t *data_size, size_t max_data_size)
 {
         (void)cmd;
         (void)data;
@@ -68,7 +68,7 @@ static int cmd_error_test(const struct cat_command *cmd, char *data, size_t *dat
         return -1;
 }
 
-static int cmd_ok_test(const struct cat_command *cmd, char *data, size_t *data_size, size_t max_data_size)
+static int cmd_ok_test(const cat_command *cmd, char *data, size_t *data_size, size_t max_data_size)
 {
         (void)cmd;
         (void)data_size;
@@ -79,7 +79,7 @@ static int cmd_ok_test(const struct cat_command *cmd, char *data, size_t *data_s
         return 0;
 }
 
-static int cmd_ok2_test(const struct cat_command *cmd, char *data, size_t *data_size, size_t max_data_size)
+static int cmd_ok2_test(const cat_command *cmd, char *data, size_t *data_size, size_t max_data_size)
 {
         (void)cmd;
         (void)data_size;
@@ -132,60 +132,60 @@ static struct cat_variable vars_wo[] = {
 
 static struct cat_variable vars2[] = { { .type = CAT_VAR_INT_DEC, .data = &var_int8, .data_size = sizeof(var_int8), .name = "var" } };
 
-static struct cat_command cmds[] = { { .name = "+SET",
+static cat_command cmds[] = { { .name = "+SET",
 
-                                       .var = vars,
-                                       .var_num = sizeof(vars) / sizeof(vars[0]) },
-                                     { .name = "+SETRO",
+                                .var = vars,
+                                .var_num = sizeof(vars) / sizeof(vars[0]) },
+                              { .name = "+SETRO",
 
-                                       .var = vars_ro,
-                                       .var_num = sizeof(vars_ro) / sizeof(vars_ro[0]) },
-                                     { .name = "+SETWO",
+                                .var = vars_ro,
+                                .var_num = sizeof(vars_ro) / sizeof(vars_ro[0]) },
+                              { .name = "+SETWO",
 
-                                       .var = vars_wo,
-                                       .var_num = sizeof(vars_wo) / sizeof(vars_wo[0]) },
-                                     { .name = "+TEST",
-                                       .description = "test_desc",
-                                       .test = cmd_override_test,
+                                .var = vars_wo,
+                                .var_num = sizeof(vars_wo) / sizeof(vars_wo[0]) },
+                              { .name = "+TEST",
+                                .description = "test_desc",
+                                .test = cmd_override_test,
 
-                                       .var = vars2,
-                                       .var_num = sizeof(vars2) / sizeof(vars2[0]) },
-                                     { .name = "+TEST2",
-                                       .description = "test2_desc",
+                                .var = vars2,
+                                .var_num = sizeof(vars2) / sizeof(vars2[0]) },
+                              { .name = "+TEST2",
+                                .description = "test2_desc",
 
-                                       .var = vars2,
-                                       .var_num = sizeof(vars2) / sizeof(vars2[0]) },
-                                     { .name = "+AP",
-                                       .test = cmd_error_test,
+                                .var = vars2,
+                                .var_num = sizeof(vars2) / sizeof(vars2[0]) },
+                              { .name = "+AP",
+                                .test = cmd_error_test,
 
-                                       .var = vars2,
-                                       .var_num = sizeof(vars2) / sizeof(vars2[0]) },
-                                     {
-                                             .name = "+ZZ",
-                                             .test = cmd_ok_test,
-                                     },
-                                     {
-                                             .name = "+ZZ2",
-                                             .description = "zz2_desc",
-                                             .test = cmd_ok_test,
-                                     },
-                                     {
-                                             .name = "+ZZ3",
-                                             .description = "zz3_desc",
-                                             .test = cmd_ok2_test,
-                                     } };
+                                .var = vars2,
+                                .var_num = sizeof(vars2) / sizeof(vars2[0]) },
+                              {
+                                      .name = "+ZZ",
+                                      .test = cmd_ok_test,
+                              },
+                              {
+                                      .name = "+ZZ2",
+                                      .description = "zz2_desc",
+                                      .test = cmd_ok_test,
+                              },
+                              {
+                                      .name = "+ZZ3",
+                                      .description = "zz3_desc",
+                                      .test = cmd_ok2_test,
+                              } };
 
 static uint8_t buf[256];
 static uint8_t unsolicited_buf[256];
 
-static struct cat_command_group cmd_group = {
+static cat_command_group cmd_group = {
         .cmd = cmds,
         .cmd_num = sizeof(cmds) / sizeof(cmds[0]),
 };
 
-static struct cat_command_group *cmd_desc[] = { &cmd_group };
+static cat_command_group *cmd_desc[] = { &cmd_group };
 
-static struct cat_descriptor desc = {
+static cat_descriptor desc = {
         .cmd_group = cmd_desc,
         .cmd_group_num = sizeof(cmd_desc) / sizeof(cmd_desc[0]),
 
@@ -251,7 +251,7 @@ static const char test_case_3[] = "\nAT+ZZ=?\nAT+ZZ2=?\nAT+ZZ3=?\r\n";
 
 int main(void)
 {
-        struct cat_object at;
+        cat_object at;
 
         cat_init(&at, &desc, &iface, NULL);
 

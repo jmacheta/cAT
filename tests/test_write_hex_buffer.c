@@ -41,7 +41,7 @@ static int var_write_size_index;
 static char const *input_text;
 static size_t input_index;
 
-static int cmd_write(const struct cat_command *cmd, const uint8_t *data, size_t data_size, size_t args_num)
+static int cmd_write(const cat_command *cmd, const uint8_t *data, size_t data_size, size_t args_num)
 {
         strcat(write_results, " CMD:");
         strncat(write_results, data, data_size);
@@ -56,26 +56,26 @@ static int var_write(const struct cat_variable *var, size_t write_size)
 
 static struct cat_variable vars[] = { { .type = CAT_VAR_BUF_HEX, .data = var, .data_size = sizeof(var), .write = var_write } };
 
-static struct cat_command cmds[] = { { .name = "+SET",
-                                       .write = cmd_write,
+static cat_command cmds[] = { { .name = "+SET",
+                                .write = cmd_write,
 
-                                       .var = vars,
-                                       .var_num = sizeof(vars) / sizeof(vars[0]) } };
+                                .var = vars,
+                                .var_num = sizeof(vars) / sizeof(vars[0]) } };
 
 static uint8_t buf[128];
 
-static struct cat_command_group cmd_group = {
+static cat_command_group cmd_group = {
         .cmd = cmds,
         .cmd_num = sizeof(cmds) / sizeof(cmds[0]),
 };
 
-static struct cat_command_group *cmd_desc[] = { &cmd_group };
+static cat_command_group *cmd_desc[] = { &cmd_group };
 
-static struct cat_descriptor desc = { .cmd_group = cmd_desc,
-                                      .cmd_group_num = sizeof(cmd_desc) / sizeof(cmd_desc[0]),
+static cat_descriptor desc = { .cmd_group = cmd_desc,
+                               .cmd_group_num = sizeof(cmd_desc) / sizeof(cmd_desc[0]),
 
-                                      .buf = buf,
-                                      .buf_size = sizeof(buf) };
+                               .buf = buf,
+                               .buf_size = sizeof(buf) };
 
 static int write_char(char ch)
 {
@@ -116,7 +116,7 @@ static const char test_case_2[] = "\nAT+SET=0x11\nAT+SET=11\nAT+SET=-1\nAT+SET=8
 
 int main(void)
 {
-        struct cat_object at;
+        cat_object at;
 
         cat_init(&at, &desc, &iface, NULL);
 

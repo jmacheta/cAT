@@ -42,7 +42,7 @@ static bool quit_flag;
 static int mode;
 
 /* main at command parser object */
-struct cat_object at;
+cat_object at;
 
 struct scan_results {
         int rssi;
@@ -71,7 +71,7 @@ static const struct scan_results results[2][3] = { { {
 static int scan_index;
 
 /* run command handler with custom exit mechanism */
-static int quit_run(const struct cat_command *cmd)
+static int quit_run(const cat_command *cmd)
 {
         quit_flag = true;
         return 0;
@@ -89,13 +89,13 @@ static struct cat_variable scan_vars[] = { { .type = CAT_VAR_INT_DEC, .data = &r
                                            { .type = CAT_VAR_BUF_STRING, .data = ssid, .data_size = sizeof(ssid), .name = "SSID" } };
 
 /* forward declaration */
-static cat_return_state scan_read(const struct cat_command *cmd, uint8_t *data, size_t *data_size, const size_t max_data_size);
+static cat_return_state scan_read(const cat_command *cmd, uint8_t *data, size_t *data_size, const size_t max_data_size);
 
 /* unsolicited command */
-static struct cat_command scan_cmd = { .name = "+SCAN", .read = scan_read, .var = scan_vars, .var_num = sizeof(scan_vars) / sizeof(scan_vars[0]) };
+static cat_command scan_cmd = { .name = "+SCAN", .read = scan_read, .var = scan_vars, .var_num = sizeof(scan_vars) / sizeof(scan_vars[0]) };
 
 /* unsolicited read callback handler */
-static cat_return_state scan_read(const struct cat_command *cmd, uint8_t *data, size_t *data_size, const size_t max_data_size)
+static cat_return_state scan_read(const cat_command *cmd, uint8_t *data, size_t *data_size, const size_t max_data_size)
 {
         int max = (mode == 0) ? 3 : 1;
 
@@ -118,7 +118,7 @@ static int mode_write(const struct cat_variable *var, const size_t write_size)
 }
 
 /* start write callback handler */
-static cat_return_state start_write(const struct cat_command *cmd, const uint8_t *data, const size_t data_size, const size_t args_num)
+static cat_return_state start_write(const cat_command *cmd, const uint8_t *data, const size_t data_size, const size_t args_num)
 {
         scan_index = 0;
 
@@ -129,7 +129,7 @@ static cat_return_state start_write(const struct cat_command *cmd, const uint8_t
 }
 
 /* run command handler attached to HELP command for printing commands list */
-static int print_cmd_list(const struct cat_command *cmd)
+static int print_cmd_list(const cat_command *cmd)
 {
         return CAT_RETURN_STATE_PRINT_CMD_LIST_OK;
 }
@@ -145,7 +145,7 @@ static struct cat_variable start_vars[] = { {
 } };
 
 /* declaring commands array */
-static struct cat_command cmds[] = {
+static cat_command cmds[] = {
         { .name = "+START",
           .description = "Start scanning after write (0 - wifi, 1 - bluetooth).",
           .write = start_write,
@@ -164,14 +164,14 @@ static struct cat_command cmds[] = {
 static char buf[128];
 
 /* declaring parser descriptor */
-static struct cat_command_group cmd_group = {
+static cat_command_group cmd_group = {
         .cmd = cmds,
         .cmd_num = sizeof(cmds) / sizeof(cmds[0]),
 };
 
-static struct cat_command_group *cmd_desc[] = { &cmd_group };
+static cat_command_group *cmd_desc[] = { &cmd_group };
 
-static struct cat_descriptor desc = {
+static cat_descriptor desc = {
         .cmd_group = cmd_desc,
         .cmd_group_num = sizeof(cmd_desc) / sizeof(cmd_desc[0]),
 

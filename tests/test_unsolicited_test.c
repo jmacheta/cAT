@@ -38,11 +38,11 @@ static char const *input_text;
 static size_t input_index;
 
 static int var_x, var_u1, var_u2;
-static struct cat_object at;
+static cat_object at;
 
-static struct cat_command u_cmds[];
+static cat_command u_cmds[];
 
-static cat_return_state cmd_test(const struct cat_command *cmd, uint8_t *data, size_t *data_size, size_t max_data_size)
+static cat_return_state cmd_test(const cat_command *cmd, uint8_t *data, size_t *data_size, size_t max_data_size)
 {
         cat_status s;
 
@@ -62,36 +62,36 @@ static struct cat_variable u_vars[] = { { .name = "U1", .type = CAT_VAR_INT_DEC,
 
 static struct cat_variable vars[] = { { .name = "X", .type = CAT_VAR_INT_DEC, .data = &var_x, .data_size = sizeof(var_x) } };
 
-static struct cat_command cmds[] = { {
+static cat_command cmds[] = { {
         .name = "+CMD",
         .test = cmd_test,
         .var = vars,
         .var_num = sizeof(vars) / sizeof(vars[0]),
 } };
 
-static struct cat_command u_cmds[] = { {
-                                               .name = "+U1CMD",
-                                               .test = cmd_test,
-                                               .var = &u_vars[0],
-                                               .var_num = 1,
-                                       },
-                                       {
-                                               .name = "+U2CMD",
-                                               .test = cmd_test,
-                                               .var = &u_vars[1],
-                                               .var_num = 1,
-                                       } };
+static cat_command u_cmds[] = { {
+                                        .name = "+U1CMD",
+                                        .test = cmd_test,
+                                        .var = &u_vars[0],
+                                        .var_num = 1,
+                                },
+                                {
+                                        .name = "+U2CMD",
+                                        .test = cmd_test,
+                                        .var = &u_vars[1],
+                                        .var_num = 1,
+                                } };
 
 static uint8_t buf[128];
 
-static struct cat_command_group cmd_group = {
+static cat_command_group cmd_group = {
         .cmd = cmds,
         .cmd_num = sizeof(cmds) / sizeof(cmds[0]),
 };
 
-static struct cat_command_group *cmd_desc[] = { &cmd_group };
+static cat_command_group *cmd_desc[] = { &cmd_group };
 
-static struct cat_descriptor desc = {
+static cat_descriptor desc = {
         .cmd_group = cmd_desc,
         .cmd_group_num = sizeof(cmd_desc) / sizeof(cmd_desc[0]),
 

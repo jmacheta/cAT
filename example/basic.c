@@ -40,20 +40,20 @@ static char message[16];
 static bool quit_flag;
 
 /* run command handler with application dependent login print code */
-static int print_run(const struct cat_command *cmd)
+static int print_run(const cat_command *cmd)
 {
         printf("some printing at (%d,%d) with text \"%s\"\n", x, y, message);
         return 0;
 }
 
 /* run command handler attached to HELP command for printing commands list */
-static int print_cmd_list(const struct cat_command *cmd)
+static int print_cmd_list(const cat_command *cmd)
 {
         return CAT_RETURN_STATE_PRINT_CMD_LIST_OK;
 }
 
 /* run command handler with custom exit mechanism */
-static int quit_run(const struct cat_command *cmd)
+static int quit_run(const cat_command *cmd)
 {
         quit_flag = true;
         return 0;
@@ -83,7 +83,7 @@ static struct cat_variable print_vars[] = { {
                                             } };
 
 /* declaring commands array */
-static struct cat_command cmds[] = {
+static cat_command cmds[] = {
         { .name = "+PRINT",
           .description = "Printing something special at (X,Y).",
           .run = print_run,
@@ -101,18 +101,18 @@ static struct cat_command cmds[] = {
 static char buf[128];
 
 /* declaring parser descriptor */
-static struct cat_command_group cmd_group = {
+static cat_command_group cmd_group = {
         .cmd = cmds,
         .cmd_num = sizeof(cmds) / sizeof(cmds[0]),
 };
 
-static struct cat_command_group *cmd_desc[] = { &cmd_group };
+static cat_command_group *cmd_desc[] = { &cmd_group };
 
-static struct cat_descriptor desc = { .cmd_group = cmd_desc,
-                                      .cmd_group_num = sizeof(cmd_desc) / sizeof(cmd_desc[0]),
+static cat_descriptor desc = { .cmd_group = cmd_desc,
+                               .cmd_group_num = sizeof(cmd_desc) / sizeof(cmd_desc[0]),
 
-                                      .buf = buf,
-                                      .buf_size = sizeof(buf) };
+                               .buf = buf,
+                               .buf_size = sizeof(buf) };
 
 /* custom target dependent input output handlers */
 static int write_char(char ch)
@@ -132,7 +132,7 @@ static struct cat_io_interface iface = { .read = read_char, .write = write_char 
 
 int main(void)
 {
-        struct cat_object at;
+        cat_object at;
 
         /* initializing */
         cat_init(&at, &desc, &iface, NULL);

@@ -37,7 +37,7 @@ static char ack_results[256];
 static char const *input_text;
 static size_t input_index;
 
-static int ap_test(const struct cat_command *cmd, char *data, size_t *data_size, size_t max_data_size)
+static int ap_test(const cat_command *cmd, char *data, size_t *data_size, size_t max_data_size)
 {
         (void)max_data_size; // Unused
         strcat(cmd_results, " test:");
@@ -49,7 +49,7 @@ static int ap_test(const struct cat_command *cmd, char *data, size_t *data_size,
         return 0;
 }
 
-static int ap_run(const struct cat_command *cmd)
+static int ap_run(const cat_command *cmd)
 {
         strcat(cmd_results, " run:");
         strcat(cmd_results, cmd->name);
@@ -57,7 +57,7 @@ static int ap_run(const struct cat_command *cmd)
         return 0;
 }
 
-static int ap_read(const struct cat_command *cmd, char *data, size_t *data_size, size_t max_data_size)
+static int ap_read(const cat_command *cmd, char *data, size_t *data_size, size_t max_data_size)
 {
         (void)data_size; // Unused
         (void)max_data_size; // Unused
@@ -71,7 +71,7 @@ static int ap_read(const struct cat_command *cmd, char *data, size_t *data_size,
         return 0;
 }
 
-static int ap_write(const struct cat_command *cmd, const char *data, size_t data_size, size_t args_num)
+static int ap_write(const cat_command *cmd, const char *data, size_t data_size, size_t args_num)
 {
         (void)data_size; // Unused
 
@@ -85,25 +85,25 @@ static int ap_write(const struct cat_command *cmd, const char *data, size_t data
         return 0;
 }
 
-static struct cat_command cmds[] = {
+static cat_command cmds[] = {
         { .name = "AP1", .test = ap_test, .write = ap_write, .read = ap_read, .run = ap_run, .only_test = true },
         { .name = "AP2", .test = ap_test, .write = ap_write, .read = ap_read, .run = ap_run, .only_test = false },
 };
 
 static uint8_t buf[128];
 
-static struct cat_command_group cmd_group = {
+static cat_command_group cmd_group = {
         .cmd = cmds,
         .cmd_num = sizeof(cmds) / sizeof(cmds[0]),
 };
 
-static struct cat_command_group *cmd_desc[] = { &cmd_group };
+static cat_command_group *cmd_desc[] = { &cmd_group };
 
-static struct cat_descriptor desc = { .cmd_group = cmd_desc,
-                                      .cmd_group_num = sizeof(cmd_desc) / sizeof(cmd_desc[0]),
+static cat_descriptor desc = { .cmd_group = cmd_desc,
+                               .cmd_group_num = sizeof(cmd_desc) / sizeof(cmd_desc[0]),
 
-                                      .buf = buf,
-                                      .buf_size = sizeof(buf) };
+                               .buf = buf,
+                               .buf_size = sizeof(buf) };
 
 static int write_char(char ch)
 {
@@ -140,7 +140,7 @@ static const char test_case_2[] = "\nATAP2=?\n\nATAP2?\n\nATAP2=1\n\nATAP2\n";
 
 int main(void)
 {
-        struct cat_object at;
+        cat_object at;
 
         cat_init(&at, &desc, &iface, NULL);
 

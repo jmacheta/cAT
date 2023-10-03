@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.0)
 
-target_compile_options(cat PUBLIC -Wall -Wextra)
+target_compile_options(cat PRIVATE -Wall -Wextra -Wconversion)
 
 add_executable(test_parse test_parse.c)
 target_link_libraries(test_parse cat)

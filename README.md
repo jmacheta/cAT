@@ -124,7 +124,7 @@ static struct cat_variable go_vars[] = {
 Define AT commands descriptor:
 
 ```c
-static struct cat_command cmds[] = {
+static cat_command cmds[] = {
         {
                 .name = "TEST",
                 .read = test_read, /* read handler for ATTEST? command */
@@ -156,16 +156,16 @@ Define AT command parser descriptor:
 
 static char working_buf[128]; /* working buffer, must be declared manually */
 
-static struct cat_command_group cmd_group = {
+static cat_command_group cmd_group = {
         .cmd = cmds,
         .cmd_num = sizeof(cmds) / sizeof(cmds[0]),
 };
 
-static struct cat_command_group *cmd_desc[] = {
+static cat_command_group *cmd_desc[] = {
         &cmd_group
 };
 
-static struct cat_descriptor desc = {
+static cat_descriptor desc = {
         .cmd_group = cmd_desc,
         .cmd_group_num = sizeof(cmd_desc) / sizeof(cmd_desc[0]),
 
@@ -198,7 +198,7 @@ static struct cat_io_interface iface = {
 Initialize AT command parser and run:
 
 ```c
-struct cat_object at; /* at command parser object */
+cat_object at; /* at command parser object */
 
 cat_init(&at, &desc, &iface, NULL); /* initialize at command parser object */
 

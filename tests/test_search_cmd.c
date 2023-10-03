@@ -31,7 +31,7 @@ SOFTWARE.
 
 #include <cat/cat.h>
 
-static int ap_read(const struct cat_command *cmd, uint8_t *data, size_t *data_size, size_t max_data_size)
+static int ap_read(const cat_command *cmd, uint8_t *data, size_t *data_size, size_t max_data_size)
 {
         (void)cmd; // Unused
         (void)data; // Unused
@@ -40,7 +40,7 @@ static int ap_read(const struct cat_command *cmd, uint8_t *data, size_t *data_si
         return 0;
 }
 
-static int ap_write(const struct cat_command *cmd, const uint8_t *data, size_t data_size, size_t args_num)
+static int ap_write(const cat_command *cmd, const uint8_t *data, size_t data_size, size_t args_num)
 {
         (void)cmd; // Unused
         (void)data; // Unused
@@ -53,39 +53,39 @@ static struct cat_variable vars_ap1[] = { { .name = "var_ap1_1" }, { .name = "va
 
 static struct cat_variable vars_apx2[] = { { .name = "var_apx2_1" }, { .name = "var_apx2_2" }, { .name = "var_apx2_3" } };
 
-static struct cat_command cmds[] = {
+static cat_command cmds[] = {
         { .name = "AP1", .write = ap_write, .only_test = true, .var = vars_ap1, .var_num = sizeof(vars_ap1) / sizeof(vars_ap1[0]) },
         { .name = "AP2", .read = ap_read, .only_test = false },
 };
 
-static struct cat_command cmds2[] = {
+static cat_command cmds2[] = {
         { .name = "APX1", .write = ap_write, .only_test = true },
         { .name = "APX2", .read = ap_read, .only_test = false, .var = vars_apx2, .var_num = sizeof(vars_apx2) / sizeof(vars_apx2[0]) },
 };
 
 static uint8_t buf[128];
 
-static struct cat_command_group cmd_group1 = {
+static cat_command_group cmd_group1 = {
         .name = "std",
 
         .cmd = cmds,
         .cmd_num = sizeof(cmds) / sizeof(cmds[0]),
 };
 
-static struct cat_command_group cmd_group2 = {
+static cat_command_group cmd_group2 = {
         .name = "ext",
 
         .cmd = cmds2,
         .cmd_num = sizeof(cmds2) / sizeof(cmds2[0]),
 };
 
-static struct cat_command_group *cmd_desc[] = { &cmd_group1, &cmd_group2 };
+static cat_command_group *cmd_desc[] = { &cmd_group1, &cmd_group2 };
 
-static struct cat_descriptor desc = { .cmd_group = cmd_desc,
-                                      .cmd_group_num = sizeof(cmd_desc) / sizeof(cmd_desc[0]),
+static cat_descriptor desc = { .cmd_group = cmd_desc,
+                               .cmd_group_num = sizeof(cmd_desc) / sizeof(cmd_desc[0]),
 
-                                      .buf = buf,
-                                      .buf_size = sizeof(buf) };
+                               .buf = buf,
+                               .buf_size = sizeof(buf) };
 
 static int write_char(char ch)
 {
@@ -103,9 +103,9 @@ static struct cat_io_interface iface = { .read = read_char, .write = write_char 
 
 int main(void)
 {
-        struct cat_object at;
-        struct cat_command const *cmd;
-        struct cat_command_group const *cmd_group;
+        cat_object at;
+        cat_command const *cmd;
+        cat_command_group const *cmd_group;
         struct cat_variable const *var;
 
         cat_init(&at, &desc, &iface, NULL);

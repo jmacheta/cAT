@@ -55,22 +55,22 @@ static uint32_t var_hex32;
 static uint8_t var_buf[4];
 static char var_string[16];
 
-static int cmd_write(const struct cat_command *cmd, const uint8_t *data, size_t data_size, size_t args_num)
+static int cmd_write(const cat_command *cmd, const uint8_t *data, size_t data_size, size_t args_num)
 {
         return 0;
 }
 
-static int cmd_read(const struct cat_command *cmd, uint8_t *data, size_t *data_size, size_t max_data_size)
+static int cmd_read(const cat_command *cmd, uint8_t *data, size_t *data_size, size_t max_data_size)
 {
         return 0;
 }
 
-static int cmd_test(const struct cat_command *cmd, uint8_t *data, size_t *data_size, size_t max_data_size)
+static int cmd_test(const cat_command *cmd, uint8_t *data, size_t *data_size, size_t max_data_size)
 {
         return 0;
 }
 
-static int cmd_run(const struct cat_command *cmd)
+static int cmd_run(const cat_command *cmd)
 {
         return 0;
 }
@@ -107,7 +107,7 @@ static int var3_read(const struct cat_variable *var)
         return 0;
 }
 
-static int print_cmd_list(const struct cat_command *cmd)
+static int print_cmd_list(const cat_command *cmd)
 {
         return CAT_RETURN_STATE_PRINT_CMD_LIST_OK;
 }
@@ -156,26 +156,26 @@ static struct cat_variable vars_misc_wo[] = {
         { .type = CAT_VAR_BUF_STRING, .data = &var_string, .data_size = sizeof(var_string), .name = "msg", .access = CAT_VAR_ACCESS_WRITE_ONLY }
 };
 
-static struct cat_command cmds[] = { { .name = "+VRW", .var = vars, .var_num = sizeof(vars) / sizeof(vars[0]) },
-                                     { .name = "+VRO", .var = vars_ro, .var_num = sizeof(vars_ro) / sizeof(vars_ro[0]) },
-                                     { .name = "+VWO", .var = vars_wo, .var_num = sizeof(vars_wo) / sizeof(vars_wo[0]) },
-                                     { .name = "+MRO", .var = vars_misc_ro, .var_num = sizeof(vars_misc_ro) / sizeof(vars_misc_ro[0]) },
-                                     { .name = "+MWO", .var = vars_misc_wo, .var_num = sizeof(vars_misc_wo) / sizeof(vars_misc_wo[0]) },
-                                     {
-                                             .name = "#HELP",
-                                             .run = print_cmd_list,
-                                     } };
+static cat_command cmds[] = { { .name = "+VRW", .var = vars, .var_num = sizeof(vars) / sizeof(vars[0]) },
+                              { .name = "+VRO", .var = vars_ro, .var_num = sizeof(vars_ro) / sizeof(vars_ro[0]) },
+                              { .name = "+VWO", .var = vars_wo, .var_num = sizeof(vars_wo) / sizeof(vars_wo[0]) },
+                              { .name = "+MRO", .var = vars_misc_ro, .var_num = sizeof(vars_misc_ro) / sizeof(vars_misc_ro[0]) },
+                              { .name = "+MWO", .var = vars_misc_wo, .var_num = sizeof(vars_misc_wo) / sizeof(vars_misc_wo[0]) },
+                              {
+                                      .name = "#HELP",
+                                      .run = print_cmd_list,
+                              } };
 
 static uint8_t buf[256];
 
-static struct cat_command_group cmd_group = {
+static cat_command_group cmd_group = {
         .cmd = cmds,
         .cmd_num = sizeof(cmds) / sizeof(cmds[0]),
 };
 
-static struct cat_command_group *cmd_desc[] = { &cmd_group };
+static cat_command_group *cmd_desc[] = { &cmd_group };
 
-static struct cat_descriptor desc = {
+static cat_descriptor desc = {
         .cmd_group = cmd_desc,
         .cmd_group_num = sizeof(cmd_desc) / sizeof(cmd_desc[0]),
 
@@ -226,7 +226,7 @@ static void print_raw_text(char *p)
 
 int main(void)
 {
-        struct cat_object at;
+        cat_object at;
 
         cat_init(&at, &desc, &iface, NULL);
 

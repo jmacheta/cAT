@@ -39,7 +39,7 @@ static int8_t var2;
 static char const *input_text;
 static size_t input_index;
 
-static int cmd_write(const struct cat_command *cmd, const uint8_t *data, size_t data_size, size_t args_num)
+static int cmd_write(const cat_command *cmd, const uint8_t *data, size_t data_size, size_t args_num)
 {
         (void)cmd; // Unused
         (void)data; // Unused
@@ -48,7 +48,7 @@ static int cmd_write(const struct cat_command *cmd, const uint8_t *data, size_t 
         return 0;
 }
 
-static int cmd_read(const struct cat_command *cmd, uint8_t *data, size_t *data_size, size_t max_data_size)
+static int cmd_read(const cat_command *cmd, uint8_t *data, size_t *data_size, size_t max_data_size)
 {
         (void)cmd; // Unused
         (void)data; // Unused
@@ -57,7 +57,7 @@ static int cmd_read(const struct cat_command *cmd, uint8_t *data, size_t *data_s
         return 0;
 }
 
-static int cmd_test(const struct cat_command *cmd, uint8_t *data, size_t *data_size, size_t max_data_size)
+static int cmd_test(const cat_command *cmd, uint8_t *data, size_t *data_size, size_t max_data_size)
 {
         (void)cmd; // Unused
         (void)data; // Unused
@@ -66,7 +66,7 @@ static int cmd_test(const struct cat_command *cmd, uint8_t *data, size_t *data_s
         return 0;
 }
 
-static int cmd_run(const struct cat_command *cmd)
+static int cmd_run(const cat_command *cmd)
 {
         (void)cmd; // Unused
 
@@ -87,7 +87,7 @@ static int var2_write(const struct cat_variable *var, size_t write_size)
         return 0;
 }
 
-static int print_cmd_list(const struct cat_command *cmd)
+static int print_cmd_list(const cat_command *cmd)
 {
         (void)cmd; // Unused
 
@@ -117,7 +117,7 @@ static struct cat_variable vars2_wo[] = {
         { .type = CAT_VAR_INT_DEC, .data = &var2, .data_size = sizeof(var2), .write = var2_write }
 };
 
-static struct cat_command cmds[] = {
+static cat_command cmds[] = {
         { .name = "+V1", .var = vars, .var_num = sizeof(vars) / sizeof(vars[0]) },
         { .name = "+V1RO", .var = vars_ro, .var_num = sizeof(vars_ro) / sizeof(vars_ro[0]) },
         { .name = "+V1RW", .var = vars_wo, .var_num = sizeof(vars_wo) / sizeof(vars_wo[0]) },
@@ -181,14 +181,14 @@ static struct cat_command cmds[] = {
 
 static uint8_t buf[512];
 
-static struct cat_command_group cmd_group = {
+static cat_command_group cmd_group = {
         .cmd = cmds,
         .cmd_num = sizeof(cmds) / sizeof(cmds[0]),
 };
 
-static struct cat_command_group *cmd_desc[] = { &cmd_group };
+static cat_command_group *cmd_desc[] = { &cmd_group };
 
-static struct cat_descriptor desc = {
+static cat_descriptor desc = {
         .cmd_group = cmd_desc,
         .cmd_group_num = sizeof(cmd_desc) / sizeof(cmd_desc[0]),
 
@@ -227,7 +227,7 @@ static void prepare_input(const char *text)
 
 int main(void)
 {
-        struct cat_object at;
+        cat_object at;
 
         cat_init(&at, &desc, &iface, NULL);
 

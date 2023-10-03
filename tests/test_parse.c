@@ -36,53 +36,53 @@ static char ack_results[256];
 static char const *input_text;
 static size_t input_index;
 
-static int a_run(const struct cat_command *cmd)
+static int a_run(const cat_command *cmd)
 {
         strcat(run_results, " A:");
         strcat(run_results, cmd->name);
         return 0;
 }
 
-static int ap_run(const struct cat_command *cmd)
+static int ap_run(const cat_command *cmd)
 {
         strcat(run_results, " AP:");
         strcat(run_results, cmd->name);
         return 0;
 }
 
-static int test_run(const struct cat_command *cmd)
+static int test_run(const cat_command *cmd)
 {
         strcat(run_results, " +TEST:");
         strcat(run_results, cmd->name);
         return 0;
 }
 
-static struct cat_command cmds[] = { {
-                                             .name = "A",
-                                             .run = a_run,
-                                             .disable = false,
-                                     },
-                                     {
-                                             .name = "AP",
-                                             .run = ap_run,
-                                             .disable = false,
-                                     },
-                                     {
-                                             .name = "+TEST",
-                                             .run = test_run,
-                                             .disable = false,
-                                     } };
+static cat_command cmds[] = { {
+                                      .name = "A",
+                                      .run = a_run,
+                                      .disable = false,
+                              },
+                              {
+                                      .name = "AP",
+                                      .run = ap_run,
+                                      .disable = false,
+                              },
+                              {
+                                      .name = "+TEST",
+                                      .run = test_run,
+                                      .disable = false,
+                              } };
 
 static uint8_t buf[128];
 
-static struct cat_command_group cmd_group = {
+static cat_command_group cmd_group = {
         .cmd = cmds,
         .cmd_num = sizeof(cmds) / sizeof(cmds[0]),
 };
 
-static struct cat_command_group *cmd_desc[] = { &cmd_group };
+static cat_command_group *cmd_desc[] = { &cmd_group };
 
-static struct cat_descriptor desc = {
+static cat_descriptor desc = {
         .cmd_group = cmd_desc,
         .cmd_group_num = sizeof(cmd_desc) / sizeof(cmd_desc[0]),
 
@@ -124,7 +124,7 @@ static const char test_case_1[] = "\nsa\rAT\n\r\nAT\nAT+\n\nATA\r\natap\naaaattt
 
 int main(void)
 {
-        struct cat_object at;
+        cat_object at;
 
         cat_init(&at, &desc, &iface, NULL);
 
@@ -159,11 +159,11 @@ int main(void)
         assert(strcmp(ack_results, "\nOK\n") == 0);
         assert(strcmp(run_results, " +TEST:+TEST") == 0);
 
-        struct cat_command *cmd;
+        cat_command *cmd;
 
-        cmd = (struct cat_command *)cat_search_command_by_name(&at, "A");
+        cmd = (cat_command *)cat_search_command_by_name(&at, "A");
         cmd->disable = true;
-        cmd = (struct cat_command *)cat_search_command_by_name(&at, "+TEST");
+        cmd = (cat_command *)cat_search_command_by_name(&at, "+TEST");
         cmd->disable = true;
 
         prepare_input("\nATA\n\nATAP\n\nAT+TEST\n");
@@ -173,12 +173,12 @@ int main(void)
         assert(strcmp(ack_results, "\nOK\n\nOK\n\nERROR\n") == 0);
         assert(strcmp(run_results, " AP:AP AP:AP") == 0);
 
-        struct cat_command_group *cmd_group;
-        cmd_group = (struct cat_command_group *)cat_search_command_group_by_name(&at, "standard");
+        cat_command_group *cmd_group;
+        cmd_group = (cat_command_group *)cat_search_command_group_by_name(&at, "standard");
         assert(cmd_group == NULL);
 
         cmd_desc[0]->name = "standard";
-        cmd_group = (struct cat_command_group *)cat_search_command_group_by_name(&at, "standard");
+        cmd_group = (cat_command_group *)cat_search_command_group_by_name(&at, "standard");
         assert(cmd_group == cmd_desc[0]);
         cmd_group->disable = true;
 

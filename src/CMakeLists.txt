@@ -4,3 +4,6 @@ target_include_directories(
   PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
          $<INSTALL_INTERFACE:include>
   PRIVATE $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/cat>)
+
+target_compile_options(cat PRIVATE -Weverything -std=c11 -Wextra -Wconversion
+                                   -Wno-padded -Wno-declaration-after-statement)

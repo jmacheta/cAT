@@ -39,11 +39,11 @@ static char const *input_text;
 static size_t input_index;
 
 static int var_x, var_u1;
-static struct cat_object at;
+static cat_object at;
 
-static struct cat_command u_cmds[];
+static cat_command u_cmds[];
 
-static cat_return_state cmd_read(const struct cat_command *cmd, uint8_t *data, size_t *data_size, size_t max_data_size)
+static cat_return_state cmd_read(const cat_command *cmd, uint8_t *data, size_t *data_size, size_t max_data_size)
 {
         cat_status s;
 
@@ -65,14 +65,14 @@ static struct cat_variable u_vars[] = { { .name = "U1", .type = CAT_VAR_INT_DEC,
 
 static struct cat_variable vars[] = { { .name = "X", .type = CAT_VAR_INT_DEC, .data = &var_x, .data_size = sizeof(var_x), .read = var_read } };
 
-static struct cat_command cmds[] = { {
+static cat_command cmds[] = { {
         .name = "+CMD",
         .read = cmd_read,
         .var = vars,
         .var_num = sizeof(vars) / sizeof(vars[0]),
 } };
 
-static struct cat_command u_cmds[] = { {
+static cat_command u_cmds[] = { {
         .name = "+UCMD",
         .read = cmd_read,
         .var = u_vars,
@@ -81,14 +81,14 @@ static struct cat_command u_cmds[] = { {
 
 static uint8_t buf[128];
 
-static struct cat_command_group cmd_group = {
+static cat_command_group cmd_group = {
         .cmd = cmds,
         .cmd_num = sizeof(cmds) / sizeof(cmds[0]),
 };
 
-static struct cat_command_group *cmd_desc[] = { &cmd_group };
+static cat_command_group *cmd_desc[] = { &cmd_group };
 
-static struct cat_descriptor desc = {
+static cat_descriptor desc = {
         .cmd_group = cmd_desc,
         .cmd_group_num = sizeof(cmd_desc) / sizeof(cmd_desc[0]),
 
@@ -136,7 +136,7 @@ int main(void)
 {
         cat_status s;
         int events = 4;
-        struct cat_command const *cmd;
+        cat_command const *cmd;
 
         cat_init(&at, &desc, &iface, NULL);
 

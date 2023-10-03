@@ -38,14 +38,14 @@ static char ack_results[256];
 static char const *input_text;
 static size_t input_index;
 
-static int a_run(const struct cat_command *cmd)
+static int a_run(const cat_command *cmd)
 {
         strcat(run_results, " A_");
         strcat(run_results, cmd->name);
         return 0;
 }
 
-static int a_write(const struct cat_command *cmd, const char *data, size_t data_size, size_t args_num)
+static int a_write(const cat_command *cmd, const char *data, size_t data_size, size_t args_num)
 {
         (void)args_num; // Mark as unused
         (void)cmd; // Mark as unused
@@ -57,7 +57,7 @@ static int a_write(const struct cat_command *cmd, const char *data, size_t data_
         return 0;
 }
 
-static int ap_write(const struct cat_command *cmd, const char *data, size_t data_size, size_t args_num)
+static int ap_write(const cat_command *cmd, const char *data, size_t data_size, size_t args_num)
 {
         (void)args_num; // Mark as unused
         (void)cmd; // Mark as unused
@@ -69,7 +69,7 @@ static int ap_write(const struct cat_command *cmd, const char *data, size_t data
         return 0;
 }
 
-static int test_write(const struct cat_command *cmd, const char *data, size_t data_size, size_t args_num)
+static int test_write(const cat_command *cmd, const char *data, size_t data_size, size_t args_num)
 {
         (void)args_num; // Mark as unused
         (void)cmd; // Mark as unused
@@ -81,25 +81,25 @@ static int test_write(const struct cat_command *cmd, const char *data, size_t da
         return -1;
 }
 
-static struct cat_command cmds[] = { { .name = "A", .write = a_write, .run = a_run },
-                                     { .name = "AP", .write = ap_write },
-                                     { .name = "+TEST", .write = test_write },
-                                     { .name = "+EMPTY" } };
+static cat_command cmds[] = { { .name = "A", .write = a_write, .run = a_run },
+                              { .name = "AP", .write = ap_write },
+                              { .name = "+TEST", .write = test_write },
+                              { .name = "+EMPTY" } };
 
 static uint8_t buf[128];
 
-static struct cat_command_group cmd_group = {
+static cat_command_group cmd_group = {
         .cmd = cmds,
         .cmd_num = sizeof(cmds) / sizeof(cmds[0]),
 };
 
-static struct cat_command_group *cmd_desc[] = { &cmd_group };
+static cat_command_group *cmd_desc[] = { &cmd_group };
 
-static struct cat_descriptor desc = { .cmd_group = cmd_desc,
-                                      .cmd_group_num = sizeof(cmd_desc) / sizeof(cmd_desc[0]),
+static cat_descriptor desc = { .cmd_group = cmd_desc,
+                               .cmd_group_num = sizeof(cmd_desc) / sizeof(cmd_desc[0]),
 
-                                      .buf = buf,
-                                      .buf_size = sizeof(buf) };
+                               .buf = buf,
+                               .buf_size = sizeof(buf) };
 
 static int write_char(char ch)
 {
@@ -136,7 +136,7 @@ static const char test_case_1[] = "\nAT\nAT+\nAT+?\nATA=123\r\nATA=\nATAP?\nATAP
 
 int main(void)
 {
-        struct cat_object at;
+        cat_object at;
 
         cat_init(&at, &desc, &iface, NULL);
 

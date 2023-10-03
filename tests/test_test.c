@@ -37,7 +37,7 @@ static char ack_results[256];
 static char const *input_text;
 static size_t input_index;
 
-static int a_test(const struct cat_command *cmd, uint8_t *data, size_t *data_size, size_t max_data_size)
+static int a_test(const cat_command *cmd, uint8_t *data, size_t *data_size, size_t max_data_size)
 {
         strcat(test_results, " A:");
         strcat(test_results, cmd->name);
@@ -48,7 +48,7 @@ static int a_test(const struct cat_command *cmd, uint8_t *data, size_t *data_siz
         return 0;
 }
 
-static int ap_test(const struct cat_command *cmd, uint8_t *data, size_t *data_size, size_t max_data_size)
+static int ap_test(const cat_command *cmd, uint8_t *data, size_t *data_size, size_t max_data_size)
 {
         strcat(test_results, " AP:");
         strcat(test_results, cmd->name);
@@ -58,7 +58,7 @@ static int ap_test(const struct cat_command *cmd, uint8_t *data, size_t *data_si
         return 0;
 }
 
-static int ap_write(const struct cat_command *cmd, const uint8_t *data, size_t data_size, size_t args_num)
+static int ap_write(const cat_command *cmd, const uint8_t *data, size_t data_size, size_t args_num)
 {
         strcat(test_results, " AP_W:");
         strcat(test_results, cmd->name);
@@ -70,7 +70,7 @@ static int ap_write(const struct cat_command *cmd, const uint8_t *data, size_t d
         return 0;
 }
 
-static int apw_write(const struct cat_command *cmd, const uint8_t *data, size_t data_size, size_t args_num)
+static int apw_write(const cat_command *cmd, const uint8_t *data, size_t data_size, size_t args_num)
 {
         strcat(test_results, " APW:");
         strcat(test_results, cmd->name);
@@ -82,7 +82,7 @@ static int apw_write(const struct cat_command *cmd, const uint8_t *data, size_t 
         return 0;
 }
 
-static int test_test(const struct cat_command *cmd, uint8_t *data, size_t *data_size, size_t max_data_size)
+static int test_test(const cat_command *cmd, uint8_t *data, size_t *data_size, size_t max_data_size)
 {
         strcat(test_results, " +TEST:");
         strcat(test_results, cmd->name);
@@ -90,26 +90,26 @@ static int test_test(const struct cat_command *cmd, uint8_t *data, size_t *data_
         return -1;
 }
 
-static struct cat_command cmds[] = { { .name = "A", .test = a_test },
-                                     { .name = "AP", .test = ap_test, .write = ap_write },
-                                     { .name = "APW", .write = apw_write },
-                                     { .name = "+TEST", .test = test_test },
-                                     { .name = "+EMPTY" } };
+static cat_command cmds[] = { { .name = "A", .test = a_test },
+                              { .name = "AP", .test = ap_test, .write = ap_write },
+                              { .name = "APW", .write = apw_write },
+                              { .name = "+TEST", .test = test_test },
+                              { .name = "+EMPTY" } };
 
 static uint8_t buf[128];
 
-static struct cat_command_group cmd_group = {
+static cat_command_group cmd_group = {
         .cmd = cmds,
         .cmd_num = sizeof(cmds) / sizeof(cmds[0]),
 };
 
-static struct cat_command_group *cmd_desc[] = { &cmd_group };
+static cat_command_group *cmd_desc[] = { &cmd_group };
 
-static struct cat_descriptor desc = { .cmd_group = cmd_desc,
-                                      .cmd_group_num = sizeof(cmd_desc) / sizeof(cmd_desc[0]),
+static cat_descriptor desc = { .cmd_group = cmd_desc,
+                               .cmd_group_num = sizeof(cmd_desc) / sizeof(cmd_desc[0]),
 
-                                      .buf = buf,
-                                      .buf_size = sizeof(buf) };
+                               .buf = buf,
+                               .buf_size = sizeof(buf) };
 
 static int write_char(char ch)
 {
@@ -145,7 +145,7 @@ static const char test_case_1[] = "\nAT\r\nAT\nATAP=?\nATAP=?a\nATAP=a\nATAPW=?\
 
 int main(void)
 {
-        struct cat_object at;
+        cat_object at;
 
         cat_init(&at, &desc, &iface, NULL);
 

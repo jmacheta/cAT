@@ -44,7 +44,7 @@ static char const *input_text;
 static size_t input_index;
 static int common_cntr;
 
-static int cmd_read(const struct cat_command *cmd, char *data, size_t *data_size, size_t max_data_size)
+static int cmd_read(const cat_command *cmd, char *data, size_t *data_size, size_t max_data_size)
 {
         (void)cmd; // Unused
         (void)data; // Unused
@@ -53,7 +53,7 @@ static int cmd_read(const struct cat_command *cmd, char *data, size_t *data_size
         return 0;
 }
 
-static int cmd2_read(const struct cat_command *cmd, char *data, size_t *data_size, size_t max_data_size)
+static int cmd2_read(const cat_command *cmd, char *data, size_t *data_size, size_t max_data_size)
 {
         (void)data_size; // Unused
         (void)max_data_size; // Unused
@@ -78,7 +78,7 @@ static struct cat_variable vars[] = { { .type = CAT_VAR_INT_DEC, .data = &var_in
                                       { .type = CAT_VAR_BUF_HEX, .data = &var_buf, .data_size = sizeof(var_buf), .read = common_var_read_handler },
                                       { .type = CAT_VAR_BUF_STRING, .data = &var_string, .data_size = sizeof(var_string), .read = common_var_read_handler } };
 
-static struct cat_command cmds[] = {
+static cat_command cmds[] = {
         { .name = "+SET",
           .read = cmd_read,
 
@@ -93,18 +93,18 @@ static struct cat_command cmds[] = {
 
 static uint8_t buf[128];
 
-static struct cat_command_group cmd_group = {
+static cat_command_group cmd_group = {
         .cmd = cmds,
         .cmd_num = sizeof(cmds) / sizeof(cmds[0]),
 };
 
-static struct cat_command_group *cmd_desc[] = { &cmd_group };
+static cat_command_group *cmd_desc[] = { &cmd_group };
 
-static struct cat_descriptor desc = { .cmd_group = cmd_desc,
-                                      .cmd_group_num = sizeof(cmd_desc) / sizeof(cmd_desc[0]),
+static cat_descriptor desc = { .cmd_group = cmd_desc,
+                               .cmd_group_num = sizeof(cmd_desc) / sizeof(cmd_desc[0]),
 
-                                      .buf = buf,
-                                      .buf_size = sizeof(buf) };
+                               .buf = buf,
+                               .buf_size = sizeof(buf) };
 
 static int write_char(char ch)
 {
@@ -155,7 +155,7 @@ static const char test_case_2[] = "\nAT+TEST?\n";
 
 int main(void)
 {
-        struct cat_object at;
+        cat_object at;
 
         cat_init(&at, &desc, &iface, NULL);
 

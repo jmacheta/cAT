@@ -36,76 +36,76 @@ static char ack_results[256];
 static char const *input_text;
 static size_t input_index;
 
-static int e_run(const struct cat_command *cmd)
+static int e_run(const cat_command *cmd)
 {
         strcat(run_results, " E:");
         strcat(run_results, cmd->name);
         return 0;
 }
 
-static int e0_run(const struct cat_command *cmd)
+static int e0_run(const cat_command *cmd)
 {
         strcat(run_results, " E0:");
         strcat(run_results, cmd->name);
         return 0;
 }
 
-static int e1_run(const struct cat_command *cmd)
+static int e1_run(const cat_command *cmd)
 {
         strcat(run_results, " E1:");
         strcat(run_results, cmd->name);
         return 0;
 }
 
-static struct cat_command cmds1[] = { {
-                                              .name = "E",
-                                              .run = e_run,
-                                      },
-                                      {
-                                              .name = "E0",
-                                              .run = e0_run,
-                                      },
-                                      {
-                                              .name = "E1",
-                                              .run = e1_run,
-                                      } };
+static cat_command cmds1[] = { {
+                                       .name = "E",
+                                       .run = e_run,
+                               },
+                               {
+                                       .name = "E0",
+                                       .run = e0_run,
+                               },
+                               {
+                                       .name = "E1",
+                                       .run = e1_run,
+                               } };
 
-static struct cat_command cmds2[] = { {
-                                              .name = "E0",
-                                              .run = e0_run,
-                                      },
-                                      {
-                                              .name = "E1",
-                                              .run = e1_run,
-                                      },
-                                      {
-                                              .name = "E",
-                                              .run = e_run,
-                                      } };
+static cat_command cmds2[] = { {
+                                       .name = "E0",
+                                       .run = e0_run,
+                               },
+                               {
+                                       .name = "E1",
+                                       .run = e1_run,
+                               },
+                               {
+                                       .name = "E",
+                                       .run = e_run,
+                               } };
 
-static struct cat_command cmds3[] = { {
-                                              .name = "E0",
-                                              .run = e0_run,
-                                      },
-                                      {
-                                              .name = "E",
-                                              .run = e_run,
-                                      },
-                                      {
-                                              .name = "E1",
-                                              .run = e1_run,
-                                      } };
+static cat_command cmds3[] = { {
+                                       .name = "E0",
+                                       .run = e0_run,
+                               },
+                               {
+                                       .name = "E",
+                                       .run = e_run,
+                               },
+                               {
+                                       .name = "E1",
+                                       .run = e1_run,
+                               } };
 
 static uint8_t buf[128];
 
-static struct cat_command_group cmd_1_group = {
+static cat_command_group cmd_1_group = {
         .cmd = cmds1,
         .cmd_num = sizeof(cmds1) / sizeof(cmds1[0]),
 };
 
-static struct cat_command_group *cmd_1_desc[] = { &cmd_1_group };
+static cat_command_group *cmd_1_desc[] = { &cmd_1_group };
 
-static struct cat_descriptor desc_1 = {
+static cat_descriptor desc_1 = {
         .cmd_group = cmd_1_desc,
         .cmd_group_num = sizeof(cmd_1_desc) / sizeof(cmd_1_desc[0]),
 
@@ -113,14 +113,14 @@ static struct cat_descriptor desc_1 = {
         .buf_size = sizeof(buf),
 };
 
-static struct cat_command_group cmd_2_group = {
+static cat_command_group cmd_2_group = {
         .cmd = cmds2,
         .cmd_num = sizeof(cmds2) / sizeof(cmds2[0]),
 };
 
-static struct cat_command_group *cmd_2_desc[] = { &cmd_2_group };
+static cat_command_group *cmd_2_desc[] = { &cmd_2_group };
 
-static struct cat_descriptor desc_2 = {
+static cat_descriptor desc_2 = {
         .cmd_group = cmd_2_desc,
         .cmd_group_num = sizeof(cmd_2_desc) / sizeof(cmd_2_desc[0]),
 
@@ -128,14 +128,14 @@ static struct cat_descriptor desc_2 = {
         .buf_size = sizeof(buf),
 };
 
-static struct cat_command_group cmd_3_group = {
+static cat_command_group cmd_3_group = {
         .cmd = cmds3,
         .cmd_num = sizeof(cmds3) / sizeof(cmds3[0]),
 };
 
-static struct cat_command_group *cmd_3_desc[] = { &cmd_3_group };
+static cat_command_group *cmd_3_desc[] = { &cmd_3_group };
 
-static struct cat_descriptor desc_3 = {
+static cat_descriptor desc_3 = {
         .cmd_group = cmd_3_desc,
         .cmd_group_num = sizeof(cmd_3_desc) / sizeof(cmd_3_desc[0]),
 
@@ -177,7 +177,7 @@ static const char test_case_1[] = "\nATE\n\nATE0\n\nATE1\n";
 
 int main(void)
 {
-        struct cat_object at;
+        cat_object at;
 
         cat_init(&at, &desc_1, &iface, NULL);
 
