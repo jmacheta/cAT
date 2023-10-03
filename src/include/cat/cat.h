@@ -45,23 +45,23 @@ typedef struct cat_command cat_command;
 #define CAT_UNSOLICITED_CMD_BUFFER_SIZE ((size_t)(1))
 #endif
 
-/* enum type with variable type definitions */
+/// enum type with variable type definitions
 typedef enum {
-        CAT_VAR_INT_DEC = 0, /* decimal encoded signed integer variable */
-        CAT_VAR_UINT_DEC, /* decimal encoded unsigned integer variable */
-        CAT_VAR_NUM_HEX, /* hexadecimal encoded unsigned integer variable */
-        CAT_VAR_BUF_HEX, /* asciihex encoded bytes array */
-        CAT_VAR_BUF_STRING /* string variable */
+        CAT_VAR_INT_DEC = 0, ///< decimal encoded signed integer variable
+        CAT_VAR_UINT_DEC, ///< decimal encoded unsigned integer variable
+        CAT_VAR_NUM_HEX, ///< hexadecimal encoded unsigned integer variable
+        CAT_VAR_BUF_HEX, ///< asciihex encoded bytes array
+        CAT_VAR_BUF_STRING ///< string variable
 } cat_var_type;
 
-/* enum type with variable accessors definitions */
+/// enum type with variable accessors definitions
 typedef enum {
-        CAT_VAR_ACCESS_READ_WRITE = 0, /* there will be possible to read and write variable */
-        CAT_VAR_ACCESS_READ_ONLY, /* there will be possible to read only variable */
-        CAT_VAR_ACCESS_WRITE_ONLY, /* there will be possible to write only variable */
+        CAT_VAR_ACCESS_READ_WRITE = 0, ///< there will be possible to read and write variable
+        CAT_VAR_ACCESS_READ_ONLY, ///< there will be possible to read only variable
+        CAT_VAR_ACCESS_WRITE_ONLY, ///< there will be possible to write only variable
 } cat_var_access;
 
-/* enum type with function status */
+/// enum type with function status
 typedef enum {
         CAT_STATUS_ERROR_BUFFER_EMPTY = -7,
         CAT_STATUS_ERROR_NOT_HOLD = -6,
@@ -85,7 +85,7 @@ typedef enum {
  * @param var - pointer to struct descriptor of parsed variable
  * @param write_size - size of data was written (useful especially with hexbuf var type)
  * @return 0 - ok, else error and stop parsing
- * */
+ **/
 typedef int (*cat_var_write_handler)(cat_variable const *var, size_t write_size);
 
 /**
@@ -97,31 +97,30 @@ typedef int (*cat_var_write_handler)(cat_variable const *var, size_t write_size)
  * 
  * @param var - pointer to struct descriptor of parsed variable
  * @return 0 - ok, else error and stop parsing
- * */
+ **/
 typedef int (*cat_var_read_handler)(cat_variable const *var);
 
 struct cat_variable {
-        const char *name; /* variable name (optional - using only for auto format test command response) */
-        cat_var_type type; /* variable type (needed for parsing and validating) */
-        void *data; /* generic pointer to statically allocated memory for variable data read/write/validate operations */
-        size_t data_size; /* variable data size, pointed by data pointer */
-        cat_var_access access; /* variable accessor */
-
-        cat_var_write_handler write; /* write variable handler */
-        cat_var_read_handler read; /* read variable handler */
+        const char *name; ///< variable name (optional - using only for auto format test command response)
+        cat_var_type type; ///< variable type (needed for parsing and validating)
+        void *data; ///< generic pointer to statically allocated memory for variable data read/write/validate operations
+        size_t data_size; ///< variable data size, pointed by data pointer
+        cat_var_access access; ///< variable accessor
+        cat_var_write_handler write; ///< write variable handler
+        cat_var_read_handler read; ///< read variable handler
 };
 
-/* enum type with command callbacks return values meaning */
+/// enum type with command callbacks return values meaning
 typedef enum {
-        CAT_RETURN_STATE_ERROR = -1, /* immediatly error acknowledge */
-        CAT_RETURN_STATE_DATA_OK, /* send current data buffer followed by ok acknowledge */
-        CAT_RETURN_STATE_DATA_NEXT, /* send current data buffer and go to next callback iteration */
-        CAT_RETURN_STATE_NEXT, /* go to next callback iteration without sending anything */
-        CAT_RETURN_STATE_OK, /* immediatly ok acknowledge */
-        CAT_RETURN_STATE_HOLD, /* enable hold parser state */
-        CAT_RETURN_STATE_HOLD_EXIT_OK, /* exit from hold state with OK response */
-        CAT_RETURN_STATE_HOLD_EXIT_ERROR, /* exit from hold state with ERROR response */
-        CAT_RETURN_STATE_PRINT_CMD_LIST_OK, /* print commands list followed by ok acknowledge (only in TEST and RUN) */
+        CAT_RETURN_STATE_ERROR = -1, ///< immediatly error acknowledge
+        CAT_RETURN_STATE_DATA_OK, ///< send current data buffer followed by ok acknowledge
+        CAT_RETURN_STATE_DATA_NEXT, ///< send current data buffer and go to next callback iteration
+        CAT_RETURN_STATE_NEXT, ///< go to next callback iteration without sending anything
+        CAT_RETURN_STATE_OK, ///< immediatly ok acknowledge
+        CAT_RETURN_STATE_HOLD, ///< enable hold parser state
+        CAT_RETURN_STATE_HOLD_EXIT_OK, ///< exit from hold state with OK response
+        CAT_RETURN_STATE_HOLD_EXIT_ERROR, ///< exit from hold state with ERROR response
+        CAT_RETURN_STATE_PRINT_CMD_LIST_OK, ///< print commands list followed by ok acknowledge (only in TEST and RUN)
 } cat_return_state;
 
 /**
@@ -138,7 +137,7 @@ typedef enum {
  * @param data_size - length of arguments buffer
  * @param args_num - number of passed arguments connected to variables
  * @return according to cat_return_state enum definitions
- * */
+ **/
 typedef cat_return_state (*cat_cmd_write_handler)(cat_command const *cmd, char const *data, size_t data_size, size_t args_num);
 
 /**
@@ -154,7 +153,7 @@ typedef cat_return_state (*cat_cmd_write_handler)(cat_command const *cmd, char c
  * @param data_size - pointer to length of arguments buffer (can be modifed if needed)
  * @param max_data_size - maximum length of buffer pointed by data pointer
  * @return according to cat_return_state enum definitions
- * */
+ **/
 typedef cat_return_state (*cat_cmd_read_handler)(cat_command const *cmd, char *data, size_t *data_size, size_t max_data_size);
 
 /**
@@ -166,7 +165,7 @@ typedef cat_return_state (*cat_cmd_read_handler)(cat_command const *cmd, char *d
  * 
  * @param cmd - pointer to struct descriptor of processed command
  * @return according to cat_return_state enum definitions
- * */
+ **/
 typedef cat_return_state (*cat_cmd_run_handler)(cat_command const *cmd);
 
 /**
@@ -184,10 +183,10 @@ typedef cat_return_state (*cat_cmd_run_handler)(cat_command const *cmd);
  * @param data_size - pointer to length of arguments buffer (can be modifed if needed)
  * @param max_data_size - maximum length of buffer pointed by data pointer
  * @return according to cat_return_state enum definitions
- * */
+ **/
 typedef cat_return_state (*cat_cmd_test_handler)(cat_command const *cmd, char *data, size_t *data_size, size_t max_data_size);
 
-/* enum type with main at parser fsm state */
+/// enum type with main at parser fsm state
 typedef enum {
         CAT_STATE_ERROR = -1,
         CAT_STATE_IDLE,
@@ -217,58 +216,58 @@ typedef enum {
         CAT_STATE_PRINT_CMD,
 } cat_state;
 
-/* enum type with type of command request */
+/// enum type with type of command request
 typedef enum { CAT_CMD_TYPE_NONE = -1, CAT_CMD_TYPE_RUN, CAT_CMD_TYPE_READ, CAT_CMD_TYPE_WRITE, CAT_CMD_TYPE_TEST, CAT_CMD_TYPE__TOTAL_NUM } cat_cmd_type;
 
-/* structure with at command descriptor */
+/// structure with at command descriptor
 struct cat_command {
-        char const *name; /* at command name (case-insensitivity) */
-        char const *description; /* at command description (optionally - can be null) */
+        char const *name; ///< at command name (case-insensitivity)
+        char const *description; ///< at command description (optionally - can be null)
 
-        cat_cmd_write_handler write; /* write command handler */
-        cat_cmd_read_handler read; /* read command handler */
-        cat_cmd_run_handler run; /* run command handler */
-        cat_cmd_test_handler test; /* test command handler */
+        cat_cmd_write_handler write; ///< write command handler
+        cat_cmd_read_handler read; ///< read command handler
+        cat_cmd_run_handler run; ///< run command handler
+        cat_cmd_test_handler test; ///< test command handler
 
-        cat_variable const *var; /* pointer to array of variables assiocated with this command */
-        size_t var_num; /* number of variables in array */
+        cat_variable const *var; ///< pointer to array of variables assiocated with this command
+        size_t var_num; ///< number of variables in array
 
-        bool need_all_vars; /* flag to need all vars parsing */
-        bool only_test; /* flag to disable read/write/run commands (only test auto description) */
-        bool disable; /* flag to completely disable command */
-        bool implicit_write; /* flag to mark command as implicit write */
+        bool need_all_vars; ///< flag to need all vars parsing
+        bool only_test; ///< flag to disable read/write/run commands (only test auto description)
+        bool disable; ///< flag to completely disable command
+        bool implicit_write; ///< flag to mark command as implicit write
 };
 
 typedef struct {
-        char const *name; /* command group name (optional, for identification purpose) */
+        char const *name; ///<command group name (optional, for identification purpose)
 
-        cat_command const *cmd; /* pointer to array of commands descriptor */
-        size_t cmd_num; /* number of commands in array */
+        cat_command const *cmd; ///< pointer to array of commands descriptor
+        size_t cmd_num; ///< number of commands in array
 
-        bool disable; /* flag to completely disable all commands in group */
+        bool disable; ///< flag to completely disable all commands in group
 } cat_command_group;
 
-/* structure with at command parser descriptor */
+/// structure with at command parser descriptor
 typedef struct {
-        cat_command_group *const *cmd_group; /* pointer to array of commands group descriptor */
-        size_t cmd_group_num; /* number of commands group in array */
+        cat_command_group *const *cmd_group; ///< pointer to array of commands group descriptor
+        size_t cmd_group_num; ///< number of commands group in array
 
-        uint8_t *buf; /* pointer to working buffer (used to parse command argument) */
-        size_t buf_size; /* working buffer length */
+        uint8_t *buf; ///< pointer to working buffer (used to parse command argument)
+        size_t buf_size; ///< working buffer length
 
         /* optional unsolicited buffer, if not configured (NULL) */
         /* then the buf will be divided into two smaller buffers */
-        uint8_t *unsolicited_buf; /* pointer to unsolicited working buffer (used to parse command argument) */
-        size_t unsolicited_buf_size; /* unsolicited working buffer length */
+        uint8_t *unsolicited_buf; ///< pointer to unsolicited working buffer (used to parse command argument)
+        size_t unsolicited_buf_size; ///< unsolicited working buffer length
 } cat_descriptor;
 
-/* strcuture with unsolicited command buffered infos */
+///strcuture with unsolicited command buffered infos
 typedef struct {
-        cat_command const *cmd; /* pointer to commands used to unsolicited event */
-        cat_cmd_type type; /* type of unsolicited event */
+        cat_command const *cmd; ///< pointer to commands used to unsolicited event
+        cat_cmd_type type; ///< type of unsolicited event
 } cat_unsolicited_cmd;
 
-/* enum type with unsolicited events fsm state */
+/// enum type with unsolicited events fsm state
 typedef enum {
         CAT_UNSOLICITED_STATE_IDLE,
         CAT_UNSOLICITED_STATE_FORMAT_READ_ARGS,
@@ -283,7 +282,7 @@ typedef enum {
         CAT_UNSOLICITED_STATE_AFTER_FLUSH_FORMAT_TEST_ARGS,
 } cat_unsolicited_state;
 
-/* enum type with fsm type */
+/// enum type with fsm type
 typedef enum {
         CAT_FSM_TYPE_ATCMD = 0,
         CAT_FSM_TYPE_UNSOLICITED = 1,
@@ -291,63 +290,63 @@ typedef enum {
 enum { CAT_FSM_TYPE_TOTAL_NUM = CAT_FSM_TYPE_UNSOLICITED + 1 };
 
 typedef struct {
-        cat_unsolicited_state state; /* current unsolicited fsm state */
+        cat_unsolicited_state state; ///< current unsolicited fsm state
 
-        size_t index; /* index used to iterate over commands and variables */
-        size_t position; /* position of actually parsed char in arguments string */
+        size_t index; ///< index used to iterate over commands and variables
+        size_t position; ///< position of actually parsed char in arguments string
 
-        cat_command const *cmd; /* pointer to current command descriptor */
-        cat_variable const *var; /* pointer to current variable descriptor */
-        cat_cmd_type cmd_type; /* type of command request */
+        cat_command const *cmd; ///< pointer to current command descriptor
+        cat_variable const *var; ///<pointer to current variable descriptor
+        cat_cmd_type cmd_type; ///< type of command request
 
-        char const *write_buf; /* working buffer pointer used for asynch writing to io */
-        int write_state; /* before, data, after flush io write state */
-        cat_unsolicited_state write_state_after; /* parser state to set after flush io write */
+        char const *write_buf; ///< working buffer pointer used for asynch writing to io
+        int write_state; ///< before, data, after flush io write state
+        cat_unsolicited_state write_state_after; ///< parser state to set after flush io write
 
-        cat_unsolicited_cmd unsolicited_cmd_buffer[CAT_UNSOLICITED_CMD_BUFFER_SIZE]; /* buffer with unsolicited commands used to unsolicited event */
-        size_t unsolicited_cmd_buffer_tail; /* tail index of unsolicited cmd buffer */
-        size_t unsolicited_cmd_buffer_head; /* head index of unsolicited cmd buffer */
-        size_t unsolicited_cmd_buffer_items_count; /* number of unsolicited cmd in buffer */
+        cat_unsolicited_cmd unsolicited_cmd_buffer[CAT_UNSOLICITED_CMD_BUFFER_SIZE]; ///< buffer with unsolicited commands used to unsolicited event
+        size_t unsolicited_cmd_buffer_tail; ///< tail index of unsolicited cmd buffer
+        size_t unsolicited_cmd_buffer_head; ///< head index of unsolicited cmd buffer
+        size_t unsolicited_cmd_buffer_items_count; ///< number of unsolicited cmd in buffer
 } cat_unsolicited_fsm;
 
-/* structure with io interface functions */
+/// structure with io interface functions
 typedef struct {
-        int (*write)(char ch); /* write char to output stream. return 1 if byte wrote successfully. */
-        int (*read)(char *ch); /* read char from input stream. return 1 if byte read successfully. */
+        int (*write)(char ch); ///< write char to output stream. return 1 if byte wrote successfully.
+        int (*read)(char *ch); ///< read char from input stream. return 1 if byte read successfully.
 } cat_io_interface;
 
-/* structure with mutex interface functions */
+/// structure with mutex interface functions
 typedef struct {
-        int (*lock)(void); /* lock mutex handler. return 0 if successfully locked, otherwise - cannot lock */
-        int (*unlock)(void); /* unlock mutex handler. return 0 if successfully unlocked, otherwise - cannot unlock */
+        int (*lock)(void); ///< lock mutex handler. return 0 if successfully locked, otherwise - cannot lock
+        int (*unlock)(void); ///< unlock mutex handler. return 0 if successfully unlocked, otherwise - cannot unlock
 } cat_mutex_interface;
 
-/* structure with main at command parser object */
+/// structure with main at command parser object
 typedef struct {
-        cat_descriptor const *desc; /* pointer to at command parser descriptor */
-        cat_io_interface const *io; /* pointer to at command parser io interface */
-        cat_mutex_interface const *mutex; /* pointer to at command parser mutex interface */
+        cat_descriptor const *desc; ///< pointer to at command parser descriptor
+        cat_io_interface const *io; ///< pointer to at command parser io interface
+        cat_mutex_interface const *mutex; ///< pointer to at command parser mutex interface
 
-        size_t index; /* index used to iterate over commands and variables */
-        size_t partial_cntr; /* partial match commands counter */
-        size_t length; /* length of input command name and command arguments */
-        size_t position; /* position of actually parsed char in arguments string */
-        size_t write_size; /* size of parsed buffer hex or buffer string */
-        size_t commands_num; /* computed total number of registered commands */
+        size_t index; ///< index used to iterate over commands and variables
+        size_t partial_cntr; ///< partial match commands counter
+        size_t length; ///< length of input command name and command arguments
+        size_t position; ///< position of actually parsed char in arguments string
+        size_t write_size; ///< size of parsed buffer hex or buffer string
+        size_t commands_num; ///< computed total number of registered commands
 
-        cat_command const *cmd; /* pointer to current command descriptor */
-        cat_variable const *var; /* pointer to current variable descriptor */
-        cat_cmd_type cmd_type; /* type of command request */
+        cat_command const *cmd; ///< pointer to current command descriptor
+        cat_variable const *var; ///< pointer to current variable descriptor
+        cat_cmd_type cmd_type; ///< type of command request
 
-        char current_char; /* current received char from input stream */
-        cat_state state; /* current fsm state */
-        bool cr_flag; /* flag for detect <cr> char in input string */
-        bool hold_state_flag; /* status of hold state (independent from fsm states) */
-        int hold_exit_status; /* hold exit parameter with status */
-        char const *write_buf; /* working buffer pointer used for asynch writing to io */
-        int write_state; /* before, data, after flush io write state */
-        cat_state write_state_after; /* parser state to set after flush io write */
-        bool implicit_write_flag; /* flag that implicit write was detected */
+        char current_char; ///< current received char from input stream
+        cat_state state; ///< current fsm state
+        bool cr_flag; ///< flag for detect <cr> char in input string
+        bool hold_state_flag; ///< status of hold state (independent from fsm states)
+        int hold_exit_status; ///< hold exit parameter with status
+        char const *write_buf; ///< working buffer pointer used for asynch writing to io
+        int write_state; ///< before, data, after flush io write state
+        cat_state write_state_after; ///< parser state to set after flush io write
+        bool implicit_write_flag; ///< flag that implicit write was detected
 
         cat_unsolicited_fsm unsolicited_fsm;
 } cat_object;
@@ -506,4 +505,4 @@ cat_status cat_is_unsolicited_event_buffered(cat_object *self, cat_command const
 }
 #endif
 
-#endif /* CAT_H */
+#endif
