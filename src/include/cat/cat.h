@@ -139,7 +139,7 @@ typedef enum {
  * @param args_num - number of passed arguments connected to variables
  * @return according to cat_return_state enum definitions
  * */
-typedef cat_return_state (*cat_cmd_write_handler)(cat_command const *cmd, uint8_t const *data, size_t data_size, size_t args_num);
+typedef cat_return_state (*cat_cmd_write_handler)(cat_command const *cmd, char const *data, size_t data_size, size_t args_num);
 
 /**
  * Read command function handler (AT+CMD?)
@@ -155,7 +155,7 @@ typedef cat_return_state (*cat_cmd_write_handler)(cat_command const *cmd, uint8_
  * @param max_data_size - maximum length of buffer pointed by data pointer
  * @return according to cat_return_state enum definitions
  * */
-typedef cat_return_state (*cat_cmd_read_handler)(cat_command const *cmd, uint8_t *data, size_t *data_size, size_t max_data_size);
+typedef cat_return_state (*cat_cmd_read_handler)(cat_command const *cmd, char *data, size_t *data_size, size_t max_data_size);
 
 /**
  * Run command function handler (AT+CMD)
@@ -185,7 +185,7 @@ typedef cat_return_state (*cat_cmd_run_handler)(cat_command const *cmd);
  * @param max_data_size - maximum length of buffer pointed by data pointer
  * @return according to cat_return_state enum definitions
  * */
-typedef cat_return_state (*cat_cmd_test_handler)(cat_command const *cmd, uint8_t *data, size_t *data_size, size_t max_data_size);
+typedef cat_return_state (*cat_cmd_test_handler)(cat_command const *cmd, char *data, size_t *data_size, size_t max_data_size);
 
 /* enum type with main at parser fsm state */
 typedef enum {
