@@ -103,7 +103,7 @@ static cat_return_state cmd2_read(const cat_command *cmd, uint8_t *data, size_t 
         return CAT_RETURN_STATE_DATA_OK;
 }
 
-static int var_read(const struct cat_variable *var)
+static int var_read(const cat_variable *var)
 {
         strcat(var_read_results, " var_read:");
         strcat(var_read_results, var->name);
@@ -111,10 +111,10 @@ static int var_read(const struct cat_variable *var)
         return 0;
 }
 
-static struct cat_variable u_vars[] = { { .name = "U1", .type = CAT_VAR_INT_DEC, .data = &var_u1, .data_size = sizeof(var_u1), .read = var_read },
+static cat_variable u_vars[] = { { .name = "U1", .type = CAT_VAR_INT_DEC, .data = &var_u1, .data_size = sizeof(var_u1), .read = var_read },
                                         { .name = "U2", .type = CAT_VAR_INT_DEC, .data = &var_u2, .data_size = sizeof(var_u2), .read = var_read } };
 
-static struct cat_variable vars[] = { { .name = "X", .type = CAT_VAR_INT_DEC, .data = &var_x, .data_size = sizeof(var_x), .read = var_read } };
+static cat_variable vars[] = { { .name = "X", .type = CAT_VAR_INT_DEC, .data = &var_x, .data_size = sizeof(var_x), .read = var_read } };
 
 static cat_command cmds[] = { {
         .name = "+CMD",
@@ -172,7 +172,7 @@ static int read_char(char *ch)
         return 1;
 }
 
-static struct cat_io_interface iface = { .read = read_char, .write = write_char };
+static cat_io_interface iface = { .read = read_char, .write = write_char };
 
 static void prepare_input(const char *text)
 {

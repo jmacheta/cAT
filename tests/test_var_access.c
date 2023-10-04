@@ -75,33 +75,33 @@ static int cmd_run(const cat_command *cmd)
         return 0;
 }
 
-static int var1_write(const struct cat_variable *var, size_t write_size)
+static int var1_write(const cat_variable *var, size_t write_size)
 {
         return 0;
 }
 
-static int var1_read(const struct cat_variable *var)
+static int var1_read(const cat_variable *var)
 {
         return 0;
 }
 
-static int var2_write(const struct cat_variable *var, size_t write_size)
+static int var2_write(const cat_variable *var, size_t write_size)
 {
         var2_write_cntr++;
         return 0;
 }
 
-static int var2_read(const struct cat_variable *var)
+static int var2_read(const cat_variable *var)
 {
         return 0;
 }
 
-static int var3_write(const struct cat_variable *var, size_t write_size)
+static int var3_write(const cat_variable *var, size_t write_size)
 {
         return 0;
 }
 
-static int var3_read(const struct cat_variable *var)
+static int var3_read(const cat_variable *var)
 {
         var3_read_cntr++;
         return 0;
@@ -112,21 +112,21 @@ static int print_cmd_list(const cat_command *cmd)
         return CAT_RETURN_STATE_PRINT_CMD_LIST_OK;
 }
 
-static struct cat_variable vars_ro[] = {
+static cat_variable vars_ro[] = {
         { .type = CAT_VAR_INT_DEC, .data = &var2, .data_size = sizeof(var2), .write = var2_write, .read = var2_read, .access = CAT_VAR_ACCESS_READ_ONLY }
 };
 
-static struct cat_variable vars_wo[] = {
+static cat_variable vars_wo[] = {
         { .type = CAT_VAR_INT_DEC, .data = &var3, .data_size = sizeof(var3), .write = var3_write, .read = var3_read, .access = CAT_VAR_ACCESS_WRITE_ONLY }
 };
 
-static struct cat_variable vars[] = {
+static cat_variable vars[] = {
         { .type = CAT_VAR_INT_DEC, .data = &var1, .data_size = sizeof(var1), .write = var1_write, .read = var1_read, .access = CAT_VAR_ACCESS_READ_WRITE },
         { .type = CAT_VAR_INT_DEC, .data = &var2, .data_size = sizeof(var2), .write = var2_write, .read = var2_read, .access = CAT_VAR_ACCESS_READ_ONLY },
         { .type = CAT_VAR_INT_DEC, .data = &var3, .data_size = sizeof(var3), .write = var3_write, .read = var3_read, .access = CAT_VAR_ACCESS_WRITE_ONLY }
 };
 
-static struct cat_variable vars_misc_ro[] = {
+static cat_variable vars_misc_ro[] = {
         { .type = CAT_VAR_INT_DEC, .data = &var1, .data_size = sizeof(var1), .access = CAT_VAR_ACCESS_READ_WRITE },
         { .type = CAT_VAR_INT_DEC, .data = &var_int8, .data_size = sizeof(var_int8), .name = "x", .access = CAT_VAR_ACCESS_READ_ONLY },
         { .type = CAT_VAR_INT_DEC, .data = &var_int16, .data_size = sizeof(var_int16), .name = "y", .access = CAT_VAR_ACCESS_READ_ONLY },
@@ -141,7 +141,7 @@ static struct cat_variable vars_misc_ro[] = {
         { .type = CAT_VAR_BUF_STRING, .data = &var_string, .data_size = sizeof(var_string), .name = "msg", .access = CAT_VAR_ACCESS_READ_ONLY }
 };
 
-static struct cat_variable vars_misc_wo[] = {
+static cat_variable vars_misc_wo[] = {
         { .type = CAT_VAR_INT_DEC, .data = &var1, .data_size = sizeof(var1), .access = CAT_VAR_ACCESS_READ_WRITE },
         { .type = CAT_VAR_INT_DEC, .data = &var_int8, .data_size = sizeof(var_int8), .name = "x", .access = CAT_VAR_ACCESS_WRITE_ONLY },
         { .type = CAT_VAR_INT_DEC, .data = &var_int16, .data_size = sizeof(var_int16), .name = "y", .access = CAT_VAR_ACCESS_WRITE_ONLY },
@@ -202,7 +202,7 @@ static int read_char(char *ch)
         return 1;
 }
 
-static struct cat_io_interface iface = { .read = read_char, .write = write_char };
+static cat_io_interface iface = { .read = read_char, .write = write_char };
 
 static void prepare_input(const char *text)
 {

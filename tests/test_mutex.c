@@ -95,7 +95,7 @@ static int read_char(char *ch)
         return 1;
 }
 
-static struct cat_io_interface iface = { .read = read_char, .write = write_char };
+static cat_io_interface iface = { .read = read_char, .write = write_char };
 
 static int mutex_ret_lock;
 static int mutex_ret_unlock;
@@ -110,7 +110,7 @@ static int mutex_unlock(void)
         return mutex_ret_unlock;
 }
 
-static struct cat_mutex_interface mutex = { .lock = mutex_lock, .unlock = mutex_unlock };
+static cat_mutex_interface mutex = { .lock = mutex_lock, .unlock = mutex_unlock };
 
 static void prepare_input(const char *text)
 {

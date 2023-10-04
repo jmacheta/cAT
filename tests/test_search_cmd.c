@@ -49,9 +49,9 @@ static int ap_write(const cat_command *cmd, const uint8_t *data, size_t data_siz
         return 0;
 }
 
-static struct cat_variable vars_ap1[] = { { .name = "var_ap1_1" }, { .name = "var_ap1_2" }, { .name = "var_ap1_3" } };
+static cat_variable vars_ap1[] = { { .name = "var_ap1_1" }, { .name = "var_ap1_2" }, { .name = "var_ap1_3" } };
 
-static struct cat_variable vars_apx2[] = { { .name = "var_apx2_1" }, { .name = "var_apx2_2" }, { .name = "var_apx2_3" } };
+static cat_variable vars_apx2[] = { { .name = "var_apx2_1" }, { .name = "var_apx2_2" }, { .name = "var_apx2_3" } };
 
 static cat_command cmds[] = {
         { .name = "AP1", .write = ap_write, .only_test = true, .var = vars_ap1, .var_num = sizeof(vars_ap1) / sizeof(vars_ap1[0]) },
@@ -99,14 +99,14 @@ static int read_char(char *ch)
         return 1;
 }
 
-static struct cat_io_interface iface = { .read = read_char, .write = write_char };
+static cat_io_interface iface = { .read = read_char, .write = write_char };
 
 int main(void)
 {
         cat_object at;
         cat_command const *cmd;
         cat_command_group const *cmd_group;
-        struct cat_variable const *var;
+        cat_variable const *var;
 
         cat_init(&at, &desc, &iface, NULL);
 

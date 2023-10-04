@@ -118,7 +118,7 @@ static int read_char(char *ch)
         return 1;
 }
 
-static struct cat_io_interface iface = { .read = read_char, .write = write_char };
+static cat_io_interface iface = { .read = read_char, .write = write_char };
 
 static void prepare_input(const char *text)
 {

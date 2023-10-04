@@ -85,7 +85,7 @@ static void load_scan_results(int index)
 }
 
 /* declaring scan variables array */
-static struct cat_variable scan_vars[] = { { .type = CAT_VAR_INT_DEC, .data = &rssi, .data_size = sizeof(rssi), .name = "RSSI" },
+static cat_variable scan_vars[] = { { .type = CAT_VAR_INT_DEC, .data = &rssi, .data_size = sizeof(rssi), .name = "RSSI" },
                                            { .type = CAT_VAR_BUF_STRING, .data = ssid, .data_size = sizeof(ssid), .name = "SSID" } };
 
 /* forward declaration */
@@ -110,7 +110,7 @@ static cat_return_state scan_read(const cat_command *cmd, uint8_t *data, size_t 
 }
 
 /* mode variable validator */
-static int mode_write(const struct cat_variable *var, const size_t write_size)
+static int mode_write(const cat_variable *var, const size_t write_size)
 {
         if (*(int *)var->data >= 2)
                 return -1;
@@ -135,7 +135,7 @@ static int print_cmd_list(const cat_command *cmd)
 }
 
 /* declaring start command variables array */
-static struct cat_variable start_vars[] = { {
+static cat_variable start_vars[] = { {
         .type = CAT_VAR_UINT_DEC,
         .data = &mode,
         .data_size = sizeof(mode),
@@ -193,7 +193,7 @@ static int read_char(char *ch)
 }
 
 /* declaring input output interface descriptor for parser */
-static struct cat_io_interface iface = { .read = read_char, .write = write_char };
+static cat_io_interface iface = { .read = read_char, .write = write_char };
 
 int main(void)
 {

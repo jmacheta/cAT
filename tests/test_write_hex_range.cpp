@@ -30,7 +30,7 @@ SOFTWARE.
 #include <assert.h>
 
 #include <cat/cat.h>
-
+#include <gtest/gtest.h>
 static char write_results[256];
 static char ack_results[256];
 
@@ -41,37 +41,37 @@ static uint32_t var3, var3b;
 static char const *input_text;
 static size_t input_index;
 
-static int cmd_write(const cat_command *cmd, const uint8_t *data, size_t data_size, size_t args_num)
+static cat_return_state cmd_write(const cat_command *cmd, const char *data, size_t data_size, size_t args_num)
 {
         strcat(write_results, " CMD:");
         strncat(write_results, data, data_size);
-        return 0;
+        return CAT_RETURN_STATE_OK;
 }
 
-static int var1_write(const struct cat_variable *var, size_t write_size)
+static int var1_write(const cat_variable *var, size_t write_size)
 {
         assert(write_size == 1);
         var1b = *(uint8_t *)(var->data);
         return 0;
 }
 
-static int var2_write(const struct cat_variable *var, size_t write_size)
+static int var2_write(const cat_variable *var, size_t write_size)
 {
         assert(write_size == 2);
         var2b = *(uint16_t *)(var->data);
         return 0;
 }
 
-static int var3_write(const struct cat_variable *var, size_t write_size)
+static int var3_write(const cat_variable *var, size_t write_size)
 {
         assert(write_size == 4);
         var3b = *(uint32_t *)(var->data);
         return 0;
 }
 
-static struct cat_variable vars[] = { { .type = CAT_VAR_NUM_HEX, .data = &var1, .data_size = sizeof(var1), .write = var1_write },
-                                      { .type = CAT_VAR_NUM_HEX, .data = &var2, .data_size = sizeof(var2), .write = var2_write },
-                                      { .type = CAT_VAR_NUM_HEX, .data = &var3, .data_size = sizeof(var3), .write = var3_write } };
+static cat_variable vars[] = { { .type = CAT_VAR_NUM_HEX, .data = &var1, .data_size = sizeof(var1), .write = var1_write },
+                               { .type = CAT_VAR_NUM_HEX, .data = &var2, .data_size = sizeof(var2), .write = var2_write },
+                               { .type = CAT_VAR_NUM_HEX, .data = &var3, .data_size = sizeof(var3), .write = var3_write } };
 
 static cat_command cmds[] = { { .name = "+SET",
                                 .write = cmd_write,
@@ -113,7 +113,7 @@ static int read_char(char *ch)
         return 1;
 }
 
-static struct cat_io_interface iface = { .read = read_char, .write = write_char };
+static cat_io_interface iface = { .write = write_char, .read = read_char };
 
 static void prepare_input(const char *text)
 {
@@ -136,7 +136,7 @@ static const char test_case_2[] = "\nAT+SET=0x,0x00\nAT+SET=0x1,0x00\nAT+SET=0x2
 static const char test_case_3[] =
         "\nAT+SET=0x0,0x0,0\nAT+SET=0x0,0x0,0x0000000000000\nAT+SET=0x0,0x0,0x1\nAT+SET=0x0,0x0,0xffffFFFF\nAT+SET=0x10,0x20,0x100000000\n";
 
-int main(void)
+TEST(cAT, write_hex_range)
 {
         cat_object at;
 
@@ -146,43 +146,41 @@ int main(void)
         while (cat_service(&at) != 0) {
         };
 
-        assert(strcmp(ack_results, "\nERROR\n\nOK\n\nOK\n\nOK\n\nERROR\n") == 0);
-        assert(strcmp(write_results, " CMD:0x0 CMD:0x01 CMD:0x0ff") == 0);
+        EXPECT_STREQ(ack_results, "\nERROR\n\nOK\n\nOK\n\nOK\n\nERROR\n");
+        EXPECT_STREQ(write_results, " CMD:0x0 CMD:0x01 CMD:0x0ff");
 
-        assert(var1 == 255);
-        assert(var1b == var1);
-        assert(var2 == 2);
-        assert(var2b == 20);
-        assert(var3 == 3);
-        assert(var3b == 30);
+        EXPECT_EQ(var1, 255);
+        EXPECT_EQ(var1b, var1);
+        EXPECT_EQ(var2, 2);
+        EXPECT_EQ(var2b, 20);
+        EXPECT_EQ(var3, 3);
+        EXPECT_EQ(var3b, 30);
 
         prepare_input(test_case_2);
         while (cat_service(&at) != 0) {
         };
 
-        assert(strcmp(ack_results, "\nERROR\n\nOK\n\nOK\n\nOK\n\nERROR\n") == 0);
-        assert(strcmp(write_results, " CMD:0x1,0x00 CMD:0x2,0xFFf CMD:0x3,0xFFFF") == 0);
+        EXPECT_STREQ(ack_results, "\nERROR\n\nOK\n\nOK\n\nOK\n\nERROR\n");
+        EXPECT_STREQ(write_results, " CMD:0x1,0x00 CMD:0x2,0xFFf CMD:0x3,0xFFFF");
 
-        assert(var1 == 4);
-        assert(var1b == var1);
-        assert(var2 == 0xFFFF);
-        assert(var2b == var2);
-        assert(var3 == 3);
-        assert(var3b == 30);
+        EXPECT_EQ(var1, 4);
+        EXPECT_EQ(var1b, var1);
+        EXPECT_EQ(var2, 0xFFFF);
+        EXPECT_EQ(var2b, var2);
+        EXPECT_EQ(var3, 3);
+        EXPECT_EQ(var3b, 30);
 
         prepare_input(test_case_3);
         while (cat_service(&at) != 0) {
         };
 
-        assert(strcmp(ack_results, "\nERROR\n\nOK\n\nOK\n\nOK\n\nERROR\n") == 0);
-        assert(strcmp(write_results, " CMD:0x0,0x0,0x0000000000000 CMD:0x0,0x0,0x1 CMD:0x0,0x0,0xffffFFFF") == 0);
+        EXPECT_STREQ(ack_results, "\nERROR\n\nOK\n\nOK\n\nOK\n\nERROR\n");
+        EXPECT_STREQ(write_results, " CMD:0x0,0x0,0x0000000000000 CMD:0x0,0x0,0x1 CMD:0x0,0x0,0xffffFFFF");
 
-        assert(var1 == 0x10);
-        assert(var1b == var1);
-        assert(var2 == 0x20);
-        assert(var2b == var2);
-        assert(var3 == 0xFFFFFFFF);
-        assert(var3b == var3);
-
-        return 0;
+        EXPECT_EQ(var1, 0x10);
+        EXPECT_EQ(var1b, var1);
+        EXPECT_EQ(var2, 0x20);
+        EXPECT_EQ(var2b, var2);
+        EXPECT_EQ(var3, 0xFFFFFFFF);
+        EXPECT_EQ(var3b, var3);
 }

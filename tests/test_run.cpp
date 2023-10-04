@@ -30,38 +30,40 @@ SOFTWARE.
 #include <assert.h>
 
 #include <cat/cat.h>
+#include <gtest/gtest.h>
+
 static char run_results[256];
 static char ack_results[256];
 
 static char const *input_text;
 static size_t input_index;
 
-static int a_run(const cat_command *cmd)
+static cat_return_state a_run(const cat_command *cmd)
 {
         strcat(run_results, " A:");
         strcat(run_results, cmd->name);
-        return 0;
+        return CAT_RETURN_STATE_DATA_OK;
 }
 
-static int ap_run(const cat_command *cmd)
+static cat_return_state ap_run(const cat_command *cmd)
 {
         strcat(run_results, " AP:");
         strcat(run_results, cmd->name);
-        return 0;
+        return CAT_RETURN_STATE_DATA_OK;
 }
 
-static int test_run(const cat_command *cmd)
+static cat_return_state test_run(const cat_command *cmd)
 {
         strcat(run_results, " +TEST:");
         strcat(run_results, cmd->name);
-        return 0;
+        return CAT_RETURN_STATE_DATA_OK;
 }
 
-static int force_run(const cat_command *cmd)
+static cat_return_state force_run(const cat_command *cmd)
 {
         strcat(run_results, " FORCE:");
         strcat(run_results, cmd->name);
-        return -1;
+        return CAT_RETURN_STATE_ERROR;
 }
 
 static cat_command cmds[] = { { .name = "A", .run = a_run },
@@ -107,7 +109,7 @@ static int read_char(char *ch)
         return 1;
 }
 
-static struct cat_io_interface iface = { .read = read_char, .write = write_char };
+static cat_io_interface iface = { .write = write_char, .read = read_char };
 
 static void prepare_input(const char *text)
 {
@@ -120,7 +122,7 @@ static void prepare_input(const char *text)
 
 static const char test_case_1[] = "\nAT\nAT+\nATA\r\nATAP\nATAPA\nAT+TEST\nAT+te\nAT+e\nAT+empTY\naTf\nAtFoRcE\n";
 
-int main(void)
+TEST(cAT, run)
 {
         cat_object at;
 
@@ -130,8 +132,6 @@ int main(void)
         while (cat_service(&at) != 0) {
         };
 
-        assert(strcmp(ack_results, "\nOK\n\nERROR\n\r\nOK\r\n\nOK\n\nERROR\n\nOK\n\nOK\n\nERROR\n\nERROR\n\nERROR\n\nERROR\n") == 0);
-        assert(strcmp(run_results, " A:A AP:AP +TEST:+TEST +TEST:+TEST FORCE:FORCE FORCE:FORCE") == 0);
-
-        return 0;
+        EXPECT_STREQ(ack_results, "\nOK\n\nERROR\n\r\nOK\r\n\nOK\n\nERROR\n\nOK\n\nOK\n\nERROR\n\nERROR\n\nERROR\n\nERROR\n");
+        EXPECT_STREQ(run_results, " A:A AP:AP +TEST:+TEST +TEST:+TEST FORCE:FORCE FORCE:FORCE");
 }

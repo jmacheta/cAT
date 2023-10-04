@@ -90,7 +90,7 @@ static int cmd_ok2_test(const cat_command *cmd, char *data, size_t *data_size, s
         return 0;
 }
 
-static struct cat_variable vars[] = { { .type = CAT_VAR_INT_DEC, .data = &var_int8, .data_size = sizeof(var_int8), .name = "x" },
+static cat_variable vars[] = { { .type = CAT_VAR_INT_DEC, .data = &var_int8, .data_size = sizeof(var_int8), .name = "x" },
                                       { .type = CAT_VAR_INT_DEC, .data = &var_int16, .data_size = sizeof(var_int16), .name = "y" },
                                       { .type = CAT_VAR_INT_DEC, .data = &var_int32, .data_size = sizeof(var_int32) },
                                       { .type = CAT_VAR_UINT_DEC, .data = &var_uint8, .data_size = sizeof(var_uint8) },
@@ -102,7 +102,7 @@ static struct cat_variable vars[] = { { .type = CAT_VAR_INT_DEC, .data = &var_in
                                       { .type = CAT_VAR_BUF_HEX, .data = &var_buf, .data_size = sizeof(var_buf) },
                                       { .type = CAT_VAR_BUF_STRING, .data = &var_string, .data_size = sizeof(var_string), .name = "msg" } };
 
-static struct cat_variable vars_ro[] = {
+static cat_variable vars_ro[] = {
         { .type = CAT_VAR_INT_DEC, .data = &var_int8, .data_size = sizeof(var_int8), .name = "x", .access = CAT_VAR_ACCESS_READ_ONLY },
         { .type = CAT_VAR_INT_DEC, .data = &var_int16, .data_size = sizeof(var_int16), .name = "y", .access = CAT_VAR_ACCESS_READ_ONLY },
         { .type = CAT_VAR_INT_DEC, .data = &var_int32, .data_size = sizeof(var_int32), .access = CAT_VAR_ACCESS_READ_ONLY },
@@ -116,7 +116,7 @@ static struct cat_variable vars_ro[] = {
         { .type = CAT_VAR_BUF_STRING, .data = &var_string, .data_size = sizeof(var_string), .name = "msg", .access = CAT_VAR_ACCESS_READ_ONLY }
 };
 
-static struct cat_variable vars_wo[] = {
+static cat_variable vars_wo[] = {
         { .type = CAT_VAR_INT_DEC, .data = &var_int8, .data_size = sizeof(var_int8), .name = "x", .access = CAT_VAR_ACCESS_WRITE_ONLY },
         { .type = CAT_VAR_INT_DEC, .data = &var_int16, .data_size = sizeof(var_int16), .name = "y", .access = CAT_VAR_ACCESS_WRITE_ONLY },
         { .type = CAT_VAR_INT_DEC, .data = &var_int32, .data_size = sizeof(var_int32), .access = CAT_VAR_ACCESS_WRITE_ONLY },
@@ -130,7 +130,7 @@ static struct cat_variable vars_wo[] = {
         { .type = CAT_VAR_BUF_STRING, .data = &var_string, .data_size = sizeof(var_string), .name = "msg", .access = CAT_VAR_ACCESS_WRITE_ONLY }
 };
 
-static struct cat_variable vars2[] = { { .type = CAT_VAR_INT_DEC, .data = &var_int8, .data_size = sizeof(var_int8), .name = "var" } };
+static cat_variable vars2[] = { { .type = CAT_VAR_INT_DEC, .data = &var_int8, .data_size = sizeof(var_int8), .name = "var" } };
 
 static cat_command cmds[] = { { .name = "+SET",
 
@@ -214,7 +214,7 @@ static int read_char(char *ch)
         return 1;
 }
 
-static struct cat_io_interface iface = { .read = read_char, .write = write_char };
+static cat_io_interface iface = { .read = read_char, .write = write_char };
 
 static void prepare_input(const char *text)
 {

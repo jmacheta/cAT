@@ -79,7 +79,7 @@ static cat_return_state cmd_test(const cat_command *cmd, uint8_t *data, size_t *
 static int8_t var1;
 static int8_t var2;
 
-static struct cat_variable vars[] = { { .type = CAT_VAR_INT_DEC, .data = &var1, .data_size = sizeof(var1), .access = CAT_VAR_ACCESS_READ_WRITE },
+static cat_variable vars[] = { { .type = CAT_VAR_INT_DEC, .data = &var1, .data_size = sizeof(var1), .access = CAT_VAR_ACCESS_READ_WRITE },
                                       { .type = CAT_VAR_INT_DEC, .data = &var2, .data_size = sizeof(var2), .access = CAT_VAR_ACCESS_READ_WRITE } };
 
 static cat_command cmds[] = {
@@ -134,7 +134,7 @@ static int read_char(char *ch)
         return 1;
 }
 
-static struct cat_io_interface iface = { .read = read_char, .write = write_char };
+static cat_io_interface iface = { .read = read_char, .write = write_char };
 
 static void prepare_input(const char *text)
 {

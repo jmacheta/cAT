@@ -12,6 +12,5 @@ if(PROJECT_IS_TOP_LEVEL OR CAT_BUILD_TESTS)
   add_subdirectory(tests)
 endif()
 
-if(PROJECT_IS_TOP_LEVEL OR CAT_BUILD_EXAMPLES)
-  add_subdirectory(example)
-endif()
+# if(PROJECT_IS_TOP_LEVEL OR CAT_BUILD_EXAMPLES) add_subdirectory(example)
+# endif()

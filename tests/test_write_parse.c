@@ -58,28 +58,28 @@ static int cmd_write3(const cat_command *cmd, const uint8_t *data, size_t data_s
         return 0;
 }
 
-static int var1_write(const struct cat_variable *var, size_t write_size)
+static int var1_write(const cat_variable *var, size_t write_size)
 {
         assert(write_size == 1);
         var1b = *(int8_t *)(var->data);
         return 0;
 }
 
-static int var2_write(const struct cat_variable *var, size_t write_size)
+static int var2_write(const cat_variable *var, size_t write_size)
 {
         assert(write_size == 1);
         var2b = *(int8_t *)(var->data);
         return 0;
 }
 
-static int var3_write(const struct cat_variable *var, size_t write_size)
+static int var3_write(const cat_variable *var, size_t write_size)
 {
         assert(write_size == 1);
         var3b = *(int8_t *)(var->data);
         return 0;
 }
 
-static struct cat_variable vars[] = { { .type = CAT_VAR_INT_DEC, .data = &var1, .data_size = sizeof(var1), .write = var1_write },
+static cat_variable vars[] = { { .type = CAT_VAR_INT_DEC, .data = &var1, .data_size = sizeof(var1), .write = var1_write },
                                       { .type = CAT_VAR_INT_DEC, .data = &var2, .data_size = sizeof(var2), .write = var2_write },
                                       { .type = CAT_VAR_INT_DEC, .data = &var3, .data_size = sizeof(var3), .write = var3_write } };
 
@@ -134,7 +134,7 @@ static int read_char(char *ch)
         return 1;
 }
 
-static struct cat_io_interface iface = { .read = read_char, .write = write_char };
+static cat_io_interface iface = { .read = read_char, .write = write_char };
 
 static void prepare_input(const char *text)
 {

@@ -48,13 +48,13 @@ static int cmd_write(const cat_command *cmd, const uint8_t *data, size_t data_si
         return 0;
 }
 
-static int var_write(const struct cat_variable *var, size_t write_size)
+static int var_write(const cat_variable *var, size_t write_size)
 {
         var_write_size[var_write_size_index++] = write_size;
         return 0;
 }
 
-static struct cat_variable vars[] = { { .type = CAT_VAR_BUF_STRING, .data = var, .data_size = sizeof(var), .write = var_write } };
+static cat_variable vars[] = { { .type = CAT_VAR_BUF_STRING, .data = var, .data_size = sizeof(var), .write = var_write } };
 
 static cat_command cmds[] = { { .name = "+SET",
                                 .write = cmd_write,
@@ -96,7 +96,7 @@ static int read_char(char *ch)
         return 1;
 }
 
-static struct cat_io_interface iface = { .read = read_char, .write = write_char };
+static cat_io_interface iface = { .read = read_char, .write = write_char };
 
 static void prepare_input(const char *text)
 {

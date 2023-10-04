@@ -63,14 +63,14 @@ static int cmd2_read(const cat_command *cmd, char *data, size_t *data_size, size
         return 0;
 }
 
-static int common_var_read_handler(const struct cat_variable *var)
+static int common_var_read_handler(const cat_variable *var)
 {
         (void)var; // Unused
         common_cntr++;
         return 0;
 }
 
-static struct cat_variable vars[] = { { .type = CAT_VAR_INT_DEC, .data = &var_int, .data_size = sizeof(var_int), .read = common_var_read_handler },
+static cat_variable vars[] = { { .type = CAT_VAR_INT_DEC, .data = &var_int, .data_size = sizeof(var_int), .read = common_var_read_handler },
                                       { .type = CAT_VAR_UINT_DEC, .data = &var_uint, .data_size = sizeof(var_uint), .read = common_var_read_handler },
                                       { .type = CAT_VAR_NUM_HEX, .data = &var_hex8, .data_size = sizeof(var_hex8), .read = common_var_read_handler },
                                       { .type = CAT_VAR_NUM_HEX, .data = &var_hex16, .data_size = sizeof(var_hex16), .read = common_var_read_handler },
@@ -125,7 +125,7 @@ static int read_char(char *ch)
         return 1;
 }
 
-static struct cat_io_interface iface = { .read = read_char, .write = write_char };
+static cat_io_interface iface = { .read = read_char, .write = write_char };
 
 static void prepare_input(const char *text)
 {

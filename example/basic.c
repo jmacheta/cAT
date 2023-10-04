@@ -60,7 +60,7 @@ static int quit_run(const cat_command *cmd)
 }
 
 /* declaring print variables array */
-static struct cat_variable print_vars[] = { {
+static cat_variable print_vars[] = { {
                                                     .type = CAT_VAR_UINT_DEC,
                                                     .data = &x,
                                                     .data_size = sizeof(x),
@@ -128,7 +128,7 @@ static int read_char(char *ch)
 }
 
 /* declaring input output interface descriptor for parser */
-static struct cat_io_interface iface = { .read = read_char, .write = write_char };
+static cat_io_interface iface = { .read = read_char, .write = write_char };
 
 int main(void)
 {

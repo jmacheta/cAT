@@ -38,37 +38,37 @@ static uint8_t bytes_buf[4];
 static char msg[16];
 static bool quit_flag;
 
-static int x_write(const struct cat_variable *var, size_t write_size)
+static int x_write(const cat_variable *var, size_t write_size)
 {
         printf("x variable updated internally to: %u\n", x);
         return 0;
 }
 
-static int y_write(const struct cat_variable *var, size_t write_size)
+static int y_write(const cat_variable *var, size_t write_size)
 {
         printf("y variable updated internally to: %u\n", y);
         return 0;
 }
 
-static int msg_write(const struct cat_variable *var, size_t write_size)
+static int msg_write(const cat_variable *var, size_t write_size)
 {
         printf("msg variable updated %lu bytes internally to: <%s>\n", write_size, msg);
         return 0;
 }
 
-static int speed_write(const struct cat_variable *var, size_t write_size)
+static int speed_write(const cat_variable *var, size_t write_size)
 {
         printf("speed variable updated internally to: %d\n", speed);
         return 0;
 }
 
-static int adr_write(const struct cat_variable *var, size_t write_size)
+static int adr_write(const cat_variable *var, size_t write_size)
 {
         printf("adr variable updated internally to: 0x%04X\n", adr);
         return 0;
 }
 
-static int bytesbuf_write(const struct cat_variable *var, size_t write_size)
+static int bytesbuf_write(const cat_variable *var, size_t write_size)
 {
         int i = 0;
 
@@ -122,11 +122,11 @@ static int print_cmd_list(const cat_command *cmd)
         return CAT_RETURN_STATE_PRINT_CMD_LIST_OK;
 }
 
-static struct cat_variable go_vars[] = { { .type = CAT_VAR_UINT_DEC, .data = &x, .data_size = sizeof(x), .write = x_write, .name = "x" },
+static cat_variable go_vars[] = { { .type = CAT_VAR_UINT_DEC, .data = &x, .data_size = sizeof(x), .write = x_write, .name = "x" },
                                          { .type = CAT_VAR_UINT_DEC, .data = &y, .data_size = sizeof(y), .write = y_write, .name = "y" },
                                          { .type = CAT_VAR_BUF_STRING, .data = msg, .data_size = sizeof(msg), .write = msg_write, .name = "msg" } };
 
-static struct cat_variable set_vars[] = {
+static cat_variable set_vars[] = {
         { .type = CAT_VAR_INT_DEC, .data = &speed, .data_size = sizeof(speed), .write = speed_write, .name = "speed" },
         { .type = CAT_VAR_NUM_HEX, .data = &adr, .data_size = sizeof(adr), .write = adr_write, .name = "address" },
         { .type = CAT_VAR_BUF_HEX, .data = &bytes_buf, .data_size = sizeof(bytes_buf), .write = bytesbuf_write, .name = "buffer" }
@@ -177,7 +177,7 @@ static int read_char(char *ch)
         return 1;
 }
 
-static struct cat_io_interface iface = { .read = read_char, .write = write_char };
+static cat_io_interface iface = { .read = read_char, .write = write_char };
 
 int main(void)
 {
