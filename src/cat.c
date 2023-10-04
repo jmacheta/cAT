@@ -562,7 +562,7 @@ static int is_valid_hex_char(const char ch)
 
 static uint8_t convert_hex_char_to_value(const char ch)
 {
-        return ((ch >= '0') && (ch <= '9')) ? (uint8_t)(ch - '0') : (uint8_t)(ch - (uint8_t)('A' + 10U));
+        return ((ch >= '0') && (ch <= '9')) ? (uint8_t)(ch - '0') : (uint8_t)((uint8_t)(ch - 'A') + 10U);
 }
 
 static void end_processing_with_error(cat_object *self, cat_fsm_type fsm)
