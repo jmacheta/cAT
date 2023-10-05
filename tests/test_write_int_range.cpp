@@ -30,6 +30,7 @@ SOFTWARE.
 #include <assert.h>
 
 #include <cat/cat.h>
+#include <gtest/gtest.h>
 
 static char write_results[256];
 static char ack_results[256];
@@ -41,11 +42,11 @@ static int32_t var3, var3b;
 static char const *input_text;
 static size_t input_index;
 
-static int cmd_write(const cat_command *cmd, const uint8_t *data, size_t data_size, size_t args_num)
+static cat_return_state cmd_write(const cat_command *cmd, const char *data, size_t data_size, size_t args_num)
 {
         strcat(write_results, " CMD:");
         strncat(write_results, data, data_size);
-        return 0;
+        return CAT_RETURN_STATE_DATA_OK;
 }
 
 static int var1_write(const cat_variable *var, size_t write_size)
@@ -70,8 +71,8 @@ static int var3_write(const cat_variable *var, size_t write_size)
 }
 
 static cat_variable vars[] = { { .type = CAT_VAR_INT_DEC, .data = &var1, .data_size = sizeof(var1), .write = var1_write },
-                                      { .type = CAT_VAR_INT_DEC, .data = &var2, .data_size = sizeof(var2), .write = var2_write },
-                                      { .type = CAT_VAR_INT_DEC, .data = &var3, .data_size = sizeof(var3), .write = var3_write } };
+                               { .type = CAT_VAR_INT_DEC, .data = &var2, .data_size = sizeof(var2), .write = var2_write },
+                               { .type = CAT_VAR_INT_DEC, .data = &var3, .data_size = sizeof(var3), .write = var3_write } };
 
 static cat_command cmds[] = { { .name = "+SET",
                                 .write = cmd_write,
@@ -115,7 +116,7 @@ static int read_char(char *ch)
         return 1;
 }
 
-static cat_io_interface iface = { .read = read_char, .write = write_char };
+static cat_io_interface iface = { .write = write_char, .read = read_char };
 
 static void prepare_input(const char *text)
 {
@@ -137,7 +138,7 @@ static const char test_case_1[] = "\nAT+SET=-128\nAT+SET=-129\nAT+SET=127\nAT+SE
 static const char test_case_2[] = "\nAT+SET=-128,-32768\nAT+SET=-128,-40000\nAT+SET=-128,32767\nAT+SET=-100,40000\n";
 static const char test_case_3[] = "\nAT+SET=0,0,-2147483648\nAT+SET=0,0,-2147483649\nAT+SET=1,1,2147483647\nAT+SET=2,2,2147483648\n";
 
-int main(void)
+TEST(cAT, write_int_range)
 {
         cat_object at;
 
@@ -147,43 +148,41 @@ int main(void)
         while (cat_service(&at) != 0) {
         };
 
-        assert(strcmp(ack_results, "\nOK\n\nERROR\n\nOK\n\nERROR\n") == 0);
-        assert(strcmp(write_results, " CMD:-128 CMD:127") == 0);
+        EXPECT_STREQ(ack_results, "\nOK\n\nERROR\n\nOK\n\nERROR\n");
+        EXPECT_STREQ(write_results, " CMD:-128 CMD:127");
 
-        assert(var1 == 127);
-        assert(var1b == var1);
-        assert(var2 == 2);
-        assert(var2b == -2);
-        assert(var3 == 3);
-        assert(var3b == -3);
+        EXPECT_EQ(var1, 127);
+        EXPECT_EQ(var1b, var1);
+        EXPECT_EQ(var2, 2);
+        EXPECT_EQ(var2b, -2);
+        EXPECT_EQ(var3, 3);
+        EXPECT_EQ(var3b, -3);
 
         prepare_input(test_case_2);
         while (cat_service(&at) != 0) {
         };
 
-        assert(strcmp(ack_results, "\nOK\n\nERROR\n\nOK\n\nERROR\n") == 0);
-        assert(strcmp(write_results, " CMD:-128,-32768 CMD:-128,32767") == 0);
+        EXPECT_STREQ(ack_results, "\nOK\n\nERROR\n\nOK\n\nERROR\n");
+        EXPECT_STREQ(write_results, " CMD:-128,-32768 CMD:-128,32767");
 
-        assert(var1 == -100);
-        assert(var1b == var1);
-        assert(var2 == 32767);
-        assert(var2b == var2);
-        assert(var3 == 3);
-        assert(var3b == -3);
+        EXPECT_EQ(var1, -100);
+        EXPECT_EQ(var1b, var1);
+        EXPECT_EQ(var2, 32767);
+        EXPECT_EQ(var2b, var2);
+        EXPECT_EQ(var3, 3);
+        EXPECT_EQ(var3b, -3);
 
         prepare_input(test_case_3);
         while (cat_service(&at) != 0) {
         };
 
-        assert(strcmp(ack_results, "\nOK\n\nERROR\n\nOK\n\nERROR\n") == 0);
-        assert(strcmp(write_results, " CMD:0,0,-2147483648 CMD:1,1,2147483647") == 0);
+        EXPECT_STREQ(ack_results, "\nOK\n\nERROR\n\nOK\n\nERROR\n");
+        EXPECT_STREQ(write_results, " CMD:0,0,-2147483648 CMD:1,1,2147483647");
 
-        assert(var1 == 2);
-        assert(var1b == var1);
-        assert(var2 == 2);
-        assert(var2b == var2);
-        assert(var3 == 2147483647);
-        assert(var3b == var3);
-
-        return 0;
+        EXPECT_EQ(var1, 2);
+        EXPECT_EQ(var1b, var1);
+        EXPECT_EQ(var2, 2);
+        EXPECT_EQ(var2b, var2);
+        EXPECT_EQ(var3, 2147483647);
+        EXPECT_EQ(var3b, var3);
 }

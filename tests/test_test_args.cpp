@@ -30,6 +30,7 @@ SOFTWARE.
 #include <assert.h>
 
 #include <cat/cat.h>
+#include <gtest/gtest.h>
 
 static char ack_results[256];
 
@@ -48,7 +49,7 @@ static char var_string[16];
 static char const *input_text;
 static size_t input_index;
 
-static int cmd_override_test(const cat_command *cmd, char *data, size_t *data_size, size_t max_data_size)
+static cat_return_state cmd_override_test(const cat_command *cmd, char *data, size_t *data_size, size_t max_data_size)
 {
         (void)cmd;
         (void)data_size;
@@ -56,19 +57,19 @@ static int cmd_override_test(const cat_command *cmd, char *data, size_t *data_si
 
         strcat(data, "\ntest");
         *data_size = strlen(data);
-        return 0;
+        return CAT_RETURN_STATE_DATA_OK;
 }
 
-static int cmd_error_test(const cat_command *cmd, char *data, size_t *data_size, size_t max_data_size)
+static cat_return_state cmd_error_test(const cat_command *cmd, char *data, size_t *data_size, size_t max_data_size)
 {
         (void)cmd;
         (void)data;
         (void)data_size;
         (void)max_data_size;
-        return -1;
+        return CAT_RETURN_STATE_ERROR;
 }
 
-static int cmd_ok_test(const cat_command *cmd, char *data, size_t *data_size, size_t max_data_size)
+static cat_return_state cmd_ok_test(const cat_command *cmd, char *data, size_t *data_size, size_t max_data_size)
 {
         (void)cmd;
         (void)data_size;
@@ -76,10 +77,10 @@ static int cmd_ok_test(const cat_command *cmd, char *data, size_t *data_size, si
 
         strcpy(data, "test1");
         *data_size = strlen(data);
-        return 0;
+        return CAT_RETURN_STATE_DATA_OK;
 }
 
-static int cmd_ok2_test(const cat_command *cmd, char *data, size_t *data_size, size_t max_data_size)
+static cat_return_state cmd_ok2_test(const cat_command *cmd, char *data, size_t *data_size, size_t max_data_size)
 {
         (void)cmd;
         (void)data_size;
@@ -87,24 +88,24 @@ static int cmd_ok2_test(const cat_command *cmd, char *data, size_t *data_size, s
 
         strcat(data, "test2");
         *data_size = strlen(data);
-        return 0;
+        return CAT_RETURN_STATE_DATA_OK;
 }
 
-static cat_variable vars[] = { { .type = CAT_VAR_INT_DEC, .data = &var_int8, .data_size = sizeof(var_int8), .name = "x" },
-                                      { .type = CAT_VAR_INT_DEC, .data = &var_int16, .data_size = sizeof(var_int16), .name = "y" },
-                                      { .type = CAT_VAR_INT_DEC, .data = &var_int32, .data_size = sizeof(var_int32) },
-                                      { .type = CAT_VAR_UINT_DEC, .data = &var_uint8, .data_size = sizeof(var_uint8) },
-                                      { .type = CAT_VAR_UINT_DEC, .data = &var_uint16, .data_size = sizeof(var_uint16) },
-                                      { .type = CAT_VAR_UINT_DEC, .data = &var_uint32, .data_size = sizeof(var_uint32) },
-                                      { .type = CAT_VAR_NUM_HEX, .data = &var_hex8, .data_size = sizeof(var_hex8) },
-                                      { .type = CAT_VAR_NUM_HEX, .data = &var_hex16, .data_size = sizeof(var_hex16) },
-                                      { .type = CAT_VAR_NUM_HEX, .data = &var_hex32, .data_size = sizeof(var_hex32) },
-                                      { .type = CAT_VAR_BUF_HEX, .data = &var_buf, .data_size = sizeof(var_buf) },
-                                      { .type = CAT_VAR_BUF_STRING, .data = &var_string, .data_size = sizeof(var_string), .name = "msg" } };
+static cat_variable vars[] = { { .name = "x", .type = CAT_VAR_INT_DEC, .data = &var_int8, .data_size = sizeof(var_int8) },
+                               { .name = "y", .type = CAT_VAR_INT_DEC, .data = &var_int16, .data_size = sizeof(var_int16) },
+                               { .type = CAT_VAR_INT_DEC, .data = &var_int32, .data_size = sizeof(var_int32) },
+                               { .type = CAT_VAR_UINT_DEC, .data = &var_uint8, .data_size = sizeof(var_uint8) },
+                               { .type = CAT_VAR_UINT_DEC, .data = &var_uint16, .data_size = sizeof(var_uint16) },
+                               { .type = CAT_VAR_UINT_DEC, .data = &var_uint32, .data_size = sizeof(var_uint32) },
+                               { .type = CAT_VAR_NUM_HEX, .data = &var_hex8, .data_size = sizeof(var_hex8) },
+                               { .type = CAT_VAR_NUM_HEX, .data = &var_hex16, .data_size = sizeof(var_hex16) },
+                               { .type = CAT_VAR_NUM_HEX, .data = &var_hex32, .data_size = sizeof(var_hex32) },
+                               { .type = CAT_VAR_BUF_HEX, .data = &var_buf, .data_size = sizeof(var_buf) },
+                               { .name = "msg", .type = CAT_VAR_BUF_STRING, .data = &var_string, .data_size = sizeof(var_string) } };
 
 static cat_variable vars_ro[] = {
-        { .type = CAT_VAR_INT_DEC, .data = &var_int8, .data_size = sizeof(var_int8), .name = "x", .access = CAT_VAR_ACCESS_READ_ONLY },
-        { .type = CAT_VAR_INT_DEC, .data = &var_int16, .data_size = sizeof(var_int16), .name = "y", .access = CAT_VAR_ACCESS_READ_ONLY },
+        { .name = "x", .type = CAT_VAR_INT_DEC, .data = &var_int8, .data_size = sizeof(var_int8), .access = CAT_VAR_ACCESS_READ_ONLY },
+        { .name = "y", .type = CAT_VAR_INT_DEC, .data = &var_int16, .data_size = sizeof(var_int16), .access = CAT_VAR_ACCESS_READ_ONLY },
         { .type = CAT_VAR_INT_DEC, .data = &var_int32, .data_size = sizeof(var_int32), .access = CAT_VAR_ACCESS_READ_ONLY },
         { .type = CAT_VAR_UINT_DEC, .data = &var_uint8, .data_size = sizeof(var_uint8), .access = CAT_VAR_ACCESS_READ_ONLY },
         { .type = CAT_VAR_UINT_DEC, .data = &var_uint16, .data_size = sizeof(var_uint16), .access = CAT_VAR_ACCESS_READ_ONLY },
@@ -113,12 +114,12 @@ static cat_variable vars_ro[] = {
         { .type = CAT_VAR_NUM_HEX, .data = &var_hex16, .data_size = sizeof(var_hex16), .access = CAT_VAR_ACCESS_READ_ONLY },
         { .type = CAT_VAR_NUM_HEX, .data = &var_hex32, .data_size = sizeof(var_hex32), .access = CAT_VAR_ACCESS_READ_ONLY },
         { .type = CAT_VAR_BUF_HEX, .data = &var_buf, .data_size = sizeof(var_buf), .access = CAT_VAR_ACCESS_READ_ONLY },
-        { .type = CAT_VAR_BUF_STRING, .data = &var_string, .data_size = sizeof(var_string), .name = "msg", .access = CAT_VAR_ACCESS_READ_ONLY }
+        { .name = "msg", .type = CAT_VAR_BUF_STRING, .data = &var_string, .data_size = sizeof(var_string), .access = CAT_VAR_ACCESS_READ_ONLY }
 };
 
 static cat_variable vars_wo[] = {
-        { .type = CAT_VAR_INT_DEC, .data = &var_int8, .data_size = sizeof(var_int8), .name = "x", .access = CAT_VAR_ACCESS_WRITE_ONLY },
-        { .type = CAT_VAR_INT_DEC, .data = &var_int16, .data_size = sizeof(var_int16), .name = "y", .access = CAT_VAR_ACCESS_WRITE_ONLY },
+        { .name = "x", .type = CAT_VAR_INT_DEC, .data = &var_int8, .data_size = sizeof(var_int8), .access = CAT_VAR_ACCESS_WRITE_ONLY },
+        { .name = "y", .type = CAT_VAR_INT_DEC, .data = &var_int16, .data_size = sizeof(var_int16), .access = CAT_VAR_ACCESS_WRITE_ONLY },
         { .type = CAT_VAR_INT_DEC, .data = &var_int32, .data_size = sizeof(var_int32), .access = CAT_VAR_ACCESS_WRITE_ONLY },
         { .type = CAT_VAR_UINT_DEC, .data = &var_uint8, .data_size = sizeof(var_uint8), .access = CAT_VAR_ACCESS_WRITE_ONLY },
         { .type = CAT_VAR_UINT_DEC, .data = &var_uint16, .data_size = sizeof(var_uint16), .access = CAT_VAR_ACCESS_WRITE_ONLY },
@@ -127,10 +128,10 @@ static cat_variable vars_wo[] = {
         { .type = CAT_VAR_NUM_HEX, .data = &var_hex16, .data_size = sizeof(var_hex16), .access = CAT_VAR_ACCESS_WRITE_ONLY },
         { .type = CAT_VAR_NUM_HEX, .data = &var_hex32, .data_size = sizeof(var_hex32), .access = CAT_VAR_ACCESS_WRITE_ONLY },
         { .type = CAT_VAR_BUF_HEX, .data = &var_buf, .data_size = sizeof(var_buf), .access = CAT_VAR_ACCESS_WRITE_ONLY },
-        { .type = CAT_VAR_BUF_STRING, .data = &var_string, .data_size = sizeof(var_string), .name = "msg", .access = CAT_VAR_ACCESS_WRITE_ONLY }
+        { .name = "msg", .type = CAT_VAR_BUF_STRING, .data = &var_string, .data_size = sizeof(var_string), .access = CAT_VAR_ACCESS_WRITE_ONLY }
 };
 
-static cat_variable vars2[] = { { .type = CAT_VAR_INT_DEC, .data = &var_int8, .data_size = sizeof(var_int8), .name = "var" } };
+static cat_variable vars2[] = { { .name = "var", .type = CAT_VAR_INT_DEC, .data = &var_int8, .data_size = sizeof(var_int8) } };
 
 static cat_command cmds[] = { { .name = "+SET",
 
@@ -214,7 +215,7 @@ static int read_char(char *ch)
         return 1;
 }
 
-static cat_io_interface iface = { .read = read_char, .write = write_char };
+static cat_io_interface iface = { .write = write_char, .read = read_char };
 
 static void prepare_input(const char *text)
 {
@@ -249,7 +250,7 @@ static const char test_case_1_wo[] = "\nAT+SETWO=?\n";
 static const char test_case_2[] = "\nAT+TEST=?\nAT+TEST2=?\r\nAT+AP=?\n";
 static const char test_case_3[] = "\nAT+ZZ=?\nAT+ZZ2=?\nAT+ZZ3=?\r\n";
 
-int main(void)
+TEST(cAT, test_args)
 {
         cat_object at;
 
@@ -259,37 +260,35 @@ int main(void)
         while (cat_service(&at) != 0) {
         };
 
-        assert(strcmp(ack_results,
-                      "\n+SET=<x:INT8[RW]>,<y:INT16[RW]>,<INT32[RW]>,<UINT8[RW]>,<UINT16[RW]>,<UINT32[RW]>,<HEX8[RW]>,<HEX16[RW]>,<HEX32[RW]>,<HEXBUF[RW]>,<msg:STRING[RW]>\n\nOK\n") ==
-               0);
+        EXPECT_STREQ(
+                ack_results,
+                "\n+SET=<x:INT8[RW]>,<y:INT16[RW]>,<INT32[RW]>,<UINT8[RW]>,<UINT16[RW]>,<UINT32[RW]>,<HEX8[RW]>,<HEX16[RW]>,<HEX32[RW]>,<HEXBUF[RW]>,<msg:STRING[RW]>\n\nOK\n");
 
         prepare_input(test_case_1_ro);
         while (cat_service(&at) != 0) {
         };
 
-        assert(strcmp(ack_results,
-                      "\n+SETRO=<x:INT8[RO]>,<y:INT16[RO]>,<INT32[RO]>,<UINT8[RO]>,<UINT16[RO]>,<UINT32[RO]>,<HEX8[RO]>,<HEX16[RO]>,<HEX32[RO]>,<HEXBUF[RO]>,<msg:STRING[RO]>\n\nOK\n") ==
-               0);
+        EXPECT_STREQ(
+                ack_results,
+                "\n+SETRO=<x:INT8[RO]>,<y:INT16[RO]>,<INT32[RO]>,<UINT8[RO]>,<UINT16[RO]>,<UINT32[RO]>,<HEX8[RO]>,<HEX16[RO]>,<HEX32[RO]>,<HEXBUF[RO]>,<msg:STRING[RO]>\n\nOK\n");
 
         prepare_input(test_case_1_wo);
         while (cat_service(&at) != 0) {
         };
 
-        assert(strcmp(ack_results,
-                      "\n+SETWO=<x:INT8[WO]>,<y:INT16[WO]>,<INT32[WO]>,<UINT8[WO]>,<UINT16[WO]>,<UINT32[WO]>,<HEX8[WO]>,<HEX16[WO]>,<HEX32[WO]>,<HEXBUF[WO]>,<msg:STRING[WO]>\n\nOK\n") ==
-               0);
+        EXPECT_STREQ(
+                ack_results,
+                "\n+SETWO=<x:INT8[WO]>,<y:INT16[WO]>,<INT32[WO]>,<UINT8[WO]>,<UINT16[WO]>,<UINT32[WO]>,<HEX8[WO]>,<HEX16[WO]>,<HEX32[WO]>,<HEXBUF[WO]>,<msg:STRING[WO]>\n\nOK\n");
 
         prepare_input(test_case_2);
         while (cat_service(&at) != 0) {
         };
 
-        assert(strcmp(ack_results, "\n+TEST=<var:INT8[RW]>\ntest_desc\ntest\n\nOK\n\r\n+TEST2=<var:INT8[RW]>\r\ntest2_desc\r\n\r\nOK\r\n\nERROR\n") == 0);
+        EXPECT_STREQ(ack_results, "\n+TEST=<var:INT8[RW]>\ntest_desc\ntest\n\nOK\n\r\n+TEST2=<var:INT8[RW]>\r\ntest2_desc\r\n\r\nOK\r\n\nERROR\n");
 
         prepare_input(test_case_3);
         while (cat_service(&at) != 0) {
         };
 
-        assert(strcmp(ack_results, "\ntest1\n\nOK\n\ntest1\n\nOK\n\r\n+ZZ3=\r\nzz3_desctest2\r\n\r\nOK\r\n") == 0);
-
-        return 0;
+        EXPECT_STREQ(ack_results, "\ntest1\n\nOK\n\ntest1\n\nOK\n\r\n+ZZ3=\r\nzz3_desctest2\r\n\r\nOK\r\n");
 }

@@ -30,31 +30,32 @@ SOFTWARE.
 #include <assert.h>
 
 #include <cat/cat.h>
+#include <gtest/gtest.h>
 static char run_results[256];
 static char ack_results[256];
 
 static char const *input_text;
 static size_t input_index;
 
-static int e_run(const cat_command *cmd)
+static cat_return_state e_run(const cat_command *cmd)
 {
         strcat(run_results, " E:");
         strcat(run_results, cmd->name);
-        return 0;
+        return CAT_RETURN_STATE_DATA_OK;
 }
 
-static int e0_run(const cat_command *cmd)
+static cat_return_state e0_run(const cat_command *cmd)
 {
         strcat(run_results, " E0:");
         strcat(run_results, cmd->name);
-        return 0;
+        return CAT_RETURN_STATE_DATA_OK;
 }
 
-static int e1_run(const cat_command *cmd)
+static cat_return_state e1_run(const cat_command *cmd)
 {
         strcat(run_results, " E1:");
         strcat(run_results, cmd->name);
-        return 0;
+        return CAT_RETURN_STATE_DATA_OK;
 }
 
 static cat_command cmds1[] = { {
@@ -162,7 +163,7 @@ static int read_char(char *ch)
         return 1;
 }
 
-static cat_io_interface iface = { .read = read_char, .write = write_char };
+static cat_io_interface iface = { .write = write_char, .read = read_char };
 
 static void prepare_input(const char *text)
 {
@@ -175,7 +176,7 @@ static void prepare_input(const char *text)
 
 static const char test_case_1[] = "\nATE\n\nATE0\n\nATE1\n";
 
-int main(void)
+TEST(cAT, order)
 {
         cat_object at;
 
@@ -185,8 +186,8 @@ int main(void)
         while (cat_service(&at) != 0) {
         };
 
-        assert(strcmp(ack_results, "\nOK\n\nOK\n\nOK\n") == 0);
-        assert(strcmp(run_results, " E:E E0:E0 E1:E1") == 0);
+        EXPECT_STREQ(ack_results, "\nOK\n\nOK\n\nOK\n");
+        EXPECT_STREQ(run_results, " E:E E0:E0 E1:E1");
 
         cat_init(&at, &desc_2, &iface, NULL);
 
@@ -194,8 +195,8 @@ int main(void)
         while (cat_service(&at) != 0) {
         };
 
-        assert(strcmp(ack_results, "\nOK\n\nOK\n\nOK\n") == 0);
-        assert(strcmp(run_results, " E:E E0:E0 E1:E1") == 0);
+        EXPECT_STREQ(ack_results, "\nOK\n\nOK\n\nOK\n");
+        EXPECT_STREQ(run_results, " E:E E0:E0 E1:E1");
 
         cat_init(&at, &desc_3, &iface, NULL);
 
@@ -203,8 +204,6 @@ int main(void)
         while (cat_service(&at) != 0) {
         };
 
-        assert(strcmp(ack_results, "\nOK\n\nOK\n\nOK\n") == 0);
-        assert(strcmp(run_results, " E:E E0:E0 E1:E1") == 0);
-
-        return 0;
+        EXPECT_STREQ(ack_results, "\nOK\n\nOK\n\nOK\n");
+        EXPECT_STREQ(run_results, " E:E E0:E0 E1:E1");
 }

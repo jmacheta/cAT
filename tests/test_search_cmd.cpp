@@ -30,23 +30,23 @@ SOFTWARE.
 #include <assert.h>
 
 #include <cat/cat.h>
-
-static int ap_read(const cat_command *cmd, uint8_t *data, size_t *data_size, size_t max_data_size)
+#include <gtest/gtest.h>
+static cat_return_state ap_read(const cat_command *cmd, char *data, size_t *data_size, size_t max_data_size)
 {
         (void)cmd; // Unused
         (void)data; // Unused
         (void)data_size; // Unused
         (void)max_data_size; // Unused
-        return 0;
+        return CAT_RETURN_STATE_DATA_OK;
 }
 
-static int ap_write(const cat_command *cmd, const uint8_t *data, size_t data_size, size_t args_num)
+static cat_return_state ap_write(const cat_command *cmd, const char *data, size_t data_size, size_t args_num)
 {
         (void)cmd; // Unused
         (void)data; // Unused
         (void)data_size; // Unused
         (void)args_num; // Unused
-        return 0;
+        return CAT_RETURN_STATE_DATA_OK;
 }
 
 static cat_variable vars_ap1[] = { { .name = "var_ap1_1" }, { .name = "var_ap1_2" }, { .name = "var_ap1_3" } };
@@ -54,13 +54,13 @@ static cat_variable vars_ap1[] = { { .name = "var_ap1_1" }, { .name = "var_ap1_2
 static cat_variable vars_apx2[] = { { .name = "var_apx2_1" }, { .name = "var_apx2_2" }, { .name = "var_apx2_3" } };
 
 static cat_command cmds[] = {
-        { .name = "AP1", .write = ap_write, .only_test = true, .var = vars_ap1, .var_num = sizeof(vars_ap1) / sizeof(vars_ap1[0]) },
+        { .name = "AP1", .write = ap_write, .var = vars_ap1, .var_num = sizeof(vars_ap1) / sizeof(vars_ap1[0]), .only_test = true },
         { .name = "AP2", .read = ap_read, .only_test = false },
 };
 
 static cat_command cmds2[] = {
         { .name = "APX1", .write = ap_write, .only_test = true },
-        { .name = "APX2", .read = ap_read, .only_test = false, .var = vars_apx2, .var_num = sizeof(vars_apx2) / sizeof(vars_apx2[0]) },
+        { .name = "APX2", .read = ap_read, .var = vars_apx2, .var_num = sizeof(vars_apx2) / sizeof(vars_apx2[0]), .only_test = false },
 };
 
 static uint8_t buf[128];
@@ -99,88 +99,86 @@ static int read_char(char *ch)
         return 1;
 }
 
-static cat_io_interface iface = { .read = read_char, .write = write_char };
+static cat_io_interface iface = { .write = write_char, .read = read_char };
 
-int main(void)
+TEST(cAT, search_cmd)
 {
         cat_object at;
         cat_command const *cmd;
         cat_command_group const *cmd_group;
         cat_variable const *var;
 
-        cat_init(&at, &desc, &iface, NULL);
+        cat_init(&at, &desc, &iface, nullptr);
 
         cmd = cat_search_command_by_name(&at, "A");
-        assert(cmd == NULL);
+        EXPECT_EQ(cmd, nullptr);
 
         cmd = cat_search_command_by_name(&at, "AP");
-        assert(cmd == NULL);
+        EXPECT_EQ(cmd, nullptr);
 
         cmd = cat_search_command_by_name(&at, "AP1");
-        assert(cmd == &cmds[0]);
+        EXPECT_EQ(cmd, &cmds[0]);
 
         cmd = cat_search_command_by_name(&at, "AP2");
-        assert(cmd == &cmds[1]);
+        EXPECT_EQ(cmd, &cmds[1]);
 
         cmd = cat_search_command_by_name(&at, "AP3");
-        assert(cmd == NULL);
+        EXPECT_EQ(cmd, nullptr);
 
         cmd = cat_search_command_by_name(&at, "APX1");
-        assert(cmd == &cmds2[0]);
+        EXPECT_EQ(cmd, &cmds2[0]);
 
         cmd = cat_search_command_by_name(&at, "APX2");
-        assert(cmd == &cmds2[1]);
+        EXPECT_EQ(cmd, &cmds2[1]);
 
         cmd = cat_search_command_by_name(&at, "APX3");
-        assert(cmd == NULL);
+        EXPECT_EQ(cmd, nullptr);
 
         cmd_group = cat_search_command_group_by_name(&at, "std");
-        assert(cmd_group == cmd_desc[0]);
+        EXPECT_EQ(cmd_group, cmd_desc[0]);
 
         cmd_group = cat_search_command_group_by_name(&at, "ext");
-        assert(cmd_group == cmd_desc[1]);
+        EXPECT_EQ(cmd_group, cmd_desc[1]);
 
         cmd_group = cat_search_command_group_by_name(&at, "not");
-        assert(cmd_group == NULL);
+        EXPECT_EQ(cmd_group, nullptr);
 
         var = cat_search_variable_by_name(&at, &cmds[0], "v");
-        assert(var == NULL);
+        EXPECT_EQ(var, nullptr);
 
         var = cat_search_variable_by_name(&at, &cmds[0], "var_ap");
-        assert(var == NULL);
+        EXPECT_EQ(var, nullptr);
 
         var = cat_search_variable_by_name(&at, &cmds[0], "var_apx2");
-        assert(var == NULL);
+        EXPECT_EQ(var, nullptr);
 
         var = cat_search_variable_by_name(&at, &cmds[0], "var_ap1_1");
-        assert(var == &vars_ap1[0]);
+        EXPECT_EQ(var, &vars_ap1[0]);
 
         var = cat_search_variable_by_name(&at, &cmds[0], "var_ap1_2");
-        assert(var == &vars_ap1[1]);
+        EXPECT_EQ(var, &vars_ap1[1]);
 
         var = cat_search_variable_by_name(&at, &cmds[0], "var_ap1_3");
-        assert(var == &vars_ap1[2]);
+        EXPECT_EQ(var, &vars_ap1[2]);
 
         var = cat_search_variable_by_name(&at, &cmds[0], "var_ap1_4");
-        assert(var == NULL);
+        EXPECT_EQ(var, nullptr);
 
         var = cat_search_variable_by_name(&at, &cmds[1], "var_ap1_1");
-        assert(var == NULL);
+        EXPECT_EQ(var, nullptr);
 
         var = cat_search_variable_by_name(&at, &cmds2[1], "var_apx2_1");
-        assert(var == &vars_apx2[0]);
+        EXPECT_EQ(var, &vars_apx2[0]);
 
         var = cat_search_variable_by_name(&at, &cmds2[1], "var_apx2_2");
-        assert(var == &vars_apx2[1]);
+        EXPECT_EQ(var, &vars_apx2[1]);
 
         var = cat_search_variable_by_name(&at, &cmds2[1], "var_apx2_3");
-        assert(var == &vars_apx2[2]);
+        EXPECT_EQ(var, &vars_apx2[2]);
 
         var = cat_search_variable_by_name(&at, &cmds2[1], "var_apx2_4");
-        assert(var == NULL);
+        EXPECT_EQ(var, nullptr);
 
         var = cat_search_variable_by_name(&at, &cmds2[0], "var_apx2_1");
-        assert(var == NULL);
-
-        return 0;
+        EXPECT_EQ(var, nullptr);
 }

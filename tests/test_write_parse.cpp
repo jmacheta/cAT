@@ -30,7 +30,7 @@ SOFTWARE.
 #include <assert.h>
 
 #include <cat/cat.h>
-
+#include <gtest/gtest.h>
 static char write_results[256];
 static char ack_results[256];
 
@@ -40,22 +40,22 @@ static int8_t var1b, var2b, var3b;
 static char const *input_text;
 static size_t input_index;
 
-static int cmd_write1(const cat_command *cmd, const uint8_t *data, size_t data_size, size_t args_num)
+static cat_return_state cmd_write1(const cat_command *cmd, const char *data, size_t data_size, size_t args_num)
 {
         char tmp[32];
         sprintf(tmp, " CMD1_%ld:", args_num);
         strcat(write_results, tmp);
         strncat(write_results, data, data_size);
-        return 0;
+        return CAT_RETURN_STATE_DATA_OK;
 }
 
-static int cmd_write3(const cat_command *cmd, const uint8_t *data, size_t data_size, size_t args_num)
+static cat_return_state cmd_write3(const cat_command *cmd, const char *data, size_t data_size, size_t args_num)
 {
         char tmp[32];
         sprintf(tmp, " CMD3_%ld:", args_num);
         strcat(write_results, tmp);
         strncat(write_results, data, data_size);
-        return 0;
+        return CAT_RETURN_STATE_DATA_OK;
 }
 
 static int var1_write(const cat_variable *var, size_t write_size)
@@ -80,8 +80,8 @@ static int var3_write(const cat_variable *var, size_t write_size)
 }
 
 static cat_variable vars[] = { { .type = CAT_VAR_INT_DEC, .data = &var1, .data_size = sizeof(var1), .write = var1_write },
-                                      { .type = CAT_VAR_INT_DEC, .data = &var2, .data_size = sizeof(var2), .write = var2_write },
-                                      { .type = CAT_VAR_INT_DEC, .data = &var3, .data_size = sizeof(var3), .write = var3_write } };
+                               { .type = CAT_VAR_INT_DEC, .data = &var2, .data_size = sizeof(var2), .write = var2_write },
+                               { .type = CAT_VAR_INT_DEC, .data = &var3, .data_size = sizeof(var3), .write = var3_write } };
 
 static cat_command cmds[] = { { .name = "+SET1",
                                 .write = cmd_write1,
@@ -134,7 +134,7 @@ static int read_char(char *ch)
         return 1;
 }
 
-static cat_io_interface iface = { .read = read_char, .write = write_char };
+static cat_io_interface iface = { .write = write_char, .read = read_char };
 
 static void prepare_input(const char *text)
 {
@@ -153,7 +153,7 @@ static const char test_case_1[] = "\nAT+SET=-10,-20,-30\r\nAT+SET1=-10,-20,-30\r
 static const char test_case_2[] = "\nAT+SET3=-1,-2,-3,0\nAT+SET3=-1,-2,-3\nAT+SET3=-100\n";
 static const char test_case_3[] = "\nAT+SETALL=-11,-22,-33\nAT+SETALL=-1,-2,-3\nAT+SETALL=100\n";
 
-int main(void)
+TEST(cAT, write_parse)
 {
         cat_object at;
 
@@ -163,43 +163,41 @@ int main(void)
         while (cat_service(&at) != 0) {
         };
 
-        assert(strcmp(ack_results, "\r\nERROR\r\n\r\nOK\r\n\r\nOK\r\n") == 0);
-        assert(strcmp(write_results, " CMD1_3:-10,-20,-30 CMD1_1:-1") == 0);
+        EXPECT_STREQ(ack_results, "\r\nERROR\r\n\r\nOK\r\n\r\nOK\r\n");
+        EXPECT_STREQ(write_results, " CMD1_3:-10,-20,-30 CMD1_1:-1");
 
-        assert(var1 == -1);
-        assert(var2 == -20);
-        assert(var3 == -30);
-        assert(var1b == -1);
-        assert(var2b == -20);
-        assert(var3b == -30);
+        EXPECT_EQ(var1, -1);
+        EXPECT_EQ(var2, -20);
+        EXPECT_EQ(var3, -30);
+        EXPECT_EQ(var1b, -1);
+        EXPECT_EQ(var2b, -20);
+        EXPECT_EQ(var3b, -30);
 
         prepare_input(test_case_2);
         while (cat_service(&at) != 0) {
         };
 
-        assert(strcmp(ack_results, "\nERROR\n\nOK\n\nOK\n") == 0);
-        assert(strcmp(write_results, " CMD3_3:-1,-2,-3 CMD3_1:-100") == 0);
+        EXPECT_STREQ(ack_results, "\nERROR\n\nOK\n\nOK\n");
+        EXPECT_STREQ(write_results, " CMD3_3:-1,-2,-3 CMD3_1:-100");
 
-        assert(var1 == -100);
-        assert(var2 == -2);
-        assert(var3 == -3);
-        assert(var1b == -100);
-        assert(var2b == -2);
-        assert(var3b == -3);
+        EXPECT_EQ(var1, -100);
+        EXPECT_EQ(var2, -2);
+        EXPECT_EQ(var3, -3);
+        EXPECT_EQ(var1b, -100);
+        EXPECT_EQ(var2b, -2);
+        EXPECT_EQ(var3b, -3);
 
         prepare_input(test_case_3);
         while (cat_service(&at) != 0) {
         };
 
-        assert(strcmp(ack_results, "\nOK\n\nOK\n\nERROR\n") == 0);
-        assert(strcmp(write_results, " CMD3_3:-11,-22,-33 CMD3_3:-1,-2,-3") == 0);
+        EXPECT_STREQ(ack_results, "\nOK\n\nOK\n\nERROR\n");
+        EXPECT_STREQ(write_results, " CMD3_3:-11,-22,-33 CMD3_3:-1,-2,-3");
 
-        assert(var1 == 100);
-        assert(var2 == -2);
-        assert(var3 == -3);
-        assert(var1b == 100);
-        assert(var2b == -2);
-        assert(var3b == -3);
-
-        return 0;
+        EXPECT_EQ(var1, 100);
+        EXPECT_EQ(var2, -2);
+        EXPECT_EQ(var3, -3);
+        EXPECT_EQ(var1b, 100);
+        EXPECT_EQ(var2b, -2);
+        EXPECT_EQ(var3b, -3);
 }

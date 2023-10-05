@@ -30,59 +30,76 @@ SOFTWARE.
 #include <assert.h>
 
 #include <cat/cat.h>
+#include <gtest/gtest.h>
 static char run_results[256];
-static char read_results[256];
 static char ack_results[256];
 
 static char const *input_text;
 static size_t input_index;
 
-static int a_run(const cat_command *cmd)
+static cat_return_state cmd_write(const cat_command *cmd, const char *data, size_t data_size, size_t args_num)
 {
-        strcat(run_results, " A_");
+        (void)args_num; // Unused
+        strcat(run_results, " W_");
         strcat(run_results, cmd->name);
-        return 0;
+        strcat(run_results, ":");
+        strncat(run_results, data, data_size);
+
+        return CAT_RETURN_STATE_OK;
 }
 
-static int a_read(const cat_command *cmd, char *data, size_t *data_size, size_t max_data_size)
-{
-        strcat(read_results, " A:");
-        strcat(read_results, cmd->name);
-
-        snprintf(data, max_data_size, "%s=A-val", cmd->name);
-        *data_size = strlen(data);
-
-        return 0;
-}
-
-static int ap_read(const cat_command *cmd, char *data, size_t *data_size, size_t max_data_size)
+static cat_return_state cmd_read(const cat_command *cmd, char *data, size_t *data_size, size_t max_data_size)
 {
         (void)data; // Unused
         (void)data_size; // Unused
         (void)max_data_size; // Unused
-        strcat(read_results, " AP:");
-        strcat(read_results, cmd->name);
 
-        *data_size = 0;
-
-        return 0;
+        strcat(run_results, " D_");
+        strcat(run_results, cmd->name);
+        return CAT_RETURN_STATE_OK;
 }
 
-static int test_read(const cat_command *cmd, char *data, size_t *data_size, size_t max_data_size)
+static cat_return_state cmd_run(const cat_command *cmd)
 {
-        (void)data; // Mask as unused
-        (void)data_size; // Mask as unused
-        (void)max_data_size; // Mask as unused
-        strcat(read_results, " +TEST:");
-        strcat(read_results, cmd->name);
-
-        return -1;
+        strcat(run_results, " R_");
+        strcat(run_results, cmd->name);
+        return CAT_RETURN_STATE_OK;
 }
 
-static cat_command cmds[] = { { .name = "A", .read = a_read, .run = a_run },
-                              { .name = "AP", .read = ap_read },
-                              { .name = "+TEST", .read = test_read },
-                              { .name = "+EMPTY" } };
+static cat_return_state cmd_test(const cat_command *cmd, char *data, size_t *data_size, size_t max_data_size)
+{
+        (void)data; // Unused
+        (void)data_size; // Unused
+        (void)max_data_size; // Unused
+
+        strcat(run_results, " T_");
+        strcat(run_results, cmd->name);
+        return CAT_RETURN_STATE_OK;
+}
+
+static int8_t var1;
+static int8_t var2;
+
+static cat_variable vars[] = { { .type = CAT_VAR_INT_DEC, .data = &var1, .data_size = sizeof(var1), .access = CAT_VAR_ACCESS_READ_WRITE },
+                               { .type = CAT_VAR_INT_DEC, .data = &var2, .data_size = sizeof(var2), .access = CAT_VAR_ACCESS_READ_WRITE } };
+
+static cat_command cmds[] = {
+        { .name = "DTEST", /* Won't ever be executed, since prefix matches implicit write command */
+          .write = cmd_write,
+          .read = cmd_read,
+          .run = cmd_run,
+          .test = cmd_test },
+        { .name = "D", .write = cmd_write, .read = NULL, .run = NULL, .test = NULL, .implicit_write = true },
+        { .name = "+D", .write = cmd_write, .read = cmd_read, .run = cmd_run, .test = cmd_test },
+        { .name = "V",
+          .write = cmd_write,
+          .read = NULL,
+          .run = NULL,
+          .test = NULL,
+          .var = vars,
+          .var_num = sizeof(vars) / sizeof(vars[0]),
+          .implicit_write = true },
+};
 
 static uint8_t buf[128];
 
@@ -118,7 +135,7 @@ static int read_char(char *ch)
         return 1;
 }
 
-static cat_io_interface iface = { .read = read_char, .write = write_char };
+static cat_io_interface iface = { .write = write_char, .read = read_char };
 
 static void prepare_input(const char *text)
 {
@@ -127,12 +144,11 @@ static void prepare_input(const char *text)
 
         memset(run_results, 0, sizeof(run_results));
         memset(ack_results, 0, sizeof(ack_results));
-        memset(read_results, 0, sizeof(read_results));
 }
 
-static const char test_case_1[] = "\nAT\r\nAT+\nAT+?\nATA?\r\nATAP\nATAP?\nATAPA?\nAT+TEST?\nAT+te?\nAT+e?\nAT+empTY?\r\nATA\r\n";
+static const char test_case_1[] = "\nATDTEST\nATD\nATD0\nATD1\nATD?\nATD=1\nATD=?\nAT+D\nAT+D?\nAT+D=0\nAT+D=?\nATV-1,42\n";
 
-int main(void)
+TEST(cAT, implicit_write)
 {
         cat_object at;
 
@@ -142,11 +158,8 @@ int main(void)
         while (cat_service(&at) != 0) {
         };
 
-        assert(strcmp(ack_results,
-                      "\r\nOK\r\n\nERROR\n\nERROR\n\r\nA=A-val\r\n\r\nOK\r\n\nERROR\n\nAP=\n\nOK\n\nERROR\n\nERROR\n\nERROR\n\nERROR\n\r\nERROR\r\n\r\nOK\r\n") ==
-               0);
-        assert(strcmp(run_results, " A_A") == 0);
-        assert(strcmp(read_results, " A:A AP:AP +TEST:+TEST +TEST:+TEST") == 0);
-
-        return 0;
+        EXPECT_STREQ(ack_results, "\nOK\n\nOK\n\nOK\n\nOK\n\nOK\n\nOK\n\nOK\n\nOK\n\nOK\n\nOK\n\nOK\n\nOK\n");
+        EXPECT_STREQ(run_results, " W_D:TEST W_D: W_D:0 W_D:1 W_D:? W_D:=1 W_D:=? R_+D D_+D W_+D:0 T_+D W_V:-1,42");
+        EXPECT_EQ(var1, -1);
+        EXPECT_EQ(var2, 42);
 }

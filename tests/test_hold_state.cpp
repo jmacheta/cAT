@@ -30,6 +30,7 @@ SOFTWARE.
 #include <assert.h>
 
 #include <cat/cat.h>
+#include <gtest/gtest.h>
 static char cmd_results[256];
 static char var_read_results[256];
 static char ack_results[256];
@@ -40,9 +41,26 @@ static size_t input_index;
 static int var_x, var_u1, var_u2;
 static cat_object at;
 
-static cat_command u_cmds[];
+static cat_return_state cmd1_read(const cat_command *cmd, char *data, size_t *data_size, size_t max_data_size);
+static cat_return_state cmd2_read(const cat_command *cmd, char *data, size_t *data_size, size_t max_data_size);
+static int var_read(const cat_variable *var);
 
-static cat_return_state cmd_write(const cat_command *cmd, const uint8_t *data, size_t data_size, size_t args_num)
+static cat_variable u_vars[] = { { .name = "U1", .type = CAT_VAR_INT_DEC, .data = &var_u1, .data_size = sizeof(var_u1), .read = var_read },
+                                 { .name = "U2", .type = CAT_VAR_INT_DEC, .data = &var_u2, .data_size = sizeof(var_u2), .read = var_read } };
+
+static cat_command u_cmds[] = { {
+                                        .name = "+U1CMD",
+                                        .read = cmd1_read,
+                                        .var = &u_vars[0],
+                                        .var_num = 1,
+                                },
+                                {
+                                        .name = "+U2CMD",
+                                        .read = cmd2_read,
+                                        .var = &u_vars[1],
+                                        .var_num = 1,
+                                } };
+static cat_return_state cmd_write(const cat_command *cmd, const char *data, size_t data_size, size_t args_num)
 {
         (void)data; // Unused
         (void)data_size; // Unused
@@ -62,7 +80,7 @@ static cat_return_state cmd_write(const cat_command *cmd, const uint8_t *data, s
         return CAT_RETURN_STATE_ERROR;
 }
 
-static cat_return_state cmd1_read(const cat_command *cmd, uint8_t *data, size_t *data_size, size_t max_data_size)
+static cat_return_state cmd1_read(const cat_command *cmd, char *data, size_t *data_size, size_t max_data_size)
 {
         (void)data; // Unused
         (void)data_size; // Unused
@@ -82,7 +100,7 @@ static cat_return_state cmd1_read(const cat_command *cmd, uint8_t *data, size_t 
         return CAT_RETURN_STATE_HOLD_EXIT_OK;
 }
 
-static cat_return_state cmd2_read(const cat_command *cmd, uint8_t *data, size_t *data_size, size_t max_data_size)
+static cat_return_state cmd2_read(const cat_command *cmd, char *data, size_t *data_size, size_t max_data_size)
 {
         (void)data; // Unused
         (void)data_size; // Unused
@@ -111,9 +129,6 @@ static int var_read(const cat_variable *var)
         return 0;
 }
 
-static cat_variable u_vars[] = { { .name = "U1", .type = CAT_VAR_INT_DEC, .data = &var_u1, .data_size = sizeof(var_u1), .read = var_read },
-                                        { .name = "U2", .type = CAT_VAR_INT_DEC, .data = &var_u2, .data_size = sizeof(var_u2), .read = var_read } };
-
 static cat_variable vars[] = { { .name = "X", .type = CAT_VAR_INT_DEC, .data = &var_x, .data_size = sizeof(var_x), .read = var_read } };
 
 static cat_command cmds[] = { {
@@ -122,19 +137,6 @@ static cat_command cmds[] = { {
         .var = vars,
         .var_num = sizeof(vars) / sizeof(vars[0]),
 } };
-
-static cat_command u_cmds[] = { {
-                                        .name = "+U1CMD",
-                                        .read = cmd1_read,
-                                        .var = &u_vars[0],
-                                        .var_num = 1,
-                                },
-                                {
-                                        .name = "+U2CMD",
-                                        .read = cmd2_read,
-                                        .var = &u_vars[1],
-                                        .var_num = 1,
-                                } };
 
 static uint8_t buf[128];
 
@@ -172,7 +174,7 @@ static int read_char(char *ch)
         return 1;
 }
 
-static cat_io_interface iface = { .read = read_char, .write = write_char };
+static cat_io_interface iface = { .write = write_char, .read = read_char };
 
 static void prepare_input(const char *text)
 {
@@ -189,7 +191,7 @@ static void prepare_input(const char *text)
 
 static const char test_case_1[] = "\nAT+CMD=0\n\nAT+CMD=1\n";
 
-int main(void)
+TEST(cAT, hold_state)
 {
         cat_init(&at, &desc, &iface, NULL);
 
@@ -197,9 +199,7 @@ int main(void)
         while (cat_service(&at) != 0) {
         };
 
-        assert(strcmp(ack_results, "\n+U1CMD=2\n\n+U1CMD=1\n\nOK\n\n+U2CMD=3\n\n+U2CMD=2\n\n+U2CMD=1\n\n+U2CMD=0\n\nOK\n") == 0);
-        assert(strcmp(cmd_results, " write:+CMD read1:+U1CMD read1:+U1CMD read1:+U1CMD write:+CMD read2:+U2CMD read2:+U2CMD read2:+U2CMD read2:+U2CMD") == 0);
-        assert(strcmp(var_read_results, " var_read:U1 var_read:U1 var_read:U1 var_read:U2 var_read:U2 var_read:U2 var_read:U2") == 0);
-
-        return 0;
+        EXPECT_STREQ(ack_results, "\n+U1CMD=2\n\n+U1CMD=1\n\nOK\n\n+U2CMD=3\n\n+U2CMD=2\n\n+U2CMD=1\n\n+U2CMD=0\n\nOK\n");
+        EXPECT_STREQ(cmd_results, " write:+CMD read1:+U1CMD read1:+U1CMD read1:+U1CMD write:+CMD read2:+U2CMD read2:+U2CMD read2:+U2CMD read2:+U2CMD");
+        EXPECT_STREQ(var_read_results, " var_read:U1 var_read:U1 var_read:U1 var_read:U2 var_read:U2 var_read:U2 var_read:U2");
 }

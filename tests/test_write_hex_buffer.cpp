@@ -30,51 +30,31 @@ SOFTWARE.
 #include <assert.h>
 
 #include <cat/cat.h>
-
+#include <gtest/gtest.h>
 static char write_results[256];
 static char ack_results[256];
 
-static uint8_t var1, var1b;
-static uint16_t var2, var2b;
-static uint32_t var3, var3b;
+static uint8_t var[4];
+static size_t var_write_size[4];
+static int var_write_size_index;
 
 static char const *input_text;
 static size_t input_index;
 
-static int cmd_write(const cat_command *cmd, const char *data, size_t data_size, size_t args_num)
+static cat_return_state cmd_write(const cat_command *cmd, const char *data, size_t data_size, size_t args_num)
 {
-        (void)cmd; // Mark as unused
-        (void)args_num; // Mark as unused
-
         strcat(write_results, " CMD:");
         strncat(write_results, data, data_size);
-        return 0;
+        return CAT_RETURN_STATE_DATA_OK;
 }
 
-static int var1_write(const cat_variable *var, size_t write_size)
+static int var_write(const cat_variable *var, size_t write_size)
 {
-        assert(write_size == 1);
-        var1b = *(uint8_t *)(var->data);
+        var_write_size[var_write_size_index++] = write_size;
         return 0;
 }
 
-static int var2_write(const cat_variable *var, size_t write_size)
-{
-        assert(write_size == 2);
-        var2b = *(uint16_t *)(var->data);
-        return 0;
-}
-
-static int var3_write(const cat_variable *var, size_t write_size)
-{
-        assert(write_size == 4);
-        var3b = *(uint32_t *)(var->data);
-        return 0;
-}
-
-static cat_variable vars[] = { { .type = CAT_VAR_UINT_DEC, .data = &var1, .data_size = sizeof(var1), .write = var1_write },
-                                      { .type = CAT_VAR_UINT_DEC, .data = &var2, .data_size = sizeof(var2), .write = var2_write },
-                                      { .type = CAT_VAR_UINT_DEC, .data = &var3, .data_size = sizeof(var3), .write = var3_write } };
+static cat_variable vars[] = { { .type = CAT_VAR_BUF_HEX, .data = var, .data_size = sizeof(var), .write = var_write } };
 
 static cat_command cmds[] = { { .name = "+SET",
                                 .write = cmd_write,
@@ -116,29 +96,28 @@ static int read_char(char *ch)
         return 1;
 }
 
-static cat_io_interface iface = { .read = read_char, .write = write_char };
+static cat_io_interface iface = {
+        .write = write_char,
+        .read = read_char,
+};
 
 static void prepare_input(const char *text)
 {
         input_text = text;
         input_index = 0;
 
-        var1 = 1;
-        var2 = 2;
-        var3 = 3;
-        var1b = 10;
-        var2b = 20;
-        var3b = 30;
+        memset(var, 0, sizeof(var));
+        memset(var_write_size, 0, sizeof(var_write_size));
+        var_write_size_index = 0;
 
         memset(ack_results, 0, sizeof(ack_results));
         memset(write_results, 0, sizeof(write_results));
 }
 
-static const char test_case_1[] = "\nAT+SET=-128\nAT+SET=0\nAT+SET=255\nAT+SET=256\n";
-static const char test_case_2[] = "\nAT+SET=0,-1\nAT+SET=0,0\nAT+SET=0,65535\nAT+SET=1,65536\n";
-static const char test_case_3[] = "\nAT+SET=0,0,-1\nAT+SET=0,0,0\nAT+SET=1,1,4294967295\nAT+SET=2,2,4294967296\n";
+static const char test_case_1[] = "\nAT+SET=0\nAT+SET=aa\nAT+SET=001\nAT+SET=12345678\nAT+SET=ffAA\n";
+static const char test_case_2[] = "\nAT+SET=0x11\nAT+SET=11\nAT+SET=-1\nAT+SET=87654321\nAT+SET=0001\nAT+SET=1122334455\n";
 
-int main(void)
+TEST(cAT, write_hex_buffer)
 {
         cat_object at;
 
@@ -148,43 +127,33 @@ int main(void)
         while (cat_service(&at) != 0) {
         };
 
-        assert(strcmp(ack_results, "\nERROR\n\nOK\n\nOK\n\nERROR\n") == 0);
-        assert(strcmp(write_results, " CMD:0 CMD:255") == 0);
+        EXPECT_STREQ(ack_results, "\nERROR\n\nOK\n\nERROR\n\nOK\n\nOK\n");
+        EXPECT_STREQ(write_results, " CMD:aa CMD:12345678 CMD:ffAA");
 
-        assert(var1 == 255);
-        assert(var1b == var1);
-        assert(var2 == 2);
-        assert(var2b == 20);
-        assert(var3 == 3);
-        assert(var3b == 30);
+        EXPECT_EQ(var[0], 0xFF);
+        EXPECT_EQ(var[1], 0xAA);
+        EXPECT_EQ(var[2], 0x56);
+        EXPECT_EQ(var[3], 0x78);
+
+        EXPECT_EQ(var_write_size[0], 1);
+        EXPECT_EQ(var_write_size[1], 4);
+        EXPECT_EQ(var_write_size[2], 2);
+        EXPECT_EQ(var_write_size[3], 0);
 
         prepare_input(test_case_2);
         while (cat_service(&at) != 0) {
         };
 
-        assert(strcmp(ack_results, "\nERROR\n\nOK\n\nOK\n\nERROR\n") == 0);
-        assert(strcmp(write_results, " CMD:0,0 CMD:0,65535") == 0);
+        EXPECT_STREQ(ack_results, "\nERROR\n\nOK\n\nERROR\n\nOK\n\nOK\n\nERROR\n");
+        EXPECT_STREQ(write_results, " CMD:11 CMD:87654321 CMD:0001");
 
-        assert(var1 == 1);
-        assert(var1b == var1);
-        assert(var2 == 65535);
-        assert(var2b == var2);
-        assert(var3 == 3);
-        assert(var3b == 30);
+        EXPECT_EQ(var[0], 0x11);
+        EXPECT_EQ(var[1], 0x22);
+        EXPECT_EQ(var[2], 0x33);
+        EXPECT_EQ(var[3], 0x44);
 
-        prepare_input(test_case_3);
-        while (cat_service(&at) != 0) {
-        };
-
-        assert(strcmp(ack_results, "\nERROR\n\nOK\n\nOK\n\nERROR\n") == 0);
-        assert(strcmp(write_results, " CMD:0,0,0 CMD:1,1,4294967295") == 0);
-
-        assert(var1 == 2);
-        assert(var1b == var1);
-        assert(var2 == 2);
-        assert(var2b == var2);
-        assert(var3 == 4294967295);
-        assert(var3b == var3);
-
-        return 0;
+        EXPECT_EQ(var_write_size[0], 1);
+        EXPECT_EQ(var_write_size[1], 4);
+        EXPECT_EQ(var_write_size[2], 2);
+        EXPECT_EQ(var_write_size[3], 0);
 }

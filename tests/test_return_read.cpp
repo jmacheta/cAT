@@ -30,6 +30,7 @@ SOFTWARE.
 #include <assert.h>
 
 #include <cat/cat.h>
+#include <gtest/gtest.h>
 static char cmd_results[256];
 static char ack_results[256];
 
@@ -117,7 +118,7 @@ static int read_char(char *ch)
         return 1;
 }
 
-static cat_io_interface iface = { .read = read_char, .write = write_char };
+static cat_io_interface iface = { .write = write_char, .read = read_char };
 
 static void prepare_input(const char *text)
 {
@@ -131,7 +132,7 @@ static void prepare_input(const char *text)
 
 static const char test_case_1[] = "\nAT+CMD?\n";
 
-int main(void)
+TEST(cAT, return_read)
 {
         cat_init(&at, &desc, &iface, NULL);
 
@@ -140,40 +141,40 @@ int main(void)
         while (cat_service(&at) != 0) {
         };
 
-        assert(strcmp(ack_results, "\nERROR\n") == 0);
-        assert(strcmp(cmd_results, " read:+CMD") == 0);
+        EXPECT_STREQ(ack_results, "\nERROR\n");
+        EXPECT_STREQ(cmd_results, " read:+CMD");
 
         ret = CAT_RETURN_STATE_DATA_OK;
         prepare_input(test_case_1);
         while (cat_service(&at) != 0) {
         };
 
-        assert(strcmp(ack_results, "\n+CMD=1\n\nOK\n") == 0);
-        assert(strcmp(cmd_results, " read:+CMD") == 0);
+        EXPECT_STREQ(ack_results, "\n+CMD=1\n\nOK\n");
+        EXPECT_STREQ(cmd_results, " read:+CMD");
 
         ret = CAT_RETURN_STATE_DATA_NEXT;
         prepare_input(test_case_1);
         while (cat_service(&at) != 0) {
         };
 
-        assert(strcmp(ack_results, "\n+CMD=1\n\n+CMD=2\n\nOK\n") == 0);
-        assert(strcmp(cmd_results, " read:+CMD read:+CMD") == 0);
+        EXPECT_STREQ(ack_results, "\n+CMD=1\n\n+CMD=2\n\nOK\n");
+        EXPECT_STREQ(cmd_results, " read:+CMD read:+CMD");
 
         ret = CAT_RETURN_STATE_NEXT;
         prepare_input(test_case_1);
         while (cat_service(&at) != 0) {
         };
 
-        assert(strcmp(ack_results, "\n+CMD=2\n\nOK\n") == 0);
-        assert(strcmp(cmd_results, " read:+CMD read:+CMD") == 0);
+        EXPECT_STREQ(ack_results, "\n+CMD=2\n\nOK\n");
+        EXPECT_STREQ(cmd_results, " read:+CMD read:+CMD");
 
         ret = CAT_RETURN_STATE_OK;
         prepare_input(test_case_1);
         while (cat_service(&at) != 0) {
         };
 
-        assert(strcmp(ack_results, "\nOK\n") == 0);
-        assert(strcmp(cmd_results, " read:+CMD") == 0);
+        EXPECT_STREQ(ack_results, "\nOK\n");
+        EXPECT_STREQ(cmd_results, " read:+CMD");
 
         ret_error = false;
         ret = CAT_RETURN_STATE_HOLD;
@@ -181,8 +182,8 @@ int main(void)
         while (cat_service(&at) != 0) {
         };
 
-        assert(strcmp(ack_results, "\n+CMD=1\n\n+CMD=2\n\ntest\n\nOK\n") == 0);
-        assert(strcmp(cmd_results, " read:+CMD read:+CMD read:+CMD read:+CMD read:+CMD") == 0);
+        EXPECT_STREQ(ack_results, "\n+CMD=1\n\n+CMD=2\n\ntest\n\nOK\n");
+        EXPECT_STREQ(cmd_results, " read:+CMD read:+CMD read:+CMD read:+CMD read:+CMD");
 
         ret_error = true;
         ret = CAT_RETURN_STATE_HOLD;
@@ -190,8 +191,6 @@ int main(void)
         while (cat_service(&at) != 0) {
         };
 
-        assert(strcmp(ack_results, "\n+CMD=1\n\n+CMD=2\n\ntest\n\nERROR\n") == 0);
-        assert(strcmp(cmd_results, " read:+CMD read:+CMD read:+CMD read:+CMD read:+CMD") == 0);
-
-        return 0;
+        EXPECT_STREQ(ack_results, "\n+CMD=1\n\n+CMD=2\n\ntest\n\nERROR\n");
+        EXPECT_STREQ(cmd_results, " read:+CMD read:+CMD read:+CMD read:+CMD read:+CMD");
 }

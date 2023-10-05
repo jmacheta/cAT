@@ -30,26 +30,62 @@ SOFTWARE.
 #include <assert.h>
 
 #include <cat/cat.h>
-
+#include <gtest/gtest.h>
 static char run_results[256];
+static char read_results[256];
 static char ack_results[256];
 
 static char const *input_text;
 static size_t input_index;
 
-static int print_name(const cat_command *cmd)
+static cat_return_state a_run(const cat_command *cmd)
 {
+        strcat(run_results, " A_");
         strcat(run_results, cmd->name);
-        strcat(run_results, " ");
-        return 0;
+        return CAT_RETURN_STATE_DATA_OK;
 }
 
-static cat_command cmds[] = {
-        { .name = "+TEST", .run = print_name }, { .name = "+TEST_A", .run = print_name }, { .name = "+TEST_B", .run = print_name },
-        { .name = "+ONE", .run = print_name },  { .name = "+TWO", .run = print_name },
-};
+static cat_return_state a_read(const cat_command *cmd, char *data, size_t *data_size, size_t max_data_size)
+{
+        strcat(read_results, " A:");
+        strcat(read_results, cmd->name);
 
-static uint8_t buf[256];
+        snprintf(data, max_data_size, "%s=A-val", cmd->name);
+        *data_size = strlen(data);
+
+        return CAT_RETURN_STATE_DATA_OK;
+}
+
+static cat_return_state ap_read(const cat_command *cmd, char *data, size_t *data_size, size_t max_data_size)
+{
+        (void)data; // Unused
+        (void)data_size; // Unused
+        (void)max_data_size; // Unused
+        strcat(read_results, " AP:");
+        strcat(read_results, cmd->name);
+
+        *data_size = 0;
+
+        return CAT_RETURN_STATE_DATA_OK;
+}
+
+static cat_return_state test_read(const cat_command *cmd, char *data, size_t *data_size, size_t max_data_size)
+{
+        (void)data; // Mask as unused
+        (void)data_size; // Mask as unused
+        (void)max_data_size; // Mask as unused
+        strcat(read_results, " +TEST:");
+        strcat(read_results, cmd->name);
+
+        return CAT_RETURN_STATE_ERROR;
+}
+
+static cat_command cmds[] = { { .name = "A", .read = a_read, .run = a_run },
+                              { .name = "AP", .read = ap_read },
+                              { .name = "+TEST", .read = test_read },
+                              { .name = "+EMPTY" } };
+
+static uint8_t buf[128];
 
 static cat_command_group cmd_group = {
         .cmd = cmds,
@@ -83,7 +119,7 @@ static int read_char(char *ch)
         return 1;
 }
 
-static cat_io_interface iface = { .read = read_char, .write = write_char };
+static cat_io_interface iface = { .write = write_char, .read = read_char };
 
 static void prepare_input(const char *text)
 {
@@ -92,11 +128,12 @@ static void prepare_input(const char *text)
 
         memset(run_results, 0, sizeof(run_results));
         memset(ack_results, 0, sizeof(ack_results));
+        memset(read_results, 0, sizeof(read_results));
 }
 
-static const char test_case_1[] = "\nAT\nAT+\nAT+T\nAT+TE\nAT+TES\nAT+TEST\nAT+TEST_\nAT+TEST_A\nAT+TEST_B\nAT+O\nAT+ON\nAT+ONE\nAT+TW\nAT+TWO\n";
+static const char test_case_1[] = "\nAT\r\nAT+\nAT+?\nATA?\r\nATAP\nATAP?\nATAPA?\nAT+TEST?\nAT+te?\nAT+e?\nAT+empTY?\r\nATA\r\n";
 
-int main(void)
+TEST(cAT, read)
 {
         cat_object at;
 
@@ -106,8 +143,8 @@ int main(void)
         while (cat_service(&at) != 0) {
         };
 
-        assert(strcmp(ack_results, "\nOK\n\nERROR\n\nERROR\n\nERROR\n\nERROR\n\nOK\n\nERROR\n\nOK\n\nOK\n\nOK\n\nOK\n\nOK\n\nOK\n\nOK\n") == 0);
-        assert(strcmp(run_results, "+TEST +TEST_A +TEST_B +ONE +ONE +ONE +TWO +TWO ") == 0);
-
-        return 0;
+        EXPECT_STREQ(ack_results,
+                     "\r\nOK\r\n\nERROR\n\nERROR\n\r\nA=A-val\r\n\r\nOK\r\n\nERROR\n\nAP=\n\nOK\n\nERROR\n\nERROR\n\nERROR\n\nERROR\n\r\nERROR\r\n\r\nOK\r\n");
+        EXPECT_STREQ(run_results, " A_A");
+        EXPECT_STREQ(read_results, " A:A AP:AP +TEST:+TEST +TEST:+TEST");
 }

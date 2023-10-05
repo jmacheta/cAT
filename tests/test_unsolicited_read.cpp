@@ -30,7 +30,7 @@ SOFTWARE.
 #include <assert.h>
 
 #include <cat/cat.h>
-
+#include <gtest/gtest.h>
 static char read_results[256];
 static char var_read_results[256];
 static char ack_results[256];
@@ -38,17 +38,39 @@ static char ack_results[256];
 static char const *input_text;
 static size_t input_index;
 
-static int var_x, var_u1;
+static int var_x, var_u1, var_u2;
 static cat_object at;
 
-static cat_command u_cmds[];
+static cat_return_state cmd_read(const cat_command *cmd, char *data, size_t *data_size, size_t max_data_size);
+static int var_read(const cat_variable *var);
 
-static cat_return_state cmd_read(const cat_command *cmd, uint8_t *data, size_t *data_size, size_t max_data_size)
+static cat_variable u_vars[] = { { .name = "U1", .type = CAT_VAR_INT_DEC, .data = &var_u1, .data_size = sizeof(var_u1), .read = var_read },
+                                 { .name = "U2", .type = CAT_VAR_INT_DEC, .data = &var_u2, .data_size = sizeof(var_u2), .read = var_read } };
+
+static cat_command u_cmds[] = { {
+                                        .name = "+U1CMD",
+                                        .read = cmd_read,
+                                        .var = &u_vars[0],
+                                        .var_num = 1,
+                                },
+                                {
+                                        .name = "+U2CMD",
+                                        .read = cmd_read,
+                                        .var = &u_vars[1],
+                                        .var_num = 1,
+                                } };
+
+static cat_return_state cmd_read(const cat_command *cmd, char *data, size_t *data_size, size_t max_data_size)
 {
         cat_status s;
 
         strcat(read_results, " read:");
         strcat(read_results, cmd->name);
+
+        if (strcmp(cmd->name, "+CMD") == 0) {
+                s = cat_trigger_unsolicited_read(&at, &u_cmds[1]);
+                assert(s == CAT_STATUS_OK);
+        }
 
         return CAT_RETURN_STATE_DATA_OK;
 }
@@ -61,8 +83,6 @@ static int var_read(const cat_variable *var)
         return 0;
 }
 
-static cat_variable u_vars[] = { { .name = "U1", .type = CAT_VAR_INT_DEC, .data = &var_u1, .data_size = sizeof(var_u1), .read = var_read } };
-
 static cat_variable vars[] = { { .name = "X", .type = CAT_VAR_INT_DEC, .data = &var_x, .data_size = sizeof(var_x), .read = var_read } };
 
 static cat_command cmds[] = { {
@@ -70,13 +90,6 @@ static cat_command cmds[] = { {
         .read = cmd_read,
         .var = vars,
         .var_num = sizeof(vars) / sizeof(vars[0]),
-} };
-
-static cat_command u_cmds[] = { {
-        .name = "+UCMD",
-        .read = cmd_read,
-        .var = u_vars,
-        .var_num = sizeof(u_vars) / sizeof(u_vars[0]),
 } };
 
 static uint8_t buf[128];
@@ -115,7 +128,7 @@ static int read_char(char *ch)
         return 1;
 }
 
-static cat_io_interface iface = { .read = read_char, .write = write_char };
+static cat_io_interface iface = { .write = write_char, .read = read_char };
 
 static void prepare_input(const char *text)
 {
@@ -124,6 +137,7 @@ static void prepare_input(const char *text)
 
         var_x = 1;
         var_u1 = 2;
+        var_u2 = 3;
 
         memset(ack_results, 0, sizeof(ack_results));
         memset(read_results, 0, sizeof(read_results));
@@ -132,56 +146,26 @@ static void prepare_input(const char *text)
 
 static const char test_case_1[] = "\nAT+CMD?\n";
 
-int main(void)
+TEST(cAT, unsolicited_read)
 {
         cat_status s;
-        int events = 4;
-        cat_command const *cmd;
 
         cat_init(&at, &desc, &iface, NULL);
 
         prepare_input(test_case_1);
 
-        cmd = cat_get_processed_command(&at, CAT_FSM_TYPE_ATCMD);
-        assert(cmd == NULL);
-        cmd = cat_get_processed_command(&at, CAT_FSM_TYPE_UNSOLICITED);
-        assert(cmd == NULL);
-        s = cat_is_unsolicited_event_buffered(&at, &u_cmds[0], CAT_CMD_TYPE_READ);
-        assert(s == CAT_STATUS_OK);
-        s = cat_is_unsolicited_event_buffered(&at, &u_cmds[0], CAT_CMD_TYPE_NONE);
-        assert(s == CAT_STATUS_OK);
+        EXPECT_EQ(cat_is_unsolicited_buffer_full(&at), CAT_STATUS_OK);
 
-        while (events > 0) {
-                s = cat_is_unsolicited_buffer_full(&at);
-                cmd = cat_get_processed_command(&at, CAT_FSM_TYPE_UNSOLICITED);
-                if ((s == CAT_STATUS_OK) && (cmd == NULL)) {
-                        var_u1 = events;
-                        s = cat_trigger_unsolicited_event(&at, &u_cmds[0], CAT_CMD_TYPE_READ);
-                        assert(s == CAT_STATUS_OK);
-                        events--;
-                } else {
-                        assert(cmd == &u_cmds[0]);
-                        s = cat_is_unsolicited_event_buffered(&at, &u_cmds[0], CAT_CMD_TYPE_READ);
-                        assert(s == CAT_STATUS_BUSY);
-                        s = cat_is_unsolicited_event_buffered(&at, &u_cmds[0], CAT_CMD_TYPE_TEST);
-                        assert(s == CAT_STATUS_OK);
-                        s = cat_is_unsolicited_event_buffered(&at, &u_cmds[0], CAT_CMD_TYPE_NONE);
-                        assert(s == CAT_STATUS_BUSY);
-                }
-                s = cat_service(&at);
-                assert(s == CAT_STATUS_BUSY);
-        }
+        EXPECT_EQ(cat_trigger_unsolicited_event(&at, &u_cmds[0], CAT_CMD_TYPE_READ), CAT_STATUS_OK);
+
+        EXPECT_EQ(cat_is_unsolicited_buffer_full(&at), CAT_STATUS_ERROR_BUFFER_FULL);
+
+        EXPECT_EQ(cat_trigger_unsolicited_read(&at, &u_cmds[1]), CAT_STATUS_ERROR_BUFFER_FULL);
 
         while (cat_service(&at) != 0) {
         };
-        cmd = cat_get_processed_command(&at, CAT_FSM_TYPE_ATCMD);
-        assert(cmd == NULL);
-        cmd = cat_get_processed_command(&at, CAT_FSM_TYPE_UNSOLICITED);
-        assert(cmd == NULL);
 
-        assert(strcmp(ack_results, "\n+UCMD=4\n\n+CMD=1\n\n+UCMD=3\n\nOK\n\n+UCMD=2\n\n+UCMD=1\n") == 0);
-        assert(strcmp(read_results, " read:+UCMD read:+CMD read:+UCMD read:+UCMD read:+UCMD") == 0);
-        assert(strcmp(var_read_results, " var_read:U1 var_read:X var_read:U1 var_read:U1 var_read:U1") == 0);
-
-        return 0;
+        EXPECT_STREQ(ack_results, "\n+U1CMD=2\n\n+CMD=1\n\n+U2CMD=3\n\nOK\n");
+        EXPECT_STREQ(read_results, " read:+U1CMD read:+CMD read:+U2CMD");
+        EXPECT_STREQ(var_read_results, " var_read:U1 var_read:X var_read:U2");
 }

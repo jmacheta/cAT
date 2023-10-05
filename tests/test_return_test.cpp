@@ -30,6 +30,7 @@ SOFTWARE.
 #include <assert.h>
 
 #include <cat/cat.h>
+#include <gtest/gtest.h>
 static char cmd_results[256];
 static char ack_results[256];
 
@@ -42,37 +43,31 @@ static cat_object at;
 static cat_return_state ret;
 static bool ret_error;
 
-static cat_return_state cmd_read(const cat_command *cmd, char *data, size_t *data_size, size_t max_data_size)
+static cat_return_state cmd_test(const cat_command *cmd, char *data, size_t *data_size, size_t max_data_size)
 {
         (void)max_data_size; // Unused
-        strcat(cmd_results, " read:");
+        strcat(cmd_results, " test:");
         strcat(cmd_results, cmd->name);
 
-        var_x++;
-        if (var_x > 5) {
-                ret = (ret_error == false) ? CAT_RETURN_STATE_HOLD_EXIT_OK : CAT_RETURN_STATE_HOLD_EXIT_ERROR;
-        } else {
-                if (var_x == 5) {
-                        strcpy(data, "test");
-                        *data_size = strlen(data);
-                }
-                ret = CAT_RETURN_STATE_DATA_NEXT;
-        }
-
-        return ret;
-}
-
-static cat_return_state cmd_write(const cat_command *cmd, const uint8_t *data, size_t data_size, size_t args_num)
-{
-        strcat(cmd_results, " write:");
-        strcat(cmd_results, cmd->name);
-
-        if ((ret == CAT_RETURN_STATE_DATA_NEXT) || (ret == CAT_RETURN_STATE_NEXT)) {
+        if (cat_is_hold(&at) == CAT_STATUS_HOLD) {
                 var_x++;
-                if (var_x > 3)
-                        ret = CAT_RETURN_STATE_DATA_OK;
-        } else if (ret == CAT_RETURN_STATE_HOLD) {
-                cat_trigger_unsolicited_read(&at, cmd);
+                if (var_x > 4) {
+                        ret = (ret_error == false) ? CAT_RETURN_STATE_HOLD_EXIT_OK : CAT_RETURN_STATE_HOLD_EXIT_ERROR;
+                } else {
+                        if (var_x == 4) {
+                                strcpy(data, "test");
+                                *data_size = strlen(data);
+                        }
+                        ret = CAT_RETURN_STATE_DATA_NEXT;
+                }
+        } else {
+                if ((ret == CAT_RETURN_STATE_DATA_NEXT) || (ret == CAT_RETURN_STATE_NEXT)) {
+                        var_x++;
+                        if (var_x > 2)
+                                ret = CAT_RETURN_STATE_DATA_OK;
+                } else if (ret == CAT_RETURN_STATE_HOLD) {
+                        cat_trigger_unsolicited_test(&at, cmd);
+                }
         }
 
         return ret;
@@ -82,8 +77,7 @@ static cat_variable vars[] = { { .name = "X", .type = CAT_VAR_INT_DEC, .data = &
 
 static cat_command cmds[] = { {
         .name = "+CMD",
-        .write = cmd_write,
-        .read = cmd_read,
+        .test = cmd_test,
         .var = vars,
         .var_num = sizeof(vars) / sizeof(vars[0]),
 } };
@@ -124,7 +118,7 @@ static int read_char(char *ch)
         return 1;
 }
 
-static cat_io_interface iface = { .read = read_char, .write = write_char };
+static cat_io_interface iface = { .write = write_char, .read = read_char };
 
 static void prepare_input(const char *text)
 {
@@ -136,9 +130,9 @@ static void prepare_input(const char *text)
         memset(cmd_results, 0, sizeof(cmd_results));
 }
 
-static const char test_case_1[] = "\nAT+CMD=2\n";
+static const char test_case_1[] = "\nAT+CMD=?\n";
 
-int main(void)
+TEST(cAT, return_test)
 {
         cat_init(&at, &desc, &iface, NULL);
 
@@ -147,45 +141,40 @@ int main(void)
         while (cat_service(&at) != 0) {
         };
 
-        assert(strcmp(ack_results, "\nERROR\n") == 0);
-        assert(strcmp(cmd_results, " write:+CMD") == 0);
-        assert(var_x == 2);
+        EXPECT_STREQ(ack_results, "\nERROR\n");
+        EXPECT_STREQ(cmd_results, " test:+CMD");
 
         ret = CAT_RETURN_STATE_DATA_OK;
         prepare_input(test_case_1);
         while (cat_service(&at) != 0) {
         };
 
-        assert(strcmp(ack_results, "\nOK\n") == 0);
-        assert(strcmp(cmd_results, " write:+CMD") == 0);
-        assert(var_x == 2);
+        EXPECT_STREQ(ack_results, "\n+CMD=<X:INT32[RW]>\n\nOK\n");
+        EXPECT_STREQ(cmd_results, " test:+CMD");
 
         ret = CAT_RETURN_STATE_DATA_NEXT;
         prepare_input(test_case_1);
         while (cat_service(&at) != 0) {
         };
 
-        assert(strcmp(ack_results, "\nOK\n") == 0);
-        assert(strcmp(cmd_results, " write:+CMD write:+CMD") == 0);
-        assert(var_x == 4);
+        EXPECT_STREQ(ack_results, "\n+CMD=<X:INT32[RW]>\n\n+CMD=<X:INT32[RW]>\n\nOK\n");
+        EXPECT_STREQ(cmd_results, " test:+CMD test:+CMD");
 
         ret = CAT_RETURN_STATE_NEXT;
         prepare_input(test_case_1);
         while (cat_service(&at) != 0) {
         };
 
-        assert(strcmp(ack_results, "\nOK\n") == 0);
-        assert(strcmp(cmd_results, " write:+CMD write:+CMD") == 0);
-        assert(var_x == 4);
+        EXPECT_STREQ(ack_results, "\n+CMD=<X:INT32[RW]>\n\nOK\n");
+        EXPECT_STREQ(cmd_results, " test:+CMD test:+CMD");
 
         ret = CAT_RETURN_STATE_OK;
         prepare_input(test_case_1);
         while (cat_service(&at) != 0) {
         };
 
-        assert(strcmp(ack_results, "\nOK\n") == 0);
-        assert(strcmp(cmd_results, " write:+CMD") == 0);
-        assert(var_x == 2);
+        EXPECT_STREQ(ack_results, "\nOK\n");
+        EXPECT_STREQ(cmd_results, " test:+CMD");
 
         ret_error = false;
         ret = CAT_RETURN_STATE_HOLD;
@@ -193,9 +182,8 @@ int main(void)
         while (cat_service(&at) != 0) {
         };
 
-        assert(strcmp(ack_results, "\n+CMD=2\n\n+CMD=3\n\ntest\n\nOK\n") == 0);
-        assert(strcmp(cmd_results, " write:+CMD read:+CMD read:+CMD read:+CMD read:+CMD") == 0);
-        assert(var_x == 6);
+        EXPECT_STREQ(ack_results, "\n+CMD=<X:INT32[RW]>\n\n+CMD=<X:INT32[RW]>\n\ntest\n\nOK\n");
+        EXPECT_STREQ(cmd_results, " test:+CMD test:+CMD test:+CMD test:+CMD test:+CMD");
 
         ret_error = true;
         ret = CAT_RETURN_STATE_HOLD;
@@ -203,27 +191,6 @@ int main(void)
         while (cat_service(&at) != 0) {
         };
 
-        assert(strcmp(ack_results, "\n+CMD=2\n\n+CMD=3\n\ntest\n\nERROR\n") == 0);
-        assert(strcmp(cmd_results, " write:+CMD read:+CMD read:+CMD read:+CMD read:+CMD") == 0);
-        assert(var_x == 6);
-
-        ret = CAT_RETURN_STATE_HOLD_EXIT_ERROR;
-        prepare_input(test_case_1);
-        while (cat_service(&at) != 0) {
-        };
-
-        assert(strcmp(ack_results, "\nERROR\n") == 0);
-        assert(strcmp(cmd_results, " write:+CMD") == 0);
-        assert(var_x == 2);
-
-        ret = CAT_RETURN_STATE_HOLD_EXIT_OK;
-        prepare_input(test_case_1);
-        while (cat_service(&at) != 0) {
-        };
-
-        assert(strcmp(ack_results, "\nERROR\n") == 0);
-        assert(strcmp(cmd_results, " write:+CMD") == 0);
-        assert(var_x == 2);
-
-        return 0;
+        EXPECT_STREQ(ack_results, "\n+CMD=<X:INT32[RW]>\n\n+CMD=<X:INT32[RW]>\n\ntest\n\nERROR\n");
+        EXPECT_STREQ(cmd_results, " test:+CMD test:+CMD test:+CMD test:+CMD test:+CMD");
 }

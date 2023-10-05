@@ -30,31 +30,32 @@ SOFTWARE.
 #include <assert.h>
 
 #include <cat/cat.h>
+#include <gtest/gtest.h>
 static char run_results[256];
 static char ack_results[256];
 
 static char const *input_text;
 static size_t input_index;
 
-static int a_run(const cat_command *cmd)
+static cat_return_state a_run(const cat_command *cmd)
 {
         strcat(run_results, " A:");
         strcat(run_results, cmd->name);
-        return 0;
+        return CAT_RETURN_STATE_DATA_OK;
 }
 
-static int ap_run(const cat_command *cmd)
+static cat_return_state ap_run(const cat_command *cmd)
 {
         strcat(run_results, " AP:");
         strcat(run_results, cmd->name);
-        return 0;
+        return CAT_RETURN_STATE_DATA_OK;
 }
 
-static int test_run(const cat_command *cmd)
+static cat_return_state test_run(const cat_command *cmd)
 {
         strcat(run_results, " +TEST:");
         strcat(run_results, cmd->name);
-        return 0;
+        return CAT_RETURN_STATE_DATA_OK;
 }
 
 static cat_command cmds[] = { { .name = "A", .run = a_run }, { .name = "AP", .run = ap_run }, { .name = "+TEST", .run = test_run } };
@@ -95,7 +96,7 @@ static int read_char(char *ch)
         return 1;
 }
 
-static cat_io_interface iface = { .read = read_char, .write = write_char };
+static cat_io_interface iface = { .write = write_char, .read = read_char };
 
 static int mutex_ret_lock;
 static int mutex_ret_unlock;
@@ -126,7 +127,7 @@ static void prepare_input(const char *text)
 
 static const char test_case_1[] = "\nAT\nAT+test\n";
 
-int main(void)
+TEST(cAT, mutex)
 {
         cat_object at;
 
@@ -136,29 +137,27 @@ int main(void)
         while (cat_service(&at) != 0) {
         };
 
-        assert(strcmp(ack_results, "\nOK\n\nOK\n") == 0);
-        assert(strcmp(run_results, " +TEST:+TEST") == 0);
+        EXPECT_STREQ(ack_results, "\nOK\n\nOK\n");
+        EXPECT_STREQ(run_results, " +TEST:+TEST");
 
         mutex_ret_lock = 1;
         mutex_ret_unlock = 0;
-        assert(cat_service(&at) == CAT_STATUS_ERROR_MUTEX_LOCK);
+        EXPECT_EQ(cat_service(&at), CAT_STATUS_ERROR_MUTEX_LOCK);
 
         mutex_ret_lock = 0;
         mutex_ret_unlock = 1;
-        assert(cat_service(&at) == CAT_STATUS_ERROR_MUTEX_UNLOCK);
+        EXPECT_EQ(cat_service(&at), CAT_STATUS_ERROR_MUTEX_UNLOCK);
 
         mutex_ret_lock = 1;
         mutex_ret_unlock = 0;
-        assert(cat_is_busy(&at) == CAT_STATUS_ERROR_MUTEX_LOCK);
+        EXPECT_EQ(cat_is_busy(&at), CAT_STATUS_ERROR_MUTEX_LOCK);
 
         mutex_ret_lock = 0;
         mutex_ret_unlock = 1;
-        assert(cat_is_busy(&at) == CAT_STATUS_ERROR_MUTEX_UNLOCK);
+        EXPECT_EQ(cat_is_busy(&at), CAT_STATUS_ERROR_MUTEX_UNLOCK);
 
         mutex_ret_lock = 0;
         mutex_ret_unlock = 0;
-        assert(cat_service(&at) == CAT_STATUS_OK);
-        assert(cat_is_busy(&at) == CAT_STATUS_OK);
-
-        return 0;
+        EXPECT_EQ(cat_service(&at), CAT_STATUS_OK);
+        EXPECT_EQ(cat_is_busy(&at), CAT_STATUS_OK);
 }
