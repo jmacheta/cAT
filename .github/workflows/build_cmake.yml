@@ -1,18 +1,22 @@
-name: CMake Build Matrix
+name: C++ CI
 
-on: [push]
+on:
+  push:
+      branches: [ main ]
+  pull_request:
+      branches: [ main ]
 
 jobs:
-  build:
+  build_and_test:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v1
-
-    - name: Configure
-      run: mkdir build && cd build && cmake ..
-
-    - name: Build
-      run: cd build && make
-
-    - name: Run tests
-      run: cd build && make test
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Install build environment
+        run: sudo apt install -y build-essential cmake  ninja-build
+      - name: Configure
+        run: cmake -B build -G Ninja
+      - name: Build
+        run: cmake --build build -t all
+      - name: Test
+        run: ctest --test-dir build
