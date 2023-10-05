@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/marcinbor85/cat.svg?branch=master)](https://travis-ci.org/marcinbor85/cat)
+[![C++ CI](https://github.com/jmacheta/cAT/actions/workflows/build_cmake.yml/badge.svg)](https://github.com/jmacheta/cAT/actions/workflows/build_cmake.yml)
 # libcat (cAT)
 Plain C library for parsing AT commands for use in host devices.
 
