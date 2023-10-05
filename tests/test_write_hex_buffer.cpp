@@ -41,14 +41,14 @@ static int var_write_size_index;
 static char const *input_text;
 static size_t input_index;
 
-static cat_return_state cmd_write(const cat_command *cmd, const char *data, size_t data_size, size_t args_num)
+static cat_return_state cmd_write(const cat_command *, const char *data, size_t data_size, size_t)
 {
         strcat(write_results, " CMD:");
         strncat(write_results, data, data_size);
         return CAT_RETURN_STATE_DATA_OK;
 }
 
-static int var_write(const cat_variable *var, size_t write_size)
+static int var_write(const cat_variable *, size_t write_size)
 {
         var_write_size[var_write_size_index++] = write_size;
         return 0;

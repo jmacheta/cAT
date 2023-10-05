@@ -1453,7 +1453,7 @@ static int format_int_decimal(cat_object *self, cat_fsm_type fsm)
         if (var->access == CAT_VAR_ACCESS_WRITE_ONLY)
                 val = 0;
 
-        if (print_format_num(self, "%d", val, fsm) != 0)
+        if (print_format_num(self, "%d", (uint32_t)val, fsm) != 0)
                 return -1;
 
         return 0;

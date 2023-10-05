@@ -63,7 +63,7 @@ static cat_return_state cmd_read(const cat_command *cmd, char *data, size_t *dat
         return ret;
 }
 
-static cat_return_state cmd_write(const cat_command *cmd, const char *data, size_t data_size, size_t args_num)
+static cat_return_state cmd_write(const cat_command *cmd, const char *, size_t, size_t)
 {
         strcat(cmd_results, " write:");
         strcat(cmd_results, cmd->name);

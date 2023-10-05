@@ -53,10 +53,8 @@ static cat_command u_cmds[] = { {
         .var_num = sizeof(u_vars) / sizeof(u_vars[0]),
 } };
 
-static cat_return_state cmd_read(const cat_command *cmd, char *data, size_t *data_size, size_t max_data_size)
+static cat_return_state cmd_read(const cat_command *cmd, char *, size_t *, size_t )
 {
-        cat_status s;
-
         strcat(read_results, " read:");
         strcat(read_results, cmd->name);
 

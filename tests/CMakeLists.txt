@@ -1,16 +1,34 @@
 cmake_minimum_required(VERSION 3.0)
 
-enable_language(CXX)
+target_compile_options(
+  cat
+  PUBLIC -Wall
+         -Wextra
+         -Wunused-parameter
+         -Winit-self
+         -Wcast-align
+         -Wconversion
+         -Wpedantic
+         -Wnull-dereference
+         -Wduplicated-cond
+         -Wnull-dereference
+         -Wsign-conversion
+         -Wlogical-op
+         -Wdouble-promotion
+         -Wno-missing-field-initializers)
+
+cmake_policy(SET CMP0135 NEW)
 
 include(FetchContent)
+include(GoogleTest)
 
 FetchContent_Declare(
   googletest URL https://github.com/google/googletest/archive/main.zip
                  FIND_PACKAGE_ARGS NAMES GTest)
 
-FetchContent_MakeAvailable(googletest)
+enable_language(CXX)
 
-# target_compile_options(cat PUBLIC -Wall -Wextra -Wconversion)
+FetchContent_MakeAvailable(googletest)
 
 add_executable(
   cat_ut
@@ -45,4 +63,12 @@ add_executable(
   test_write_uint_range.cpp
   test_write.cpp)
 
+target_compile_features(cat_ut PRIVATE cxx_std_20)
+
 target_link_libraries(cat_ut PRIVATE cat gtest_main)
+gtest_discover_tests(cat_ut)
+
+# Exclude googletest from all to make use of install target
+if(IS_DIRECTORY "${googletest_SOURCE_DIR}")
+  set_property(DIRECTORY ${googletest_SOURCE_DIR} PROPERTY EXCLUDE_FROM_ALL YES)
+endif()

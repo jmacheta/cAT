@@ -55,59 +55,39 @@ static uint32_t var_hex32;
 static uint8_t var_buf[4];
 static char var_string[16];
 
-static cat_return_state cmd_write(const cat_command *cmd, const char *data, size_t data_size, size_t args_num)
-{
-        return CAT_RETURN_STATE_DATA_OK;
-}
-
-static cat_return_state cmd_read(const cat_command *cmd, char *data, size_t *data_size, size_t max_data_size)
-{
-        return CAT_RETURN_STATE_DATA_OK;
-}
-
-static cat_return_state cmd_test(const cat_command *cmd, char *data, size_t *data_size, size_t max_data_size)
-{
-        return CAT_RETURN_STATE_DATA_OK;
-}
-
-static cat_return_state cmd_run(const cat_command *cmd)
-{
-        return CAT_RETURN_STATE_DATA_OK;
-}
-
-static int var1_write(const cat_variable *var, size_t write_size)
+static int var1_write(const cat_variable *, size_t)
 {
         return 0;
 }
 
-static int var1_read(const cat_variable *var)
+static int var1_read(const cat_variable *)
 {
         return 0;
 }
 
-static int var2_write(const cat_variable *var, size_t write_size)
+static int var2_write(const cat_variable *, size_t)
 {
         var2_write_cntr++;
         return 0;
 }
 
-static int var2_read(const cat_variable *var)
+static int var2_read(const cat_variable *)
 {
         return 0;
 }
 
-static int var3_write(const cat_variable *var, size_t write_size)
+static int var3_write(const cat_variable *, size_t)
 {
         return 0;
 }
 
-static int var3_read(const cat_variable *var)
+static int var3_read(const cat_variable *)
 {
         var3_read_cntr++;
         return 0;
 }
 
-static cat_return_state print_cmd_list(const cat_command *cmd)
+static cat_return_state print_cmd_list(const cat_command *)
 {
         return CAT_RETURN_STATE_PRINT_CMD_LIST_OK;
 }
@@ -210,18 +190,6 @@ static void prepare_input(const char *text)
         input_index = 0;
 
         memset(ack_results, 0, sizeof(ack_results));
-}
-
-static void print_raw_text(char *p)
-{
-        while (*p != '\0') {
-                if (*p == '\n') {
-                        printf("\\n");
-                } else {
-                        putchar(*p);
-                }
-                p++;
-        }
 }
 
 TEST(cAT, var_access)

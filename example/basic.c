@@ -42,6 +42,7 @@ static bool quit_flag;
 /* run command handler with application dependent login print code */
 static int print_run(const cat_command *cmd)
 {
+        (void)cmd; // Unused
         printf("some printing at (%d,%d) with text \"%s\"\n", x, y, message);
         return 0;
 }
@@ -49,38 +50,42 @@ static int print_run(const cat_command *cmd)
 /* run command handler attached to HELP command for printing commands list */
 static int print_cmd_list(const cat_command *cmd)
 {
+        (void)cmd; // Unused
+
         return CAT_RETURN_STATE_PRINT_CMD_LIST_OK;
 }
 
 /* run command handler with custom exit mechanism */
 static int quit_run(const cat_command *cmd)
 {
+        (void)cmd; // Unused
+
         quit_flag = true;
         return 0;
 }
 
 /* declaring print variables array */
 static cat_variable print_vars[] = { {
-                                                    .type = CAT_VAR_UINT_DEC,
-                                                    .data = &x,
-                                                    .data_size = sizeof(x),
-                                                    .name = "X",
-                                                    .access = CAT_VAR_ACCESS_READ_WRITE,
-                                            },
-                                            {
-                                                    .type = CAT_VAR_UINT_DEC,
-                                                    .data = &y,
-                                                    .data_size = sizeof(y),
-                                                    .name = "Y",
-                                                    .access = CAT_VAR_ACCESS_READ_WRITE,
-                                            },
-                                            {
-                                                    .type = CAT_VAR_BUF_STRING,
-                                                    .data = message,
-                                                    .data_size = sizeof(message),
-                                                    .name = "MESSAGE",
-                                                    .access = CAT_VAR_ACCESS_READ_WRITE,
-                                            } };
+                                             .type = CAT_VAR_UINT_DEC,
+                                             .data = &x,
+                                             .data_size = sizeof(x),
+                                             .name = "X",
+                                             .access = CAT_VAR_ACCESS_READ_WRITE,
+                                     },
+                                     {
+                                             .type = CAT_VAR_UINT_DEC,
+                                             .data = &y,
+                                             .data_size = sizeof(y),
+                                             .name = "Y",
+                                             .access = CAT_VAR_ACCESS_READ_WRITE,
+                                     },
+                                     {
+                                             .type = CAT_VAR_BUF_STRING,
+                                             .data = message,
+                                             .data_size = sizeof(message),
+                                             .name = "MESSAGE",
+                                             .access = CAT_VAR_ACCESS_READ_WRITE,
+                                     } };
 
 /* declaring commands array */
 static cat_command cmds[] = {
@@ -98,7 +103,7 @@ static cat_command cmds[] = {
 };
 
 /* working buffer */
-static char buf[128];
+static uint8_t buf[128];
 
 /* declaring parser descriptor */
 static cat_command_group cmd_group = {
@@ -123,7 +128,7 @@ static int write_char(char ch)
 
 static int read_char(char *ch)
 {
-        *ch = getc(stdin);
+        *ch = (char)getc(stdin);
         return 1;
 }
 

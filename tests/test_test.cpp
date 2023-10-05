@@ -48,7 +48,7 @@ static cat_return_state a_test(const cat_command *cmd, char *data, size_t *data_
         return CAT_RETURN_STATE_DATA_OK;
 }
 
-static cat_return_state ap_test(const cat_command *cmd, char *data, size_t *data_size, size_t max_data_size)
+static cat_return_state ap_test(const cat_command *cmd, char *, size_t *data_size, size_t )
 {
         strcat(test_results, " AP:");
         strcat(test_results, cmd->name);
@@ -82,7 +82,7 @@ static cat_return_state apw_write(const cat_command *cmd, const char *data, size
         return CAT_RETURN_STATE_DATA_OK;
 }
 
-static cat_return_state test_test(const cat_command *cmd, char *data, size_t *data_size, size_t max_data_size)
+static cat_return_state test_test(const cat_command *cmd, char *, size_t *, size_t )
 {
         strcat(test_results, " +TEST:");
         strcat(test_results, cmd->name);

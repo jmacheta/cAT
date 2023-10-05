@@ -73,6 +73,7 @@ static int scan_index;
 /* run command handler with custom exit mechanism */
 static int quit_run(const cat_command *cmd)
 {
+        (void)cmd; // Unused
         quit_flag = true;
         return 0;
 }
@@ -86,17 +87,21 @@ static void load_scan_results(int index)
 
 /* declaring scan variables array */
 static cat_variable scan_vars[] = { { .type = CAT_VAR_INT_DEC, .data = &rssi, .data_size = sizeof(rssi), .name = "RSSI" },
-                                           { .type = CAT_VAR_BUF_STRING, .data = ssid, .data_size = sizeof(ssid), .name = "SSID" } };
+                                    { .type = CAT_VAR_BUF_STRING, .data = ssid, .data_size = sizeof(ssid), .name = "SSID" } };
 
 /* forward declaration */
-static cat_return_state scan_read(const cat_command *cmd, uint8_t *data, size_t *data_size, const size_t max_data_size);
+static cat_return_state scan_read(const cat_command *cmd, char *data, size_t *data_size, const size_t max_data_size);
 
 /* unsolicited command */
 static cat_command scan_cmd = { .name = "+SCAN", .read = scan_read, .var = scan_vars, .var_num = sizeof(scan_vars) / sizeof(scan_vars[0]) };
 
 /* unsolicited read callback handler */
-static cat_return_state scan_read(const cat_command *cmd, uint8_t *data, size_t *data_size, const size_t max_data_size)
+static cat_return_state scan_read(const cat_command *cmd, char *data, size_t *data_size, const size_t max_data_size)
 {
+        (void)cmd; // Unused
+        (void)data; // Unused
+        (void)data_size; // Unused
+        (void)max_data_size; // Unused
         int max = (mode == 0) ? 3 : 1;
 
         scan_index++;
@@ -112,14 +117,21 @@ static cat_return_state scan_read(const cat_command *cmd, uint8_t *data, size_t 
 /* mode variable validator */
 static int mode_write(const cat_variable *var, const size_t write_size)
 {
+        (void)write_size; // Unused
+
         if (*(int *)var->data >= 2)
                 return -1;
         return 0;
 }
 
 /* start write callback handler */
-static cat_return_state start_write(const cat_command *cmd, const uint8_t *data, const size_t data_size, const size_t args_num)
+static cat_return_state start_write(const cat_command *cmd, const char *data, const size_t data_size, const size_t args_num)
 {
+        (void)cmd; // Unused;
+        (void)data; // Unused;
+        (void)data_size; // Unused;
+        (void)args_num; // Unused;
+
         scan_index = 0;
 
         load_scan_results(scan_index);
@@ -131,6 +143,7 @@ static cat_return_state start_write(const cat_command *cmd, const uint8_t *data,
 /* run command handler attached to HELP command for printing commands list */
 static int print_cmd_list(const cat_command *cmd)
 {
+        (void)cmd; // Unused
         return CAT_RETURN_STATE_PRINT_CMD_LIST_OK;
 }
 
@@ -161,7 +174,7 @@ static cat_command cmds[] = {
 };
 
 /* working buffer */
-static char buf[128];
+static uint8_t buf[128];
 
 /* declaring parser descriptor */
 static cat_command_group cmd_group = {
@@ -188,7 +201,7 @@ static int write_char(char ch)
 
 static int read_char(char *ch)
 {
-        *ch = getc(stdin);
+        *ch = (char)getc(stdin);
         return 1;
 }
 

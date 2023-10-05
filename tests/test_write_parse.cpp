@@ -26,9 +26,9 @@ SOFTWARE.
 #include <stdint.h>
 #include <string.h>
 #include <stdbool.h>
-
+#include <inttypes.h>
 #include <assert.h>
-
+#include <inttypes.h>
 #include <cat/cat.h>
 #include <gtest/gtest.h>
 static char write_results[256];
@@ -40,19 +40,19 @@ static int8_t var1b, var2b, var3b;
 static char const *input_text;
 static size_t input_index;
 
-static cat_return_state cmd_write1(const cat_command *cmd, const char *data, size_t data_size, size_t args_num)
+static cat_return_state cmd_write1(const cat_command *, const char *data, size_t data_size, size_t args_num)
 {
         char tmp[32];
-        sprintf(tmp, " CMD1_%ld:", args_num);
+        sprintf(tmp, " CMD1_%" PRIuMAX ":", static_cast<uintmax_t>(args_num));
         strcat(write_results, tmp);
         strncat(write_results, data, data_size);
         return CAT_RETURN_STATE_DATA_OK;
 }
 
-static cat_return_state cmd_write3(const cat_command *cmd, const char *data, size_t data_size, size_t args_num)
+static cat_return_state cmd_write3(const cat_command *, const char *data, size_t data_size, size_t args_num)
 {
         char tmp[32];
-        sprintf(tmp, " CMD3_%ld:", args_num);
+        sprintf(tmp, " CMD3_%" PRIuMAX ":", static_cast<uintmax_t>(args_num));
         strcat(write_results, tmp);
         strncat(write_results, data, data_size);
         return CAT_RETURN_STATE_DATA_OK;

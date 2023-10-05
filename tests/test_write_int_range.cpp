@@ -42,7 +42,7 @@ static int32_t var3, var3b;
 static char const *input_text;
 static size_t input_index;
 
-static cat_return_state cmd_write(const cat_command *cmd, const char *data, size_t data_size, size_t args_num)
+static cat_return_state cmd_write(const cat_command *, const char *data, size_t data_size, size_t )
 {
         strcat(write_results, " CMD:");
         strncat(write_results, data, data_size);
